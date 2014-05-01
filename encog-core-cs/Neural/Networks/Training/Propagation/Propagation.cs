@@ -369,11 +369,13 @@ namespace Encog.Neural.Networks.Training.Propagation
         protected internal void Learn()
         {
             double[] weights = _flat.Weights;
-            for (int i = 0; i < Gradients.Length; i++)
+            Parallel.For(0, Gradients.Length, i =>
+            //for (int i = 0; i < Gradients.Length; i++)
             {
                 weights[i] += UpdateWeight(Gradients, _lastGradient, i);
                 Gradients[i] = 0;
             }
+            );
         }
 
         /// <summary>
