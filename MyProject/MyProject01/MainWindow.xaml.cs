@@ -21,6 +21,7 @@ using Encog.ML.Train;
 using System.Diagnostics;
 using System.Threading;
 using MyProject01.Util;
+using System.Threading.Tasks;
 
 namespace MyProject01
 {
@@ -29,42 +30,72 @@ namespace MyProject01
     /// </summary>
     public partial class MainWindow : Window
     {
+        private delegate void func();
+        private Thread workThread;
+
         public MainWindow()
         {
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
+            this.Closing += MainWindow_Closing;
+
+            OutputTextBox.Text = "";
+            OutputTextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            
+            OutputTextBox.Foreground = Brushes.Green;
+            OutputTextBox.Background = Brushes.Black;
+
+        }
+
+        void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (null == workThread)
+                return;
+            workThread.Abort();
+
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            /*
-            XORHelloWorld obj = new XORHelloWorld();
-            obj.Execute();
-            */
-
-            /*
-            DataLoader loader = new DataLoader("data.csv");
-
-            foreach (RateSet rateSet in loader)
+            LogFile.FuncList.Add(new LogFile.WriteLineFunction(WriteText));
+            workThread = new Thread(new ThreadStart(MainWorkFunction));
+            workThread.Start();
+        }
+        private void CloseWindows()
+        {
+            this.Dispatcher.BeginInvoke(new func(delegate
             {
-                printf(rateSet.Date.ToShortDateString() + ": " + rateSet.Value.ToString() + "\r\n");
-            }
-            */
+                this.Close();
+            }));
+        }
+        private void WriteText(string str)
+        {
+            this.Dispatcher.BeginInvoke(new func(delegate
+            {
+                OutputTextBox.AppendText(str + "\r\n");
+                OutputTextBox.ScrollToEnd();
+            }));
+        }
+        
 
+        private void MainWorkFunction()
+        {
+            TestANN();
+            // CloseWindows();
+        }
+
+        private void TestANN()
+        {
             XORHelloWorld test = new XORHelloWorld();
             test.Execute();
-            printf("=== End!\r\n");
-
-        }
-        private void printf(string str)
-        {
-            System.Console.Write(str);
         }
     }
     
 
     public class XORHelloWorld
     {
+        private LogWriter logger;
+        private LogWriter resultLog;
         /// <summary>
         /// Input for the XOR function.
         /// </summary>
@@ -93,9 +124,14 @@ namespace MyProject01
         /// <param name="app">Holds arguments and other info.</param>
         public void Execute()
         {
+            // init log
+            logger = new LogWriter("log.txt");
+            resultLog = new LogWriter("Results.txt");
+
+            //
             const int dataLenth = 10;
             const int dataInv = 1;
-            const int dataSetNum = 15;
+            const int dataSetNum = 19;
             const int trainNum = 10;
             double[][] input = new double[dataSetNum][];
             double[][] output = new double[dataSetNum][];
@@ -111,12 +147,12 @@ namespace MyProject01
                 currDate = currDate.AddDays(dataInv);
             }
 
-
+            
 
             // create a neural network, without using a factory
             var network = new BasicNetwork();
             network.AddLayer(new BasicLayer(null, true, dataLenth));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, dataLenth*3));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(dataLenth*10000)));
             network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, 1));
             network.Structure.FinalizeStructure();
             network.Reset();
@@ -130,67 +166,90 @@ namespace MyProject01
             IMLDataSet trainingSet = new BasicMLDataSet(trainInput, trainOutput);
 
             // train the neural network
-            IMLTrain train = new ResilientPropagation(network, trainingSet);
+            var train = new ResilientPropagation(network, trainingSet);
+            train.ThreadCount = 16;
 
-            int epoch = 1;
+            int epoch = 8;
 
             do
             {
                 train.Iteration();
                 // if(epoch%1 == 1 )
-                    Console.WriteLine(@"Epoch #" + epoch + @" Error:" + train.Error);
+                    LogPrintf(@"Epoch #" + epoch + @" Error:" + train.Error);
                 epoch++;
                 if (epoch > 1000)
                     break;
-            } while (train.Error > 0.01);
+            } while (train.Error > 0.005);
 
             // test the neural network
-            Console.WriteLine(@"Neural Network Results:");
+            ResultPrintf(@"Neural Network Results:");
             int loopCnt = 1;
             foreach (IMLDataPair pair in dataSet)
             {
                 IMLData res = network.Compute(pair.Input);
-                Console.WriteLine(loopCnt.ToString("d2")+ @": actual=" + res[0] + 
+                ResultPrintf(loopCnt.ToString("d2") + @": actual=" + res[0] + 
                     @",ideal=" + pair.Ideal[0] + ",radio=" + (Math.Abs(res[0]-pair.Ideal[0])/pair.Ideal[0]*100));
                 loopCnt++;
             }
+
+            LogPrintf("Test end!");
+            LogPrintf("");
         }
 
         #endregion
+        private void LogPrintf(string str)
+        {
+            logger.WriteLine(str);
+            LogFile.WriteLine(str);
+        }
+        private void ResultPrintf(string str)
+        {
+            resultLog.WriteLine(str);
+        }
+
     }
     class LogFile
     {
+        public delegate void WriteLineFunction(string str);
+        public static List<WriteLineFunction> FuncList;
         static string _logFileName = "log.txt";
         static private bool isStart = false;
-
-        static private void Init()
+        static LogFile()
         {
-            
-        }
-        static public void Printf(string str)
-        {
-
-           
-
+            FuncList = new List<WriteLineFunction>();
         }
 
+        public static void WriteLine(string str)
+        {
+            foreach (WriteLineFunction func in FuncList)
+            {
+                func(str);
+            }
+        }
     }
     class RateDataCreator
     {
         private const string _dataFile = "data.csv";
         private DataLoader _loader;
         private int _dateLength = 0;
-        public RateDataCreator(int dateLength)
+        private int index = 0;
+        public RateDataCreator()
         {
             _loader = new DataLoader(_dataFile);
-            _dateLength = dateLength;
+            Reset();
         }
-        public double[][] GetData(DateTime date)
+        public void Reset()
         {
-            double[][] dataArrContainer= new double[2][];
-            dataArrContainer[0] = _loader.GetArr(date, _dateLength);
-            dataArrContainer[1] = _loader.GetArr(date.AddDays(_dateLength));
-            return dataArrContainer;
+            index = 0;
+        }
+        public
+        public RateSet GetData(int index)
+        {
+            return _loader[index].Clone();
+        }
+        public double[] GetData(int startIndex, int length)
+        {
+            return _loader.GetArr(startIndex, length);
         }
         
 
