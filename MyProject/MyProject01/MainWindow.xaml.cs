@@ -22,6 +22,8 @@ using System.Diagnostics;
 using System.Threading;
 using MyProject01.Util;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace MyProject01
 {
@@ -39,12 +41,16 @@ namespace MyProject01
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
             this.Closing += MainWindow_Closing;
 
+
             OutputTextBox.Text = "";
             OutputTextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             
             OutputTextBox.Foreground = Brushes.Green;
             OutputTextBox.FontSize = 12;
             OutputTextBox.Background = Brushes.Black;
+
+            // Set lowest priority
+            System.Diagnostics.Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 
         }
 
@@ -60,6 +66,7 @@ namespace MyProject01
         {
             LogFile.FuncList.Add(new LogFile.WriteLineFunction(WriteText));
             workThread = new Thread(new ThreadStart(MainWorkFunction));
+            workThread.Priority = ThreadPriority.BelowNormal;
             workThread.Start();
         }
         private void CloseWindows()
@@ -97,27 +104,16 @@ namespace MyProject01
     {
         private LogWriter logger;
         private LogWriter resultLog;
-        /// <summary>
-        /// Input for the XOR function.
-        /// </summary>
-        public static double[][] XORInput = {
-            new[] {0.0, 0.0},
-            new[] {1.0, 0.0},
-            new[] {0.0, 1.0},
-            new[] {1.0, 1.0}
-        };
+        private const string networkFileName = "network.bin";
 
-        /// <summary>
-        /// Ideal output for the XOR function.
-        /// </summary>
-        public static double[][] XORIdeal = {
-            new[] {0.0},
-            new[] {1.0},
-            new[] {1.0},
-            new[] {0.0}
-        };
+        public XORHelloWorld()
+        {
+            // init log
+            logger = new LogWriter("log.txt");
+            resultLog = new LogWriter("Results.txt");
 
-       #region IExample Members
+        }
+
 
         /// <summary>
         /// Program entry point.
@@ -125,39 +121,26 @@ namespace MyProject01
         /// <param name="app">Holds arguments and other info.</param>
         public void Execute()
         {
-            // init log
-            logger = new LogWriter("log.txt");
-            resultLog = new LogWriter("Results.txt");
+            ResultPrintf(@"------------------------");
+            LogPrintf("Test Start!");
 
             RateDataCreator dataCreator = new RateDataCreator();
             TestData data = dataCreator.GetTestData();
 
-            // create a neural network, without using a factory
-            var network = new BasicNetwork();
-            network.AddLayer(new BasicLayer(null, true, data.inputCount));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(data.inputCount*10000)));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, data.outputCount));
-            network.Structure.FinalizeStructure();
-            network.Reset();
-
-            // create training data
-            IMLDataSet trainingSet = new BasicMLDataSet(data.trainInputs, data.trainIdeaOutputs);
-
-            // train the neural network
-            var train = new ResilientPropagation(network, trainingSet);
-            train.ThreadCount = 16;
-
-            int epoch = 1;
-
-            do
+            BasicNetwork network = null;
+            if( false )
             {
-                train.Iteration();
-                // if(epoch%1 == 1 )
-                    LogPrintf(@"Epoch #" + epoch + @" Error:" + train.Error);
-                epoch++;
-                if (epoch > 1000)
-                    break;
-            } while (train.Error > 0.01);
+                // Create a new trained netwrok
+                network = CreateNetwork(data);
+            }
+            else
+            {
+                // Create network from file.
+                network = LoadNetwrokFromFile();
+            }
+
+            if (null == network)
+                throw (new Exception("Empty Network."));
 
             // test the neural network
             //   test train data
@@ -218,12 +201,73 @@ namespace MyProject01
 
             }
 
-
             LogPrintf("Test end!");
             LogPrintf("");
         }
 
-        #endregion
+        public TestData CreateTestData()
+        {
+            RateDataCreator dataCreator = new RateDataCreator();
+            TestData data = dataCreator.GetTestData();
+            return data;
+        }
+
+        public BasicNetwork CreateNetwork(TestData data)
+        {
+            // create a neural network, without using a factory
+            var network = new BasicNetwork();
+            network.AddLayer(new BasicLayer(null, true, data.inputCount));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(data.inputCount * 2)));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, data.outputCount));
+            network.Structure.FinalizeStructure();
+            network.Reset();
+
+            // create training data
+            IMLDataSet trainingSet = new BasicMLDataSet(data.trainInputs, data.trainIdeaOutputs);
+
+            // train the neural network
+            var train = new ResilientPropagation(network, trainingSet);
+            train.ThreadCount = 8;
+
+            int epoch = 1;
+
+            do
+            {
+                train.Iteration();
+                // if(epoch%1 == 1 )
+                LogPrintf(@"Epoch #" + epoch + @" Error:" + train.Error);
+                // Save network each train.
+                SaveNetworkToFile(network);
+                epoch++;
+                if (epoch > 1000)
+                    break;
+            } while (train.Error > 0.03);
+
+            return network;
+        }
+
+        // Save network class to file.
+        private void SaveNetworkToFile(BasicNetwork network)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(networkFileName, FileMode.Create);
+            formatter.Serialize(stream, network);
+            stream.Flush();
+            stream.Close();
+        }
+        private BasicNetwork LoadNetwrokFromFile()
+        {
+            if (File.Exists(networkFileName) == false)
+                return null;
+
+            BasicNetwork network;
+            BinaryFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(networkFileName, FileMode.Open);
+            network = (BasicNetwork)formatter.Deserialize(stream);
+            stream.Close();
+
+            return network;
+        }
         private void LogPrintf(string str)
         {
             logger.WriteLine(str);
@@ -239,8 +283,6 @@ namespace MyProject01
     {
         public delegate void WriteLineFunction(string str);
         public static List<WriteLineFunction> FuncList;
-        static string _logFileName = "log.txt";
-        static private bool isStart = false;
         static LogFile()
         {
             FuncList = new List<WriteLineFunction>();
@@ -254,7 +296,7 @@ namespace MyProject01
             }
         }
     }
-    class TestData
+    public class TestData
     {
         public bool isSet = false;
         public int inputCount;
@@ -274,8 +316,6 @@ namespace MyProject01
     {
         private const string _dataFile = "data.csv";
         private DataLoader _loader;
-        private int _dateLength = 0;
-        private int index = 0;
 
         private const int inputCount = 14;
         private const int outputCount = 4;
@@ -285,11 +325,6 @@ namespace MyProject01
         public RateDataCreator()
         {
             _loader = new DataLoader(_dataFile);
-            Reset();
-        }
-        public void Reset()
-        {
-            index = 0;
         }
         public TestData GetTestData()
         {
