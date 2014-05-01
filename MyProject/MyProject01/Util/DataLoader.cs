@@ -18,6 +18,10 @@ namespace MyProject01.Util
         {
             return Date.ToShortDateString() + ": " + Value.ToString();
         }
+        public RateSet Clone()
+        {
+            return (RateSet)MemberwiseClone();
+        }
     }
     class DataLoader : List<RateSet>
     {
@@ -72,6 +76,17 @@ namespace MyProject01.Util
             return GetArr(startDate, startDate.AddDays(days));
         }
 
+        public double[] GetArr(int startIndex, int length)
+        {
+            if ((startIndex + length) > this.Count)
+                return null;
+            double[] res = new double[length];
+            for (int i = 0; i < length; i++)
+            {
+                res[i] = this[startIndex + i].Value;
+            }
+            return res;
+        }
         public double[] GetArr(DateTime startDate, DateTime endDate)
         {
             if( endDate < startDate)
@@ -114,6 +129,7 @@ namespace MyProject01.Util
             }
 
             _dataRadio = (_dataMaxValue - _dataMinValue) / (_targDataMax - _targDataMin);
+            _dataRadio *= 2; // output value maybe large than inputs.
             _dataOffset = _dataMinValue - _targDataMin;
 
             foreach (RateSet data in this)

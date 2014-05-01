@@ -43,6 +43,7 @@ namespace MyProject01
             OutputTextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             
             OutputTextBox.Foreground = Brushes.Green;
+            OutputTextBox.FontSize = 12;
             OutputTextBox.Background = Brushes.Black;
 
         }
@@ -128,48 +129,25 @@ namespace MyProject01
             logger = new LogWriter("log.txt");
             resultLog = new LogWriter("Results.txt");
 
-            //
-            const int dataLenth = 10;
-            const int dataInv = 1;
-            const int dataSetNum = 19;
-            const int trainNum = 10;
-            double[][] input = new double[dataSetNum][];
-            double[][] output = new double[dataSetNum][];
-            RateDataCreator dataCreator = new RateDataCreator(dataLenth);
-            DateTime startDate = DateTime.Parse("2013/4/20");
-            DateTime currDate = startDate;
-            for (int i = 0; i < dataSetNum; i++)
-            {
-                double[][] res = dataCreator.GetData(currDate);
-                input[i] = res[0];
-                output[i] = res[1];
-
-                currDate = currDate.AddDays(dataInv);
-            }
-
-            
+            RateDataCreator dataCreator = new RateDataCreator();
+            TestData data = dataCreator.GetTestData();
 
             // create a neural network, without using a factory
             var network = new BasicNetwork();
-            network.AddLayer(new BasicLayer(null, true, dataLenth));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(dataLenth*10000)));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, 1));
+            network.AddLayer(new BasicLayer(null, true, data.inputCount));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(data.inputCount*10000)));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, data.outputCount));
             network.Structure.FinalizeStructure();
             network.Reset();
 
             // create training data
-            IMLDataSet dataSet = new BasicMLDataSet(input, output);
-            double[][] trainInput = new double[trainNum][];
-            double[][] trainOutput = new double[trainNum][];
-            Array.Copy(input, trainInput, trainNum);
-            Array.Copy(output, trainOutput, trainNum);
-            IMLDataSet trainingSet = new BasicMLDataSet(trainInput, trainOutput);
+            IMLDataSet trainingSet = new BasicMLDataSet(data.trainInputs, data.trainIdeaOutputs);
 
             // train the neural network
             var train = new ResilientPropagation(network, trainingSet);
             train.ThreadCount = 16;
 
-            int epoch = 8;
+            int epoch = 1;
 
             do
             {
@@ -179,18 +157,67 @@ namespace MyProject01
                 epoch++;
                 if (epoch > 1000)
                     break;
-            } while (train.Error > 0.005);
+            } while (train.Error > 0.01);
 
             // test the neural network
-            ResultPrintf(@"Neural Network Results:");
-            int loopCnt = 1;
-            foreach (IMLDataPair pair in dataSet)
+            //   test train data
+            data.trainRealOutputs = new double[data.trainInputs.Length][];
+            for(int i=0;i<data.trainInputs.Length;i++)
             {
-                IMLData res = network.Compute(pair.Input);
-                ResultPrintf(loopCnt.ToString("d2") + @": actual=" + res[0] + 
-                    @",ideal=" + pair.Ideal[0] + ",radio=" + (Math.Abs(res[0]-pair.Ideal[0])/pair.Ideal[0]*100));
-                loopCnt++;
+                IMLData res = network.Compute(new BasicMLData(data.trainInputs[i]));
+                double[] realArr = new double[data.outputCount];
+                res.CopyTo(realArr, 0, data.outputCount);
+                data.trainRealOutputs[i] = realArr;
             }
+
+            //   test test data
+            double[][] ideals = new double[data.trainInputs.Length][];
+            data.testRealOutputs = new double[data.testInputs.Length][];
+            for(int i=0;i<data.testRealOutputs.Length;i++)
+            {
+                IMLData res = network.Compute(new BasicMLData(data.trainInputs[i]));
+                double[] realArr = new double[data.outputCount];
+                res.CopyTo(realArr, 0, data.outputCount);
+                data.testRealOutputs[i] = realArr;
+            }
+
+
+            // Output results.
+            int loopCnt = 1;
+            ResultPrintf(@"------------------------");
+            ResultPrintf(@"Neural Network Results:");
+            ResultPrintf("Tain data:");
+            for (int i = 0; i < data.trainInputs.Length; i++)
+            {
+                string str = "";
+                str += loopCnt.ToString("d2");
+                str += ": =";
+                for (int j = 0; j < data.outputCount; j++)
+                {
+                    str += ((data.trainRealOutputs[i][j] - data.trainIdeaOutputs[i][j]) / data.trainIdeaOutputs[i][j] * 100).ToString("000.0000");
+                    str += ",\t";
+                }
+                ResultPrintf(str);
+                loopCnt++;
+               
+            }
+            loopCnt = 1;
+            ResultPrintf("Test data:");
+            for (int i = 0; i < data.testInputs.Length; i++)
+            {
+                string str = "";
+                str += loopCnt.ToString("d2");
+                str += ": =";
+                for (int j = 0; j < data.outputCount; j++)
+                {
+                    str += ((data.testRealOutputs[i][j] - data.testIdeaOutputs[i][j]) / data.testIdeaOutputs[i][j] * 100).ToString("000.0000");
+                    str += ",\t";
+                }
+                ResultPrintf(str);
+                loopCnt++;
+
+            }
+
 
             LogPrintf("Test end!");
             LogPrintf("");
@@ -227,12 +254,34 @@ namespace MyProject01
             }
         }
     }
+    class TestData
+    {
+        public bool isSet = false;
+        public int inputCount;
+        public int outputCount;
+
+        public double[][] trainInputs;
+        public double[][] trainIdeaOutputs;
+        public double[][] trainRealOutputs;
+
+        public double[][] testInputs;
+        public double[][] testIdeaOutputs;
+        public double[][] testRealOutputs;
+
+        
+    }
     class RateDataCreator
     {
         private const string _dataFile = "data.csv";
         private DataLoader _loader;
         private int _dateLength = 0;
         private int index = 0;
+
+        private const int inputCount = 14;
+        private const int outputCount = 4;
+        private const int testSetCount = 5;
+        private const int dataInv = 1;
+
         public RateDataCreator()
         {
             _loader = new DataLoader(_dataFile);
@@ -242,7 +291,53 @@ namespace MyProject01
         {
             index = 0;
         }
-        public
+        public TestData GetTestData()
+        {
+
+            // check data is enough
+            int inputCount = RateDataCreator.inputCount;
+            int outputCount = RateDataCreator.outputCount;
+            int dataInv = RateDataCreator.dataInv;
+            int testSetCount = RateDataCreator.testSetCount;
+            int setCount = (_loader.Count - inputCount - outputCount + dataInv)/dataInv;
+            int trainSetCount = setCount - testSetCount;
+            
+            if( trainSetCount < 0 )
+                return null;
+
+            double[][] inputs = new double[trainSetCount][];
+            double[][] outputs = new double[trainSetCount][];
+            double[][] testInputs = new double[testSetCount][];
+            double[][] testOutputs = new double[testSetCount][];
+            int index = 0;
+
+            // Create train data sets.
+            for(int i=0;i<trainSetCount;i++)
+            {
+                inputs[i] = _loader.GetArr(index, inputCount);
+                outputs[i] = _loader.GetArr(index + inputCount, outputCount);
+                index += dataInv;
+            }
+
+            // Create test data sets.
+            for(int i=0;i<testSetCount;i++)
+            {
+                testInputs[i] = _loader.GetArr(index, inputCount);
+                testOutputs[i] = _loader.GetArr(index + inputCount, outputCount);
+                index += dataInv;
+            }
+
+            TestData data = new TestData();
+            data.isSet = false;
+            data.inputCount = inputCount;
+            data.outputCount = outputCount;
+            data.trainInputs = inputs;
+            data.trainIdeaOutputs = outputs;
+            data.testInputs = testInputs;
+            data.testIdeaOutputs = testOutputs;
+
+            return data;
+        }
         public RateSet GetData(int index)
         {
             return _loader[index].Clone();
