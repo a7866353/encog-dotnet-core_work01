@@ -13,6 +13,11 @@ namespace MyProject01.Util
         public LogWriter(string file_name)
         {
             this._fileName = file_name;
+            if (false)
+            {
+                StreamWriter sw = new StreamWriter(_fileName, false);
+                sw.Close();
+            }
         }
         public void SetFileName(string fileName)
         {
