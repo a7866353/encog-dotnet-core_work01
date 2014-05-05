@@ -60,6 +60,8 @@
     </ApplicationDefinition>
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\LogWriter.cs" />
+    <Compile Include="Util\MyTestData.cs" />
+    <Compile Include="Util\MyTestDataList.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

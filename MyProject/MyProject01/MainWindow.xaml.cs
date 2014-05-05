@@ -17,6 +17,7 @@ using Encog.ML.Data.Basic;
 using Encog.Engine.Network.Activation;
 using Encog.ML.Data;
 using Encog.Neural.Networks.Training.Propagation.Resilient;
+using Encog.Neural.Networks.Training.Propagation.Back;
 using Encog.ML.Train;
 using System.Diagnostics;
 using System.Threading;
@@ -24,6 +25,7 @@ using MyProject01.Util;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using Encog.Util.Simple;
 
 namespace MyProject01
 {
@@ -90,23 +92,121 @@ namespace MyProject01
         {
             TestANN();
             // CloseWindows();
+
+            // XORHelloWorld test = new XORHelloWorld();
+            // test.Execute();
         }
 
         private void TestANN()
         {
-            XORHelloWorld test = new XORHelloWorld();
-            test.Execute();
+            MyTest test = new MyTest();
+            string testName = "SimpleFeedFoward+BP";
+            int num = 1;
+            NetworkParm[] parmArr = new NetworkParm[]
+            {
+                new NetworkParm(testName+num++.ToString("D2"),0.03,  0.01,   500),
+                new NetworkParm(testName+num++.ToString("D2"),0.03,  0.1,    500),
+                new NetworkParm(testName+num++.ToString("D2"),0.03,  1,      500),
+                new NetworkParm(testName+num++.ToString("D2"),0.03,  10,     500),
+                new NetworkParm(testName+num++.ToString("D2"),0.03,  100,    500),
+                // new NetworkParm(testName+num++.ToString("D2"),0.03,  1000,   500),
+                // new NetworkParm("Test04",0.03,  10000,  100),
+                new NetworkParm(testName+num++.ToString("D2"),0.01,  0.01,   500),
+                new NetworkParm(testName+num++.ToString("D2"),0.01,  0.1,    500),
+                new NetworkParm(testName+num++.ToString("D2"),0.01,  1,      500),
+                new NetworkParm(testName+num++.ToString("D2"),0.01,  10,     500),
+                // new NetworkParm(testName+num++.ToString("D2"),0.01,  100,    500),
+                // new NetworkParm(testName+num++.ToString("D2"),0.01,  1000,   500),
+                // new NetworkParm("Test08",0.01,  10000,  100),
+                new NetworkParm(testName+num++.ToString("D2"),0.005, 0.01,   1000),
+                new NetworkParm(testName+num++.ToString("D2"),0.005, 0.1,    1000),
+                new NetworkParm(testName+num++.ToString("D2"),0.005, 1,      1000),
+                new NetworkParm(testName+num++.ToString("D2"),0.005, 10,     1000),
+                 new NetworkParm(testName+num++.ToString("D2"),0.0001, 100,     1000),
+               // new NetworkParm(testName+num++.ToString("D2"),0.005, 100,    500),
+                // new NetworkParm(testName+num++.ToString("D2"),0.005, 1000,   500),
+                // new NetworkParm("Test12",0.005, 10000,  100),
+            };
+            foreach (NetworkParm parm in parmArr)
+            {
+                test.Execute(parm);
+            }
         }
     }
-    
 
     public class XORHelloWorld
     {
+        /// <summary>
+        /// Input for the XOR function.
+        /// </summary>
+        public static double[][] XORInput = {
+            new[] {0.0, 0.0},
+            new[] {1.0, 0.0},
+            new[] {0.0, 1.0},
+            new[] {1.0, 1.0}
+        };
+
+        /// <summary>
+        /// Ideal output for the XOR function.
+        /// </summary>
+        public static double[][] XORIdeal = {
+            new[] {0.0},
+            new[] {1.0},
+            new[] {1.0},
+            new[] {0.0}
+        };
+
+         #region IExample Members
+
+        /// <summary>
+        /// Program entry point.
+        /// </summary>
+        /// <param name="app">Holds arguments and other info.</param>
+        public void Execute()
+        {
+            // create a neural network, without using a factory
+            var network = new BasicNetwork();
+            network.AddLayer(new BasicLayer(null, true, 2));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, 3*10000));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), false, 1));
+            network.Structure.FinalizeStructure();
+            network.Reset();
+
+            // create training data
+            IMLDataSet trainingSet = new BasicMLDataSet(XORInput, XORIdeal);
+
+            // train the neural network
+            IMLTrain train = new ResilientPropagation(network, trainingSet);
+
+            int epoch = 1;
+
+            do
+            {
+                train.Iteration();
+                Console.WriteLine(@"Epoch #" + epoch + @" Error:" + train.Error);
+                epoch++;
+            } while (train.Error > 0.00001);
+
+            // test the neural network
+            Console.WriteLine(@"Neural Network Results:");
+            foreach (IMLDataPair pair in trainingSet)
+            {
+                IMLData output = network.Compute(pair.Input);
+                Console.WriteLine(pair.Input[0] + @"," + pair.Input[1]
+                                  + @", actual=" + output[0] + @",ideal=" + pair.Ideal[0]);
+            }
+        }
+
+        #endregion
+    }
+
+    public class MyTest
+    {
         private LogWriter logger;
         private LogWriter resultLog;
-        private const string networkFileName = "network.bin";
+        private string networkFileName = "network.bin";
 
-        public XORHelloWorld()
+        public MyTest()
         {
             // init log
             logger = new LogWriter("log.txt");
@@ -119,24 +219,53 @@ namespace MyProject01
         /// Program entry point.
         /// </summary>
         /// <param name="app">Holds arguments and other info.</param>
-        public void Execute()
+        public void Execute(NetworkParm parm)
         {
+            logger.SetFileName(parm.name + "_log.txt");
+            logger.Reset();
+            resultLog.SetFileName(parm.name + "_result.txt");
+            resultLog.Reset();
+
             ResultPrintf(@"------------------------");
-            LogPrintf("Test Start!");
+            LogPrintf("Test Start!" + parm.name);
 
             RateDataCreator dataCreator = new RateDataCreator();
             TestData data = dataCreator.GetTestData();
 
+            if (false)
+            {
+                LogPrintf("[TestData]");
+                string dataStr = "";
+                for (int i = 0; i < data.TrainInputs.Length; i++)
+                {
+                    dataStr = i.ToString("D4") + ":";
+                    for (int j = 0; j < data.InputSize; j++)
+                    {
+                        dataStr += data.TrainInputs[i][j].ToString("0.000");
+                        dataStr += ", ";
+                    }
+                    dataStr += "| ";
+
+                    for (int j = 0; j < data.OutputSize; j++)
+                    {
+                        dataStr += data.TrainIdeaOutputs[i][j].ToString("0.000");
+                        dataStr += ", ";
+                    }
+                    LogPrintf(dataStr);
+                }
+            }
+
             BasicNetwork network = null;
-            if( false )
+            if( true )
             {
                 // Create a new trained netwrok
-                network = CreateNetwork(data);
+                // network = CreateNetwork(data,parm);
+                network = CreateNetwork02(data, parm);
             }
             else
             {
                 // Create network from file.
-                network = LoadNetwrokFromFile();
+                network = LoadNetwrokFromFile(parm.name);
             }
 
             if (null == network)
@@ -144,24 +273,21 @@ namespace MyProject01
 
             // test the neural network
             //   test train data
-            data.trainRealOutputs = new double[data.trainInputs.Length][];
-            for(int i=0;i<data.trainInputs.Length;i++)
+            foreach(MyTestData dataObj in data.TrainList)
             {
-                IMLData res = network.Compute(new BasicMLData(data.trainInputs[i]));
-                double[] realArr = new double[data.outputCount];
-                res.CopyTo(realArr, 0, data.outputCount);
-                data.trainRealOutputs[i] = realArr;
+                IMLData res = network.Compute(new BasicMLData(dataObj.Input));
+                double[] realArr = new double[data.OutputSize];
+                res.CopyTo(realArr, 0, data.OutputSize);
+                dataObj.Real = realArr;
             }
 
             //   test test data
-            double[][] ideals = new double[data.trainInputs.Length][];
-            data.testRealOutputs = new double[data.testInputs.Length][];
-            for(int i=0;i<data.testRealOutputs.Length;i++)
+            foreach (MyTestData dataObj in data.TestList)
             {
-                IMLData res = network.Compute(new BasicMLData(data.trainInputs[i]));
-                double[] realArr = new double[data.outputCount];
-                res.CopyTo(realArr, 0, data.outputCount);
-                data.testRealOutputs[i] = realArr;
+                IMLData res = network.Compute(new BasicMLData(dataObj.Input));
+                double[] realArr = new double[data.OutputSize];
+                res.CopyTo(realArr, 0, data.OutputSize);
+                dataObj.Real = realArr;
             }
 
 
@@ -169,100 +295,106 @@ namespace MyProject01
             int loopCnt = 1;
             ResultPrintf(@"------------------------");
             ResultPrintf(@"Neural Network Results:");
-            ResultPrintf("Tain data:");
-            for (int i = 0; i < data.trainInputs.Length; i++)
-            {
-                string str = "";
-                str += loopCnt.ToString("d2");
-                str += ": =";
-                for (int j = 0; j < data.outputCount; j++)
-                {
-                    str += ((data.trainRealOutputs[i][j] - data.trainIdeaOutputs[i][j]) / data.trainIdeaOutputs[i][j] * 100).ToString("000.0000");
-                    str += ",\t";
-                }
-                ResultPrintf(str);
-                loopCnt++;
-               
-            }
-            loopCnt = 1;
-            ResultPrintf("Test data:");
-            for (int i = 0; i < data.testInputs.Length; i++)
-            {
-                string str = "";
-                str += loopCnt.ToString("d2");
-                str += ": =";
-                for (int j = 0; j < data.outputCount; j++)
-                {
-                    str += ((data.testRealOutputs[i][j] - data.testIdeaOutputs[i][j]) / data.testIdeaOutputs[i][j] * 100).ToString("000.0000");
-                    str += ",\t";
-                }
-                ResultPrintf(str);
-                loopCnt++;
-
-            }
-
+            ResultPrintf(data.ToStringResults());
             LogPrintf("Test end!");
             LogPrintf("");
         }
 
-        public TestData CreateTestData()
+        public BasicNetwork CreateNetwork(TestData data, NetworkParm parm)
         {
-            RateDataCreator dataCreator = new RateDataCreator();
-            TestData data = dataCreator.GetTestData();
-            return data;
-        }
-
-        public BasicNetwork CreateNetwork(TestData data)
-        {
+            LogPrintf("[NetworkCreate]"+parm.ToString());
             // create a neural network, without using a factory
             var network = new BasicNetwork();
-            network.AddLayer(new BasicLayer(null, true, data.inputCount));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(data.inputCount * 2)));
-            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, data.outputCount));
+            network.AddLayer(new BasicLayer(null, true, data.InputSize));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(data.InputSize * parm.hidenLayerRaio)));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, data.OutputSize));
             network.Structure.FinalizeStructure();
             network.Reset();
 
             // create training data
-            IMLDataSet trainingSet = new BasicMLDataSet(data.trainInputs, data.trainIdeaOutputs);
+            IMLDataSet trainingSet = new BasicMLDataSet(data.TrainInputs, data.TrainIdeaOutputs);
 
             // train the neural network
             var train = new ResilientPropagation(network, trainingSet);
             train.ThreadCount = 8;
 
             int epoch = 1;
-
+            SlidingFilter filter = new SlidingFilter(5);
             do
             {
                 train.Iteration();
                 // if(epoch%1 == 1 )
                 LogPrintf(@"Epoch #" + epoch + @" Error:" + train.Error);
                 // Save network each train.
-                SaveNetworkToFile(network);
+                SaveNetworkToFile(network,parm.name);
                 epoch++;
-                if (epoch > 1000)
+                if (epoch > parm.retryCnt)
                     break;
-            } while (train.Error > 0.03);
+                if(filter.Add(train.Error) < parm.errorlimit)
+                    break;
+            } while (true);
+            train.FinishTraining();
+            SaveNetworkToFile(network, parm.name);
+
+            return network;
+        }
+        public BasicNetwork CreateNetwork02(TestData data, NetworkParm parm)
+        {
+            LogPrintf("[NetworkCreate]" + parm.ToString());
+            ResultPrintf("[NetworkCreate]" + parm.ToString());
+            // create a network
+            BasicNetwork network = EncogUtility.SimpleFeedForward(
+                data.InputSize,
+                (int)(data.InputSize * parm.hidenLayerRaio),
+                (int)(data.OutputSize * 10),
+                data.OutputSize,
+                true);
+            // create training data
+            IMLDataSet trainingSet = new BasicMLDataSet(data.TrainInputs, data.TrainIdeaOutputs);
+
+            // train the neural network
+            // var train = new Backpropagation(network, trainingSet);
+            var train = new ResilientPropagation(network, trainingSet);
+            train.ThreadCount = 8;
+
+            int epoch = 1;
+            SlidingFilter filter = new SlidingFilter(5);
+            do
+            {
+                train.Iteration();
+                // if(epoch%1 == 1 )
+                LogPrintf(@"Epoch #" + epoch + @" Error:" + train.Error);
+                // Save network each train.
+                SaveNetworkToFile(network, parm.name);
+                epoch++;
+                if (epoch > parm.retryCnt)
+                    break;
+                if (filter.Add(train.Error) < parm.errorlimit)
+                    break;
+            } while (true);
+            train.FinishTraining();
+            SaveNetworkToFile(network, parm.name);
 
             return network;
         }
 
         // Save network class to file.
-        private void SaveNetworkToFile(BasicNetwork network)
+        private void SaveNetworkToFile(BasicNetwork network, string filename)
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(networkFileName, FileMode.Create);
+            Stream stream = new FileStream(filename+".net", FileMode.Create);
             formatter.Serialize(stream, network);
             stream.Flush();
             stream.Close();
         }
-        private BasicNetwork LoadNetwrokFromFile()
+        private BasicNetwork LoadNetwrokFromFile(string filename)
         {
             if (File.Exists(networkFileName) == false)
                 return null;
 
             BasicNetwork network;
             BinaryFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(networkFileName, FileMode.Open);
+            Stream stream = new FileStream(filename+".net", FileMode.Open);
             network = (BasicNetwork)formatter.Deserialize(stream);
             stream.Close();
 
@@ -278,6 +410,37 @@ namespace MyProject01
             resultLog.WriteLine(str);
         }
 
+    }
+    class SlidingFilter
+    {
+        private double[] _dataArr;
+        private int _length;
+        private int _index;
+        private bool _isInit;
+        public SlidingFilter(int cnt)
+        {
+            _length = cnt;
+            _index = 0;
+            _dataArr = new double[cnt];
+            _isInit = false;
+        }
+        public double Add(double value)
+        {
+            if (false == _isInit)
+            {
+                for (int i = 0; i < _length; i++)
+                    _dataArr[i] = value;
+                _isInit = true;
+            }
+            else
+            {
+                _dataArr[_index] = value;
+            }
+            if (++_index >= _length)
+                _index = 0;
+
+            return _dataArr.Sum() / _length;
+        }
     }
     class LogFile
     {
@@ -296,30 +459,114 @@ namespace MyProject01
             }
         }
     }
+    public class NetworkParm
+    {
+        public string name;
+        public double errorlimit = 0.001;
+        public double hidenLayerRaio = 10000;
+        public int retryCnt;
+
+        public NetworkParm(string name, double error, double hidenLayerRaio, int retryCnt)
+        {
+            this.name = name;
+            this.errorlimit = error;
+            this.hidenLayerRaio = hidenLayerRaio;
+            this.retryCnt = retryCnt;
+        }
+
+        public override string ToString()
+        {
+            return "Err:" + errorlimit.ToString("G2") + " NeroRaio:" + hidenLayerRaio.ToString();
+        }
+    }
     public class TestData
     {
-        public bool isSet = false;
-        public int inputCount;
-        public int outputCount;
+        public MyTestDataList TrainList;
+        public MyTestDataList TestList;
+        public TestData(MyTestDataList trainList, MyTestDataList testList)
+        {
+            TrainList = trainList;
+            TestList = testList;
+        }
 
-        public double[][] trainInputs;
-        public double[][] trainIdeaOutputs;
-        public double[][] trainRealOutputs;
+        public int InputSize
+        {
+            get
+            {
+                return TrainList.InputSize;
+            }
+        }
+        public int OutputSize
+        {
+            get
+            {
+                return TrainList.OutputSize;
+            }
+        }
 
-        public double[][] testInputs;
-        public double[][] testIdeaOutputs;
-        public double[][] testRealOutputs;
+        public double[][] TrainInputs
+        {
+            get
+            {
+                return TrainList.Inputs;
+            }
+        }
+        public double[][] TrainIdeaOutputs
+        {
+            get
+            {
+                return TrainList.Ideals;
+            }
+        }
+        public double[][] TrainRealOutputs
+        {
+            get
+            {
+                return TrainList.Reals;
+            }
+        }
 
-        
+        public double[][] TestInputs
+        {
+            get
+            {
+                return TestList.Inputs;
+            }
+        }
+        public double[][] TestIdeaOutputs
+        {
+            get
+            {
+                return TestList.Ideals;
+            }
+        }
+        public double[][] TestRealOutputs
+        {
+            get
+            {
+                return TestList.Reals;
+            }
+        }
+
+        public string ToStringResults()
+        {
+            string str = "";
+            str += "Tain data:\r\n";
+            str += TrainList.ResultToString();
+            str += "Test data:\r\n";
+            str += TestList.ResultToString();
+            return str;
+        }
     }
+
     class RateDataCreator
     {
         private const string _dataFile = "data.csv";
         private DataLoader _loader;
 
         private const int inputCount = 14;
-        private const int outputCount = 4;
-        private const int testSetCount = 5;
+        private const int outputCount = 1;
+        private const int testSetCount = 20;
         private const int dataInv = 1;
 
         public RateDataCreator()
@@ -340,37 +587,36 @@ namespace MyProject01
             if( trainSetCount < 0 )
                 return null;
 
+            MyTestDataList trainList = new MyTestDataList();
+            MyTestDataList testList = new MyTestDataList();
+
             double[][] inputs = new double[trainSetCount][];
             double[][] outputs = new double[trainSetCount][];
             double[][] testInputs = new double[testSetCount][];
             double[][] testOutputs = new double[testSetCount][];
             int index = 0;
-
+            MyTestData dataObj;
             // Create train data sets.
             for(int i=0;i<trainSetCount;i++)
             {
-                inputs[i] = _loader.GetArr(index, inputCount);
-                outputs[i] = _loader.GetArr(index + inputCount, outputCount);
+                dataObj = new MyTestData();
+                dataObj.Input = _loader.GetArr(index, inputCount);
+                dataObj.Ideal = _loader.GetArr(index + inputCount, outputCount);
                 index += dataInv;
+                trainList.Add(dataObj);
             }
 
             // Create test data sets.
             for(int i=0;i<testSetCount;i++)
             {
-                testInputs[i] = _loader.GetArr(index, inputCount);
-                testOutputs[i] = _loader.GetArr(index + inputCount, outputCount);
+                dataObj = new MyTestData();
+                dataObj.Input = _loader.GetArr(index, inputCount);
+                dataObj.Ideal = _loader.GetArr(index + inputCount, outputCount);
                 index += dataInv;
+                testList.Add(dataObj);
             }
 
-            TestData data = new TestData();
-            data.isSet = false;
-            data.inputCount = inputCount;
-            data.outputCount = outputCount;
-            data.trainInputs = inputs;
-            data.trainIdeaOutputs = outputs;
-            data.testInputs = testInputs;
-            data.testIdeaOutputs = testOutputs;
-
+            TestData data = new TestData(trainList, testList);
             return data;
         }
         public RateSet GetData(int index)

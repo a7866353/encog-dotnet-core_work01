@@ -3,6 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <TextBox Name="OutputTextBox" HorizontalAlignment="Left" Height="322" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="508"/>
+        <TextBox Name="OutputTextBox"   TextWrapping="Wrap" Text="TextBox" Margin="0,0,0,0"/>
     </Grid>
 </Window>
