@@ -58,10 +58,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Test\FeedForwardNetworkTest.cs" />
+    <Compile Include="Test\NetworkTestParameter.cs" />
+    <Compile Include="Test\RateDataCreator.cs" />
+    <Compile Include="Test\TestData.cs" />
     <Compile Include="Util\DataLoader.cs" />
+    <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
     <Compile Include="Util\MyTestData.cs" />
     <Compile Include="Util\MyTestDataList.cs" />
+    <Compile Include="Util\SlidingFilter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

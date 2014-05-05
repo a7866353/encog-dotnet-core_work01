@@ -59,6 +59,20 @@ namespace MyProject01.Util
             return str;
 
         }
+        public double ResultError
+        {
+            get
+            {
+                double err = 0;
+                for (int i = 0; i < Count; i++)
+                {
+                    err += Math.Abs(this[i].GetError());
+                }
+                err /= Count;
+
+                return err;
+            }
+        }
 
         public double[][] Inputs
         {
