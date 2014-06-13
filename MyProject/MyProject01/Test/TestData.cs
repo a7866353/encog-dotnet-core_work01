@@ -80,8 +80,6 @@ namespace MyProject01.Test
             string str = "";
             str += "Test data:\r\n";
             str += TestList.ResultToString();
-            str += "Tain data:\r\n";
-            str += TrainList.ResultToString();
             return str;
         }
     }

@@ -11,6 +11,7 @@ namespace MyProject01.Test
         public double errorlimit = 0.001;
         public double hidenLayerRaio = 10000;
         public int retryCnt;
+        public int hidenLayerNum;
 
         public NetworkTestParameter(string name, double error, double hidenLayerRaio, int retryCnt)
         {
@@ -18,6 +19,11 @@ namespace MyProject01.Test
             this.errorlimit = error;
             this.hidenLayerRaio = hidenLayerRaio;
             this.retryCnt = retryCnt;
+        }
+        public NetworkTestParameter(string name, int hidenLayerNum)
+        {
+            this.name = name;
+            this.hidenLayerNum = hidenLayerNum;
         }
 
         public override string ToString()

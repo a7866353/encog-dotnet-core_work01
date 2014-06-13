@@ -15,17 +15,12 @@ using System.Text;
 
 namespace MyProject01.Test
 {
-    class FeedForwardNetworkTest
+    class FeedForwardNetworkTest : NetworkTest
     {
-        private LogWriter logger;
-        private LogWriter resultLog;
         private string networkFileName = "network.bin";
 
         public FeedForwardNetworkTest()
         {
-            // init log
-            logger = new LogWriter("log.txt");
-            resultLog = new LogWriter("Results.txt");
             string testName = "FeedFowardNetwork";
             int num = 1;
             NetworkTestParameter[] parmArr = new NetworkTestParameter[]
@@ -226,37 +221,7 @@ namespace MyProject01.Test
             return network;
         }
 
-        // Save network class to file.
-        private void SaveNetworkToFile(BasicNetwork network, string filename)
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(filename+".net", FileMode.Create);
-            formatter.Serialize(stream, network);
-            stream.Flush();
-            stream.Close();
-        }
-        private BasicNetwork LoadNetwrokFromFile(string filename)
-        {
-            if (File.Exists(networkFileName) == false)
-                return null;
 
-            BasicNetwork network;
-            BinaryFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(filename+".net", FileMode.Open);
-            network = (BasicNetwork)formatter.Deserialize(stream);
-            stream.Close();
-
-            return network;
-        }
-        private void LogPrintf(string str)
-        {
-            logger.WriteLine(str);
-            LogFile.WriteLine(str);
-        }
-        private void ResultPrintf(string str)
-        {
-            resultLog.WriteLine(str);
-        }
 
     }
 }

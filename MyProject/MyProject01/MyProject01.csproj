@@ -59,8 +59,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Test\FeedForwardNetworkTest.cs" />
+    <Compile Include="Test\NetworkTest.cs" />
     <Compile Include="Test\NetworkTestParameter.cs" />
     <Compile Include="Test\RateDataCreator.cs" />
+    <Compile Include="Test\ElmanNetworkTest.cs" />
     <Compile Include="Test\TestData.cs" />
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />

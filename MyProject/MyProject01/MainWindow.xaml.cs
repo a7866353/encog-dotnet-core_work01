@@ -100,7 +100,8 @@ namespace MyProject01
 
         private void TestANN()
         {
-            FeedForwardNetworkTest test = new FeedForwardNetworkTest();
+            // FeedForwardNetworkTest test = new FeedForwardNetworkTest();
+            ElmanNetworkTest test = new ElmanNetworkTest();
 
         }
     }
