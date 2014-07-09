@@ -3,9 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+
+using MongoDB.Driver;
+using MongoDB.Bson;
+
 namespace MyProject01.Util
 {
-    class RateSet
+    class MarketData
+    {
+        public ObjectId _id;
+        public string Data { get; set; }
+        public string MiddleRate { get; set; }
+
+    }
+
+     class DataProvider
+     {
+         public static string DatabaseName = "MarketRateDB";
+         public static string ConnectionString = @"mongodb://127.0.0.1";
+
+         public static MarketData[] GetAllMarketData()
+         {
+             MongoServer server = MongoServer.Create(ConnectionString);
+             if (null == server)
+             {
+                 throw (new Exception("Cannot connect to server!"));
+             }
+
+             MongoDatabase db = server.GetDatabase(DatabaseName); // Create a new Database or get a current Database
+
+             string collectionName = "MiddleRate";
+             MongoCollection collection = db.GetCollection(collectionName);
+
+             MongoCursor cursor = collection.FindAllAs<MarketData>();
+             List<MarketData> dataList = new List<MarketData>();
+             foreach (MarketData dataObj in cursor)
+             {
+                 dataList.Add(dataObj);
+             }
+             server.Disconnect();
+
+             MarketData[] dataArr = dataList.ToArray();
+             return dataArr;
+         }
+     }
+
+    public class RateSet
     {
         public DateTime Date;
         public double Value;
@@ -23,7 +66,7 @@ namespace MyProject01.Util
             return (RateSet)MemberwiseClone();
         }
     }
-    class DataLoader : List<RateSet>
+    public class DataLoader : List<RateSet>
     {
         private double _dataMaxValue;
         private double _dataMinValue;
@@ -33,29 +76,42 @@ namespace MyProject01.Util
         private const double _targDataMax = 1.0;
         private const double _targDataMin = 0.0;
 
-        public DataLoader(string path)
+        public DataLoader(string path=null)
         {
-            StreamReader sr = new StreamReader(path);
-            string str = null;
-            RateSet currRateSet;
-            // read title
-            str = sr.ReadLine();
-            while (true)
+            if (true != string.IsNullOrWhiteSpace(path))
             {
+                StreamReader sr = new StreamReader(path);
+                string str = null;
+                RateSet currRateSet;
+                // read title
                 str = sr.ReadLine();
-                if (str == null)
-                    break;
+                while (true)
+                {
+                    str = sr.ReadLine();
+                    if (str == null)
+                        break;
 
-                string[] strArr = str.Split(',');
-                // Data Check
-                if( string.IsNullOrWhiteSpace(strArr[0]) == true )
-                    continue;
-                if( string.IsNullOrWhiteSpace(strArr[1]) == true )
-                    continue;
-                currRateSet = new RateSet(DateTime.Parse(strArr[0]), double.Parse(strArr[1]));
-                Add(currRateSet);
+                    string[] strArr = str.Split(',');
+                    // Data Check
+                    if (string.IsNullOrWhiteSpace(strArr[0]) == true)
+                        continue;
+                    if (string.IsNullOrWhiteSpace(strArr[1]) == true)
+                        continue;
+                    currRateSet = new RateSet(DateTime.Parse(strArr[0]), double.Parse(strArr[1]));
+                    Add(currRateSet);
+                }
+                sr.Close();
             }
-            sr.Close();
+            else
+            {
+                MarketData[] rawDataArr = DataProvider.GetAllMarketData();
+                foreach (MarketData rawObj in rawDataArr)
+                {
+                    RateSet currRateSet;
+                    currRateSet = new RateSet(DateTime.Parse(rawObj.Data), double.Parse(rawObj.MiddleRate));
+                    Add(currRateSet);
+                }
+            }
             DataNormalize();
         }
         public double[] GetArr(DateTime date)

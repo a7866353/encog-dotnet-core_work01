@@ -27,6 +27,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Encog.Util.Simple;
 using MyProject01.Test;
+using MyProject01.Util.View;
 
 namespace MyProject01
 {
@@ -71,6 +72,10 @@ namespace MyProject01
             workThread = new Thread(new ThreadStart(MainWorkFunction));
             workThread.Priority = ThreadPriority.BelowNormal;
             workThread.Start();
+
+            GraphViewer win = new GraphViewer();
+            win.Show();
+
         }
         private void CloseWindows()
         {
@@ -91,17 +96,36 @@ namespace MyProject01
 
         private void MainWorkFunction()
         {
-            TestANN();
+            // TestANN();
             // CloseWindows();
 
             // XORHelloWorld test = new XORHelloWorld();
             // test.Execute();
+
+            TestMarketAnalyz();
+
         }
 
         private void TestANN()
         {
             // FeedForwardNetworkTest test = new FeedForwardNetworkTest();
-            ElmanNetworkTest test = new ElmanNetworkTest();
+            //ElmanNetworkTest test = new ElmanNetworkTest();
+            RateAnalyzeTest();
+        }
+
+        private void TestMarketAnalyz()
+        {
+            DataLoader loader = new DataLoader();
+            MarketRateAnalyzer analyzer = new MarketRateAnalyzer(loader.ToArray());
+            DealPointInfomation[] info =  analyzer.GetDealInfo();
+        }
+
+        private void RateAnalyzeTest()
+        {
+            DataLoader dataLoader = new DataLoader();
+            MarketRateAnalyzer test = new MarketRateAnalyzer(dataLoader.ToArray());
+            test.GetDealInfo();
+
 
         }
     }
