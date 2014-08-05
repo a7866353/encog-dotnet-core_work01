@@ -96,21 +96,23 @@ namespace MyProject01
 
         private void MainWorkFunction()
         {
-            // TestANN();
+            TestANN();
             // CloseWindows();
 
             // XORHelloWorld test = new XORHelloWorld();
             // test.Execute();
 
-            TestMarketAnalyz();
+            // TestMarketAnalyz();
 
         }
 
         private void TestANN()
         {
-            // FeedForwardNetworkTest test = new FeedForwardNetworkTest();
-            //ElmanNetworkTest test = new ElmanNetworkTest();
-            RateAnalyzeTest();
+            NetworkTest test;
+            //  test = new FeedForwardNetworkTest();
+            test = new ElmanNetworkTest();
+            // RateAnalyzeTest();
+            test.Run();
         }
 
         private void TestMarketAnalyz()

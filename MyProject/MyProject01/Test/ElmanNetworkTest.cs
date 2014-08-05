@@ -58,7 +58,7 @@ namespace MyProject01.Test
             {
                 parm.name = testName + num++.ToString("D2");
                 parm.hidenLayerNum = i;
-                Execute();
+                Execute(parm);
             }
             /*
             foreach (NetworkTestParameter parm in parmArr)
@@ -68,78 +68,31 @@ namespace MyProject01.Test
             }
             */
         }
-        public void Execute()
+
+        public override BasicNetwork CreateNetworkWithTraining(TestData data, NetworkTestParameter parm)
         {
-            RateDataCreator dataCreator = new RateDataCreator();
-            TestData data = dataCreator.GetTestData();
+            // create training data
             IMLDataSet trainingSet = new BasicMLDataSet(data.TrainInputs, data.TrainIdeaOutputs);
 
-         
-            var elmanNetwork = (BasicNetwork)CreateElmanNetwork(trainingSet.InputSize);
-            // var feedforwardNetwork = (BasicNetwork)CreateFeedforwardNetwork(trainingSet.InputSize);
-
+            // create a neural network,
+            BasicNetwork elmanNetwork = (BasicNetwork)CreateElmanNetwork(data, parm);
             double elmanError = TrainNetwork("Elman", elmanNetwork, trainingSet, "Leven");
-            // double feedforwardError = TrainNetwork("Feedforward", feedforwardNetwork, trainingSet, "Leven");
-
-            LogPrintf("Best error rate with Elman Network: " + elmanError);
-            // LogPrintf("Best error rate with Feedforward Network: " + feedforwardError);
-            LogPrintf("(Elman should outperform feed forward)");
-            LogPrintf("If your results are not as good, try rerunning, or perhaps training longer.");
-            // test the neural network
-            //   test train data
-            foreach (MyTestData dataObj in data.TrainList)
-            {
-                IMLData res = elmanNetwork.Compute(new BasicMLData(dataObj.Input));
-                double[] realArr = new double[data.OutputSize];
-                res.CopyTo(realArr, 0, data.OutputSize);
-                dataObj.Real = realArr;
-            }
-
-            //   test test data
-            foreach (MyTestData dataObj in data.TestList)
-            {
-                IMLData res = elmanNetwork.Compute(new BasicMLData(dataObj.Input));
-                double[] realArr = new double[data.OutputSize];
-                res.CopyTo(realArr, 0, data.OutputSize);
-                dataObj.Real = realArr;
-            }
-
-
-            // Output results.
-            int loopCnt = 1;
-            ResultPrintf("------------------------");
-            ResultPrintf("Neural Network Results:");
-            ResultPrintf("hidenLayerNum:\t" + parm.hidenLayerNum.ToString());
-            ResultPrintf("TotalError:\t" + data.TestList.ResultError.ToString("000.0000"));
-            ResultPrintf(data.ToStringResults());
-            LogPrintf("Test end!");
-            LogPrintf("");
+            return elmanNetwork;
         }
 
-    
-        private IMLMethod CreateElmanNetwork(int input)
+        private IMLMethod CreateElmanNetwork(TestData data, NetworkTestParameter parm)
         {
             // construct an Elman type network
             var pattern = new ElmanPattern
             {
                 ActivationFunction = new ActivationSigmoid(),
-                InputNeurons = input
+                InputNeurons = data.InputSize,
+                OutputNeurons = data.OutputSize
             };
             pattern.AddHiddenLayer(parm.hidenLayerNum);
-            pattern.OutputNeurons = 1;
             return pattern.Generate();
         }
 
-        private IMLMethod CreateFeedforwardNetwork(int input)
-        {
-            // construct a feedforward type network
-            var pattern = new FeedForwardPattern();
-            pattern.ActivationFunction = new ActivationSigmoid();
-            pattern.InputNeurons = input;
-            pattern.AddHiddenLayer(parm.hidenLayerNum);
-            pattern.OutputNeurons = 1;
-            return pattern.Generate();
-        }
 
         private double TrainNetwork(String what, BasicNetwork network, IMLDataSet trainingSet, string Method)
         {
@@ -170,6 +123,6 @@ namespace MyProject01.Test
             }
             return trainMain.Error;
         }
-
+ 
     }
 }

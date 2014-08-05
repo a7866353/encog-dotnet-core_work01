@@ -1,9 +1,11 @@
 ﻿using Encog.Engine.Network.Activation;
+using Encog.ML;
 using Encog.ML.Data;
 using Encog.ML.Data.Basic;
 using Encog.Neural.Networks;
 using Encog.Neural.Networks.Layers;
 using Encog.Neural.Networks.Training.Propagation.Resilient;
+using Encog.Neural.Pattern;
 using Encog.Util.Simple;
 using MyProject01.Util;
 using System;
@@ -19,7 +21,7 @@ namespace MyProject01.Test
     {
         private string networkFileName = "network.bin";
 
-        public FeedForwardNetworkTest()
+        public override void Run()
         {
             string testName = "FeedFowardNetwork";
             int num = 1;
@@ -53,96 +55,14 @@ namespace MyProject01.Test
                 Execute(parm);
             }
         }
-
-
+       
         /// <summary>
-        /// Program entry point.
+        /// CreateNetwork
         /// </summary>
-        /// <param name="app">Holds arguments and other info.</param>
-        public void Execute(NetworkTestParameter parm)
-        {
-            logger.SetFileName(parm.name + "_log.txt");
-            logger.Reset();
-            resultLog.SetFileName(parm.name + "_result.txt");
-            resultLog.Reset();
-
-            ResultPrintf(@"------------------------");
-            LogPrintf("Test Start!" + parm.name);
-
-            RateDataCreator dataCreator = new RateDataCreator();
-            TestData data = dataCreator.GetTestData();
-
-            if (false)
-            {
-                LogPrintf("[TestData]");
-                string dataStr = "";
-                for (int i = 0; i < data.TrainInputs.Length; i++)
-                {
-                    dataStr = i.ToString("D4") + ":";
-                    for (int j = 0; j < data.InputSize; j++)
-                    {
-                        dataStr += data.TrainInputs[i][j].ToString("0.000");
-                        dataStr += ", ";
-                    }
-                    dataStr += "| ";
-
-                    for (int j = 0; j < data.OutputSize; j++)
-                    {
-                        dataStr += data.TrainIdeaOutputs[i][j].ToString("0.000");
-                        dataStr += ", ";
-                    }
-                    LogPrintf(dataStr);
-                }
-            }
-
-            BasicNetwork network = null;
-            if( true )
-            {
-                // Create a new trained netwrok
-                network = CreateNetwork(data,parm);
-                // network = CreateNetwork02(data, parm);
-            }
-            else
-            {
-                // Create network from file.
-                network = LoadNetwrokFromFile(parm.name);
-            }
-
-            if (null == network)
-                throw (new Exception("Empty Network."));
-
-            // test the neural network
-            //   test train data
-            foreach(MyTestData dataObj in data.TrainList)
-            {
-                IMLData res = network.Compute(new BasicMLData(dataObj.Input));
-                double[] realArr = new double[data.OutputSize];
-                res.CopyTo(realArr, 0, data.OutputSize);
-                dataObj.Real = realArr;
-            }
-
-            //   test test data
-            foreach (MyTestData dataObj in data.TestList)
-            {
-                IMLData res = network.Compute(new BasicMLData(dataObj.Input));
-                double[] realArr = new double[data.OutputSize];
-                res.CopyTo(realArr, 0, data.OutputSize);
-                dataObj.Real = realArr;
-            }
-
-
-            // Output results.
-            int loopCnt = 1;
-            ResultPrintf("------------------------");
-            ResultPrintf("Neural Network Results:");
-            ResultPrintf("ErrorLimit:\t"+parm.errorlimit.ToString() +"\tNerul:\t" + parm.hidenLayerRaio.ToString() );
-            ResultPrintf("TotalError:\t" + data.TestList.ResultError.ToString("000.0000"));
-            ResultPrintf(data.ToStringResults());
-            LogPrintf("Test end!");
-            LogPrintf("");
-        }
-
-        public BasicNetwork CreateNetwork(TestData data, NetworkTestParameter parm)
+        /// <param name="data"></param>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        public override BasicNetwork CreateNetworkWithTraining(TestData data, NetworkTestParameter parm)
         {
             LogPrintf("[NetworkCreate]"+parm.ToString());
             // create a neural network, without using a factory
@@ -221,6 +141,21 @@ namespace MyProject01.Test
             return network;
         }
 
+        /// <summary>
+        /// Use pattern to create
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private IMLMethod CreateFeedforwardNetwork(TestData data, NetworkTestParameter parm)
+        {
+            // construct a feedforward type network
+            var pattern = new FeedForwardPattern();
+            pattern.ActivationFunction = new ActivationSigmoid();
+            pattern.InputNeurons = data.InputSize;
+            pattern.OutputNeurons = data.OutputSize;
+            pattern.AddHiddenLayer(parm.hidenLayerNum);
+            return pattern.Generate();
+        }
 
 
     }

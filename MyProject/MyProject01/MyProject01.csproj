@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Test\DealTest.cs" />
     <Compile Include="Test\FeedForwardNetworkTest.cs" />
     <Compile Include="Test\NetworkTest.cs" />
     <Compile Include="Test\NetworkTestParameter.cs" />
