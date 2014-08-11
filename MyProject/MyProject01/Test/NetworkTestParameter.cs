@@ -7,11 +7,21 @@ namespace MyProject01.Test
 {
     public class NetworkTestParameter
     {
+        //-----------------------------------------------
+        // Common
         public string name;
         public double errorlimit = 0.001;
         public double hidenLayerRaio = 10000;
         public int retryCnt;
-        public int hidenLayerNum;
+
+        //-----------------------------------------------
+        // Network
+        public int InputSize;
+        public int OutputSize;
+        public int HidenLayerNum;
+
+        //-----------------------------------------------
+        // Test
 
         public NetworkTestParameter(string name, double error, double hidenLayerRaio, int retryCnt)
         {
@@ -23,7 +33,7 @@ namespace MyProject01.Test
         public NetworkTestParameter(string name, int hidenLayerNum)
         {
             this.name = name;
-            this.hidenLayerNum = hidenLayerNum;
+            this.HidenLayerNum = hidenLayerNum;
         }
 
         public override string ToString()

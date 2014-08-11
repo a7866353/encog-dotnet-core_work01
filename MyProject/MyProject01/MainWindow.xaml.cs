@@ -108,11 +108,24 @@ namespace MyProject01
 
         private void TestANN()
         {
-            NetworkTest test;
+            // NetworkTest test;
             //  test = new FeedForwardNetworkTest();
-            test = new ElmanNetworkTest();
+            //  test = new ElmanNetworkTest();
             // RateAnalyzeTest();
-            test.Run();
+            // test.Run();
+
+            TestCaseFactory testCaseFactory = new TestCaseFactory();
+            BasicTestCase[] testCaseArr = testCaseFactory.GetTestCases();
+            Parallel.ForEach(testCaseArr, (testCase, loopState) =>
+            {
+                try
+                {
+                    testCase.RunTest();
+                }catch(Exception e)
+                {
+                    System.Console.WriteLine(e.ToString());
+                }
+            });
         }
 
         private void TestMarketAnalyz()

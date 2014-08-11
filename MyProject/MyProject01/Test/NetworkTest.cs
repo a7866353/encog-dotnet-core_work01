@@ -11,7 +11,7 @@ using System.Text;
 
 namespace MyProject01.Test
 {
-    class NetworkTest
+    abstract class NetworkTest
     {
         protected LogWriter logger;
         protected LogWriter resultLog;
@@ -57,15 +57,9 @@ namespace MyProject01.Test
 
         #region virtual functions
 
-        public virtual BasicNetwork CreateNetworkWithTraining(TestData data, NetworkTestParameter parm)
-        {
-            return null;
-        }
+        public abstract BasicNetwork CreateNetworkWithTraining(TestData data, NetworkTestParameter parm);
 
-        public virtual void Run()
-        {
-            return;
-        }
+        public abstract void Run();
 
         #endregion
 

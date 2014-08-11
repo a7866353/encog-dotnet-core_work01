@@ -10,6 +10,7 @@ using Encog.Neural.Networks.Training.Anneal;
 using Encog.Neural.Networks.Training.Lma;
 using Encog.Neural.Networks.Training.Propagation.Back;
 using Encog.Neural.Pattern;
+
 using MyProject01.Util;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,11 @@ using System.Text;
 
 namespace MyProject01.Test
 {
-    class ElmanNetworkTest : NetworkTest
+    class DealTest : NetworkTest
     {
-        private string testName = "ElmanNetwork";
-        NetworkTestParameter parm;
 
+        private string testName = "DealTest";
+        NetworkTestParameter parm;
         public override void Run()
         {
             int num = 1;
@@ -59,7 +60,7 @@ namespace MyProject01.Test
             {
                 parm.name = testName + num++.ToString("D2");
                 parm.HidenLayerNum = i;
-                Execute(parm);
+
             }
             /*
             foreach (NetworkTestParameter parm in parmArr)
@@ -70,30 +71,20 @@ namespace MyProject01.Test
             */
         }
 
-        public override BasicNetwork CreateNetworkWithTraining(TestData data, NetworkTestParameter parm)
-        {
-            // create training data
-            IMLDataSet trainingSet = new BasicMLDataSet(data.TrainInputs, data.TrainIdeaOutputs);
 
-            // create a neural network,
-            BasicNetwork elmanNetwork = (BasicNetwork)CreateElmanNetwork(data, parm);
-            double elmanError = TrainNetwork("Elman", elmanNetwork, trainingSet, "Leven");
-            return elmanNetwork;
-        }
 
-        private IMLMethod CreateElmanNetwork(TestData data, NetworkTestParameter parm)
+        private IMLMethod CreateElmanNetwork(int input)
         {
             // construct an Elman type network
             var pattern = new ElmanPattern
             {
                 ActivationFunction = new ActivationSigmoid(),
-                InputNeurons = data.InputSize,
-                OutputNeurons = data.OutputSize
+                InputNeurons = input
             };
             pattern.AddHiddenLayer(parm.HidenLayerNum);
+            pattern.OutputNeurons = 1;
             return pattern.Generate();
         }
-
 
         private double TrainNetwork(String what, BasicNetwork network, IMLDataSet trainingSet, string Method)
         {
@@ -125,6 +116,20 @@ namespace MyProject01.Test
             return trainMain.Error;
         }
 
+        private TestData CreateTestData()
+        {
+            TestData data = null;
+
+            return data;
+        }
+
+
+        public override BasicNetwork CreateNetworkWithTraining(TestData data, NetworkTestParameter parm)
+        {
+            NetworkTest net = new FeedForwardNetworkTest();
+            return net.CreateNetworkWithTraining(data, parm);
+        }
 
     }
+
 }

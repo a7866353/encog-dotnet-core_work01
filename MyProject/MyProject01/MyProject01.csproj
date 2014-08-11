@@ -64,13 +64,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BasicNet.cs" />
+    <Compile Include="BasicTestCase.cs" />
+    <Compile Include="BasicTestParameterSet.cs" />
+    <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="MyNet.cs" />
+    <Compile Include="MyNetFactory.cs" />
+    <Compile Include="MyNetList.cs" />
+    <Compile Include="Networks\ElmanNet.cs" />
+    <Compile Include="Networks\FeedForwardNet.cs" />
+    <Compile Include="Networks\SimpleFeedForwardNet.cs" />
+    <Compile Include="TestCaseFactory.cs" />
+    <Compile Include="TestCases\PredictTestCase.cs" />
+    <Compile Include="TestParameters\NormalParameterSet.cs" />
     <Compile Include="Test\DealTest.cs" />
     <Compile Include="Test\FeedForwardNetworkTest.cs" />
     <Compile Include="Test\NetworkTest.cs" />
     <Compile Include="Test\NetworkTestParameter.cs" />
+    <Compile Include="Test\NewTest.cs" />
     <Compile Include="Test\RateDataCreator.cs" />
     <Compile Include="Test\ElmanNetworkTest.cs" />
     <Compile Include="Test\TestData.cs" />
+    <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
+    <Compile Include="TrainingMethods\LevenTraining.cs" />
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
@@ -133,6 +149,7 @@
       <Name>encog-core-cs</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -153,7 +153,7 @@ namespace MyProject01.Test
             pattern.ActivationFunction = new ActivationSigmoid();
             pattern.InputNeurons = data.InputSize;
             pattern.OutputNeurons = data.OutputSize;
-            pattern.AddHiddenLayer(parm.hidenLayerNum);
+            pattern.AddHiddenLayer(parm.HidenLayerNum);
             return pattern.Generate();
         }
 
