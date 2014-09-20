@@ -16,7 +16,8 @@ namespace MyProject01.Agent
     };
     class RateMarketAgentData
     {
-        public double[] rateDataArray;
+        public double[] RateDataArray;
+        public double Reward;
     }
 
     interface IRateMarketUser
@@ -54,7 +55,7 @@ namespace MyProject01.Agent
                     break;// end
 
                 // Calcute
-                inputData.rateDataArray = dataLoader.GetArr(index, dataLength);
+                inputData.RateDataArray = dataLoader.GetArr(index, dataLength);
                 action = user.Determine(inputData);
 
                 switch(action)
