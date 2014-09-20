@@ -85,6 +85,8 @@ namespace MyProject01
         {
             this.Dispatcher.BeginInvoke(new func(delegate
             {
+                if (OutputTextBox.Text.Length > 10000)
+                    OutputTextBox.Clear();
                 OutputTextBox.AppendText(str + "\r\n");
                 OutputTextBox.ScrollToEnd();
             }));

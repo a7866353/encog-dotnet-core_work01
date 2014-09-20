@@ -94,6 +94,7 @@
     <Compile Include="Test\TestData.cs" />
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
+    <Compile Include="TrainingMethods\ResilientPropagationTraining.cs" />
     <Compile Include="Util\DatabaseConnector.cs" />
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />

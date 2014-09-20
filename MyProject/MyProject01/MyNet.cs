@@ -26,28 +26,55 @@ namespace MyProject01
             this.parm = parm;
         }
 
-        public void Rest()
+        public void Init(int inputSize, int outputSize)
         {
-            this._network = null;
+            parm.InputSize = inputSize;
+            parm.OutputSize = outputSize;
+            _network = net.GetNet(parm);
+            _network.Reset();
+            
         }
 
         public void Training(TestData testData)
         {
-            parm.InputSize = testData.InputSize;
-            parm.OutputSize = testData.OutputSize;
-
             // Get Network
             if( _network == null )
             {
+                parm.InputSize = testData.InputSize;
+                parm.OutputSize = testData.OutputSize;
                 _network = net.GetNet(parm);
             }
            
-            // Trainning
-            IMLDataSet trainingSet = new BasicMLDataSet(testData.TrainInputs, testData.TrainIdeaOutputs);
-            method.TrainNetwork(_network, trainingSet);
 
         }
+         public double Training(double[] inputData, double[] ideaOutputData)
+        {
+            if (_network == null)
+            {
+                parm.InputSize = inputData.Length;
+                parm.OutputSize = ideaOutputData.Length;
+                _network = net.GetNet(parm);
+            }
+            double[][] inputDataArray = new double[][]
+             {
+                 inputData,
+             };
+            double[][] outputDataArray = new double[][]
+             {
+                 ideaOutputData,
+             };
+            // Trainning
+            IMLDataSet trainingSet = new BasicMLDataSet(inputDataArray, outputDataArray);
+            return method.TrainNetwork(_network, trainingSet);
+        }
 
+        public double[] Compute(double[] inputData)
+        {
+            IMLData res = _network.Compute(new BasicMLData(inputData));
+            double[] realArr = new double[parm.OutputSize];
+            res.CopyTo(realArr, 0, parm.OutputSize);
+            return realArr;
+        }
         public void Compute(MyTestDataList dataList)
         {
             foreach (MyTestData data in dataList)

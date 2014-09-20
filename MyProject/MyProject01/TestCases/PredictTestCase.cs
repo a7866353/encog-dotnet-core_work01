@@ -59,7 +59,7 @@ namespace MyProject01.TestCases
             // TODO
             // network = _network.(_testData, parm);
             // network = CreateNetwork02(_testData, parm);
-            _network.Rest();
+            _network.Init(_testData.InputSize, _testData.OutputSize);
             _network.Training(_testData);
             // test the neural network
             //   test train data
