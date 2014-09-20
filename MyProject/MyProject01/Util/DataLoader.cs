@@ -19,29 +19,21 @@ namespace MyProject01.Util
 
      class DataProvider
      {
-         public static string DatabaseName = "MarketRateDB";
-         public static string ConnectionString = @"mongodb://127.0.0.1";
-
          public static MarketData[] GetAllMarketData()
          {
-             MongoServer server = MongoServer.Create(ConnectionString);
-             if (null == server)
-             {
-                 throw (new Exception("Cannot connect to server!"));
-             }
-
-             MongoDatabase db = server.GetDatabase(DatabaseName); // Create a new Database or get a current Database
+             DatabaseConnector connector = new DatabaseConnector();
+             MongoDatabase db = connector.Connect();
 
              string collectionName = "MiddleRate";
              MongoCollection collection = db.GetCollection(collectionName);
-
+              
              MongoCursor cursor = collection.FindAllAs<MarketData>();
              List<MarketData> dataList = new List<MarketData>();
              foreach (MarketData dataObj in cursor)
              {
                  dataList.Add(dataObj);
              }
-             server.Disconnect();
+             connector.Close();
 
              MarketData[] dataArr = dataList.ToArray();
              return dataArr;

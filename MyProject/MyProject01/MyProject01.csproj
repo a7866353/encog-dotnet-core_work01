@@ -36,7 +36,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MongoDB.Bson">
@@ -47,6 +48,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -64,18 +67,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Agent\RateMarketAgent.cs" />
     <Compile Include="BasicNet.cs" />
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="DAO\TestCaseDAO.cs" />
     <Compile Include="MyNet.cs" />
     <Compile Include="MyNetFactory.cs" />
     <Compile Include="MyNetList.cs" />
     <Compile Include="Networks\ElmanNet.cs" />
     <Compile Include="Networks\FeedForwardNet.cs" />
     <Compile Include="Networks\SimpleFeedForwardNet.cs" />
+    <Compile Include="Reinforcement\QLearn.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestCases\PredictTestCase.cs" />
+    <Compile Include="TestCases\RateMarketTest.cs" />
     <Compile Include="TestParameters\NormalParameterSet.cs" />
     <Compile Include="Test\DealTest.cs" />
     <Compile Include="Test\FeedForwardNetworkTest.cs" />
@@ -87,6 +94,7 @@
     <Compile Include="Test\TestData.cs" />
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
+    <Compile Include="Util\DatabaseConnector.cs" />
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
@@ -99,6 +107,9 @@
       <DependentUpon>GraphViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Util\View\PathTest.cs" />
+    <Compile Include="TestCaseWindow.xaml.cs">
+      <DependentUpon>TestCaseWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -112,6 +123,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Util\View\GraphViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TestCaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -38,10 +38,12 @@ namespace MyProject01
     {
         private delegate void func();
         private Thread workThread;
-
-        public MainWindow()
+        private TestCaseObject _testObject;
+        public MainWindow(TestCaseObject testObject)
         {
             InitializeComponent();
+            this._testObject = testObject;
+            
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
             this.Closing += MainWindow_Closing;
 
@@ -60,10 +62,8 @@ namespace MyProject01
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (null == workThread)
-                return;
-            workThread.Abort();
-
+            if (workThread != null)
+                workThread.Abort();
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -72,9 +72,6 @@ namespace MyProject01
             workThread = new Thread(new ThreadStart(MainWorkFunction));
             workThread.Priority = ThreadPriority.BelowNormal;
             workThread.Start();
-
-            GraphViewer win = new GraphViewer();
-            win.Show();
 
         }
         private void CloseWindows()
@@ -96,51 +93,8 @@ namespace MyProject01
 
         private void MainWorkFunction()
         {
-            TestANN();
-            // CloseWindows();
-
-            // XORHelloWorld test = new XORHelloWorld();
-            // test.Execute();
-
-            // TestMarketAnalyz();
-
-        }
-
-        private void TestANN()
-        {
-            // NetworkTest test;
-            //  test = new FeedForwardNetworkTest();
-            //  test = new ElmanNetworkTest();
-            // RateAnalyzeTest();
-            // test.Run();
-
-            TestCaseFactory testCaseFactory = new TestCaseFactory();
-            BasicTestCase[] testCaseArr = testCaseFactory.GetTestCases();
-            Parallel.ForEach(testCaseArr, (testCase, loopState) =>
-            {
-                try
-                {
-                    testCase.RunTest();
-                }catch(Exception e)
-                {
-                    System.Console.WriteLine(e.ToString());
-                }
-            });
-        }
-
-        private void TestMarketAnalyz()
-        {
-            DataLoader loader = new DataLoader();
-            MarketRateAnalyzer analyzer = new MarketRateAnalyzer(loader.ToArray());
-            DealPointInfomation[] info =  analyzer.GetDealInfo();
-        }
-
-        private void RateAnalyzeTest()
-        {
-            DataLoader dataLoader = new DataLoader();
-            MarketRateAnalyzer test = new MarketRateAnalyzer(dataLoader.ToArray());
-            test.GetDealInfo();
-
+            if (_testObject.TestFunction != null)
+                _testObject.TestFunction();
 
         }
     }

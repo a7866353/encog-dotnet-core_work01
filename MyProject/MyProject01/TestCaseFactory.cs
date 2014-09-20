@@ -29,5 +29,10 @@ namespace MyProject01
 
             return testCaseList.ToArray();
         }
+
+        public BasicTestCase GetRateMarketTest()
+        {
+            return new RateMarketTest();
+        }
     }
 }
