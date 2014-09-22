@@ -14,6 +14,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MyProject01.TestCases;
+using Encog.ML.Data;
+using Encog.ML.Data.Basic;
+using Encog.Neural.NEAT;
+using Encog.Neural.Networks.Training;
+using Encog.ML.EA.Train;
+using Encog.Util.Simple;
+using Encog.Util.Banchmark;
+using Encog.Util;
 
 namespace MyProject01
 {
@@ -37,7 +45,7 @@ namespace MyProject01
                 new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
                 new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
                 new TestCaseObject("RateAnalyzeTest", "", new TestCaseObject.TestFucntion(RateAnalyzeTest)),
-                new TestCaseObject("SampleCase", "", new TestCaseObject.TestFucntion(TestCase01)),
+                new TestCaseObject("TestNEATNet", "", new TestCaseObject.TestFucntion(TestNEATNet)),
                 new TestCaseObject("SampleCase", "", new TestCaseObject.TestFucntion(TestCase01)),
             };
 
@@ -125,6 +133,49 @@ namespace MyProject01
             RateMarketTest test = new RateMarketTest();
             test.RunTest();
         }
+
+        private void TestNEATNet()
+        {
+            double errorLimit = 0.01;
+
+            IMLDataSet trainingSet = RandomTrainingFactory.Generate(1000, 1500,
+                                         30, 3, -1, 1);
+
+            double targetErrorLimit = 0;
+            for (int i = 0; i < trainingSet[0].Ideal.Count; i++)
+                targetErrorLimit += Math.Abs(trainingSet[0].Ideal[i]);
+            targetErrorLimit /= trainingSet[0].Ideal.Count;
+            targetErrorLimit *= errorLimit;
+
+            NEATPopulation pop = new NEATPopulation(2, 1, 10000);
+            pop.Reset();
+            pop.InitialConnectionDensity = 1.0; // not required, but speeds processing.
+            ICalculateScore score = new TrainingSetScore(trainingSet);
+            // train the neural network
+            TrainEA train = NEATUtil.ConstructNEATTrainer(pop,score);
+           
+            int epoch = 1;
+            LogFile.WriteLine(@"Beginning training...");
+            do
+            {
+                train.Iteration();
+
+                LogFile.WriteLine(@"Iteration #" + Format.FormatInteger(epoch)
+                         + @" Error:" + Format.FormatPercent(train.Error)
+                         + @" Target Error: " + Format.FormatPercent(targetErrorLimit));
+                epoch++;
+            } while ((train.Error > targetErrorLimit) && !train.TrainingDone);
+            train.FinishTraining();
+
+
+            NEATNetwork network = (NEATNetwork)train.CODEC.Decode(train.BestGenome);
+
+            // test the neural network
+            LogFile.WriteLine(@"Neural Network Results:");
+            EncogUtility.Evaluate(network, trainingSet);
+
+        }
+
     }
 
     public class TestCaseObject
@@ -141,4 +192,6 @@ namespace MyProject01
             this.TestFunction = function;
         }
     }
+
+
 }

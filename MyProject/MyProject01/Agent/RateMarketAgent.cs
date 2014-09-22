@@ -31,7 +31,7 @@ namespace MyProject01.Agent
         private const string _dataFile = "data.csv";
 
         private double initMoney = 10000;
-        private double scaleRate = 100;
+        private double scaleRate = 10000;
         private double money;
         private int dataLength = 30;
 
@@ -40,10 +40,10 @@ namespace MyProject01.Agent
         private double mountInHand;
         private IRateMarketUser user;
 
-        public RateMarketAgent(IRateMarketUser user)
+        public RateMarketAgent(MyNet network)
         {
             money = initMoney;
-            this.user = user;
+            this.user = new QLearn(network);
             dataLoader = new DataLoader(_dataFile);
         }
 

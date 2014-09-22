@@ -22,7 +22,7 @@ namespace MyProject01.Reinforcement
         private MyNet network;
         private Random rand;
 
-        private int _greedRate = 80;
+        private int _greedRate = 95;
         private double _discountRate = 0.80;
         private double _scaleRate = 1000;
         // Paramters
@@ -32,14 +32,14 @@ namespace MyProject01.Reinforcement
         private double[] _inputDataArray;
         private double[] _outputDataArray;
 
-        public QLearn(MyNet network, int inputLengh)
+        public QLearn(MyNet network)
         {
             rand = new Random();
             _previousState = null;
             _previousOutput = null;
             _previousOutputSelete = -1;
 
-            this._inputLength = inputLengh;
+            this._inputLength = network.parm.InputSize; ;
             _inputDataArray = new double[_inputLength];
 
             _outputLength = 3;

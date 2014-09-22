@@ -40,6 +40,8 @@ namespace MyProject01.TrainingMethods
                 // LogFile.WriteLine("Epoch #" + epoch + " Error:" + trainMain.Error);
                 //SaveNetworkToFile(network, testName);
                 epoch++;
+                if (epoch > 1000)
+                    break;
             }
             return trainMain.Error;
         }

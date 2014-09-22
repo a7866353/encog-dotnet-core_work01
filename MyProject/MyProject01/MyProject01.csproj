@@ -80,6 +80,7 @@
     <Compile Include="MyNetList.cs" />
     <Compile Include="Networks\ElmanNet.cs" />
     <Compile Include="Networks\FeedForwardNet.cs" />
+    <Compile Include="Networks\NEATNet.cs" />
     <Compile Include="Networks\SimpleFeedForwardNet.cs" />
     <Compile Include="Reinforcement\QLearn.cs" />
     <Compile Include="TestCaseFactory.cs" />
