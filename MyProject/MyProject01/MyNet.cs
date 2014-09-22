@@ -24,6 +24,8 @@ namespace MyProject01
             this.net = net;
             this.method = method;
             this.parm = parm;
+            method.errorLimit = parm.errorlimit;
+            method.maxTryCount = parm.retryCnt;
         }
 
         public void Init(int inputSize, int outputSize)

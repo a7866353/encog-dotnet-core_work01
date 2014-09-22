@@ -14,13 +14,15 @@ namespace MyProject01.Reinforcement
 {
     class QLearn : IRateMarketUser
     {
+        public double _totalError;
+        public int _totalCount;
         private RateMarketAgentData _previousState;
         private double[] _previousOutput;
         private int _previousOutputSelete;
         private MyNet network;
         private Random rand;
 
-        private int _greedRate = 95;
+        private int _greedRate = 80;
         private double _discountRate = 0.80;
         private double _scaleRate = 1000;
         // Paramters
@@ -30,7 +32,7 @@ namespace MyProject01.Reinforcement
         private double[] _inputDataArray;
         private double[] _outputDataArray;
 
-        public QLearn(int inputLengh)
+        public QLearn(MyNet network, int inputLengh)
         {
             rand = new Random();
             _previousState = null;
@@ -42,15 +44,13 @@ namespace MyProject01.Reinforcement
 
             _outputLength = 3;
 
+            _totalError = 0;
+            _totalCount = 0;
 
-            // Init network
-            NetworkTestParameter parm = new NetworkTestParameter("QLearn", 0.5, 5, 10000);
-            // network = new MyNet(new FeedForwardNet(), new ResilientPropagationTraining(), parm);
-            network = new MyNet(new FeedForwardNet(), new BackpropagationTraining(), parm);
-            network.Init(_inputLength, _outputLength);
+            this.network = network;
         }
 
-        public MarketActions Determine(RateMarketAgentData state)
+        MarketActions IRateMarketUser.Determine(RateMarketAgentData state)
         {
             int actionIndex;
             int greedActionIndex;
@@ -88,8 +88,8 @@ namespace MyProject01.Reinforcement
                 _previousOutput[_previousOutputSelete] = state.Reward + _discountRate * actionQValueArr[greedActionIndex];
                 error = network.Training(_previousState.RateDataArray, _previousOutput);
                 // LogFile.WriteLine(error.ToString("G"));
-                if (error > 0.1)
-                    error = error;
+                _totalError += error;
+                _totalCount++;
             }
 
             _previousState = state;
@@ -108,5 +108,22 @@ namespace MyProject01.Reinforcement
                     return MarketActions.Nothing;
             }
         }
+
+        double IRateMarketUser.TotalErrorRate
+        {
+            get
+            {
+                double errorSum = 0;
+                foreach (double d in _previousOutput)
+                    errorSum += Math.Abs(d);
+                errorSum /= _previousOutput.Length;
+                return _totalError / errorSum / _totalCount;
+            }
+            set
+            {
+                _totalError = 0; _totalCount = 0;
+            }
+        }
+
     }
 }

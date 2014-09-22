@@ -18,13 +18,17 @@ namespace MyProject01.TrainingMethods
     {
         public override double TrainNetwork(BasicNetwork network, IMLDataSet trainingSet)
         {
+            double idealSum = 0;
+            for (int i = 0; i < trainingSet[0].Ideal.Count; i++)
+                idealSum += Math.Abs( trainingSet[0].Ideal[i]);
+            idealSum /= trainingSet[0].Ideal.Count;
+            
             // train the neural network
             ICalculateScore score = new TrainingSetScore(trainingSet);
             IMLTrain trainAlt = new NeuralSimulatedAnnealing(network, score, 10, 2, 100);
-
+            
             var trainMain = new Backpropagation(network, trainingSet);
-            trainMain.ThreadCount = 16;
-            var stop = new StopTrainingStrategy(0.00001, 10);
+            var stop = new StopTrainingStrategy(idealSum * errorLimit, maxTryCount);
             trainMain.AddStrategy(new Greedy());
             // trainMain.AddStrategy(new HybridStrategy(trainAlt));
             trainMain.AddStrategy(stop);

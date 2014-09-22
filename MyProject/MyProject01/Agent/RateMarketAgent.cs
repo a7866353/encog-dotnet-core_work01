@@ -23,6 +23,7 @@ namespace MyProject01.Agent
     interface IRateMarketUser
     {
         MarketActions Determine(RateMarketAgentData inputData);
+        double TotalErrorRate{ set; get; }
     }
 
     class RateMarketAgent
@@ -30,7 +31,7 @@ namespace MyProject01.Agent
         private const string _dataFile = "data.csv";
 
         private double initMoney = 10000;
-        private double scaleRate = 10000;
+        private double scaleRate = 100;
         private double money;
         private int dataLength = 30;
 
@@ -39,10 +40,10 @@ namespace MyProject01.Agent
         private double mountInHand;
         private IRateMarketUser user;
 
-        public RateMarketAgent()
+        public RateMarketAgent(IRateMarketUser user)
         {
             money = initMoney;
-            user = new QLearn(dataLength);
+            this.user = user;
             dataLoader = new DataLoader(_dataFile);
         }
 
@@ -57,6 +58,7 @@ namespace MyProject01.Agent
                 index = dataLength - 1;
                 mountInHand = 0;
                 money = initMoney;
+                user.TotalErrorRate = 0;
                 while (true)
                 {
                     if (dataLoader[index].Value > 0)
@@ -86,7 +88,7 @@ namespace MyProject01.Agent
                         break;// end
                     index++;
                 }
-                LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString());
+                LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString() + "\tErrorRate:" + user.TotalErrorRate.ToString());
                 testStep++;
             }
 

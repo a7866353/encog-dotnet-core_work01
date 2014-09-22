@@ -1,6 +1,11 @@
 ﻿using Encog.ML.Data;
+using Encog.ML.Train;
+using Encog.ML.Train.Strategy;
+using Encog.Neural.Networks.Training;
+using Encog.Neural.Networks.Training.Anneal;
 using Encog.Neural.Networks.Training.Propagation.Resilient;
 using Encog.Util.Banchmark;
+using MyProject01.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,17 +18,45 @@ namespace MyProject01.TrainingMethods
 
         public override double TrainNetwork(Encog.Neural.Networks.BasicNetwork network, Encog.ML.Data.IMLDataSet trainingSet)
         {
-            IMLDataSet training = RandomTrainingFactory.Generate(1000, 500,
-                                                     trainingSet.InputSize, trainingSet.IdealSize, -1, 1);
+            double idealSum = 0;
+            int torenteCount = 0;
+            for (int i = 0; i < trainingSet[0].Ideal.Count; i++)
+                idealSum += Math.Abs(trainingSet[0].Ideal[i]);
+            idealSum /= trainingSet[0].Ideal.Count;
+            idealSum *= errorLimit;
 
-            var rprop = new ResilientPropagation(network, training);
-            rprop.ThreadCount = 16;
-            for (int i = 0; i < 5; i++)
+            var trainMain = new ResilientPropagation(network, trainingSet);
+            trainMain.ThreadCount = 16;
+
+            ICalculateScore score = new TrainingSetScore(trainingSet);
+            IMLTrain trainAlt = new NeuralSimulatedAnnealing(network, score, 10, 2, 100);
+
+            var stop = new StopTrainingStrategy(idealSum * errorLimit, maxTryCount);
+            // trainMain.AddStrategy(new Greedy());
+            // trainMain.AddStrategy(new HybridStrategy(trainAlt));
+            trainMain.AddStrategy(stop);
+
+            int epoch = 0;
+            while (true)
             {
-                rprop.Iteration();
-            }
+                trainMain.Iteration();
+                // LogFile.WriteLine("Training Epoch #" + epoch + " Error:" + trainMain.Error);
+                // SaveNetworkToFile(network, testName);
+                if (trainMain.Error < errorLimit)
+                {
+                    torenteCount++;
+                    if (torenteCount >= maxTryCount)
+                        break;
+                }
+                else
+                {
+                    torenteCount = 0;
+                }
+                epoch++;
 
-            return rprop.Error;
+
+            }
+            return trainMain.Error;
 
         }
     }
