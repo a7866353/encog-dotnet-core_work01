@@ -14,7 +14,7 @@ namespace MyProject01.Networks
             BasicNetwork network = EncogUtility.SimpleFeedForward(
               parm.InputSize,
               (int)(parm.InputSize * parm.hidenLayerRaio),
-              (int)(parm.OutputSize * 10),
+              (int)(parm.OutputSize * parm.hidenLayerRaio),
               parm.OutputSize,
               true);
 

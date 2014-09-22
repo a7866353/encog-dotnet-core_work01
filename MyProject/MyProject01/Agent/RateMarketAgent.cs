@@ -29,51 +29,64 @@ namespace MyProject01.Agent
     {
         private const string _dataFile = "data.csv";
 
-        private double money = 10000;
+        private double initMoney = 10000;
+        private double scaleRate = 10000;
+        private double money;
         private int dataLength = 30;
 
         private DataLoader dataLoader;
         private int index = 0;
         private double mountInHand;
+        private IRateMarketUser user;
 
-        
-        
+        public RateMarketAgent()
+        {
+            money = initMoney;
+            user = new QLearn(dataLength);
+            dataLoader = new DataLoader(_dataFile);
+        }
 
         public void Run()
         {
             long testStep = 1;
-            dataLoader = new DataLoader(_dataFile);
-            index = dataLength - 1;
-            mountInHand = 0;
 
             MarketActions action;
-            IRateMarketUser user = new QLearn();
             RateMarketAgentData inputData = new RateMarketAgentData();
-            while(true)
+            while (true)
             {
-                if (index >= dataLoader.Count)
-                    break;// end
-
-                // Calcute
-                inputData.RateDataArray = dataLoader.GetArr(index, dataLength);
-                action = user.Determine(inputData);
-
-                switch(action)
+                index = dataLength - 1;
+                mountInHand = 0;
+                money = initMoney;
+                while (true)
                 {
-                    case MarketActions.Buy:
-                        Buy();
-                        break;
-                    case MarketActions.Sell:
-                        Sell();
-                        break;
-                    case MarketActions.Nothing:
-                        break;
-                    default:
-                        break;
-                }
+                    if (dataLoader[index].Value > 0)
+                    {
+                        // Calcute
+                        inputData.RateDataArray = dataLoader.GetArr(index - dataLength+1, dataLength);
+                        inputData.Reward = (CurrentValue() - initMoney) / initMoney / scaleRate;
+                        action = user.Determine(inputData);
 
+                        switch (action)
+                        {
+                            case MarketActions.Buy:
+                                Buy();
+                                break;
+                            case MarketActions.Sell:
+                                Sell();
+                                break;
+                            case MarketActions.Nothing:
+                                break;
+                            default:
+                                break;
+                        }
+
+                        // LogFile.WriteLine("[" + index.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString());
+                    }
+                    if (index >= dataLoader.Count-1)
+                        break;// end
+                    index++;
+                }
                 LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString());
-                index++;
                 testStep++;
             }
 

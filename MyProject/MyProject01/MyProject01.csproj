@@ -40,11 +40,13 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\..\..\..\..\MongoDB\Projects\DataImporter\DataImporter\MongoDB.Bson.dll</HintPath>
+    <Reference Include="MongoDB.Bson, Version=1.9.1.221, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\MongoDB.Bson.dll</HintPath>
     </Reference>
-    <Reference Include="MongoDB.Driver">
-      <HintPath>..\..\..\..\..\MongoDB\Projects\DataImporter\DataImporter\MongoDB.Driver.dll</HintPath>
+    <Reference Include="MongoDB.Driver, Version=1.9.1.221, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\MongoDB.Driver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -94,6 +96,7 @@
     <Compile Include="Test\TestData.cs" />
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
+    <Compile Include="TrainingMethods\ResilientPropagationTraining.cs" />
     <Compile Include="Util\DatabaseConnector.cs" />
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />
