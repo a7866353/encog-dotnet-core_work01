@@ -25,6 +25,7 @@ namespace MyProject01.Reinforcement
         private int _greedRate = 95;
         private double _discountRate = 0.80;
         private double _scaleRate = 1000;
+        private double _learnRate = 0.7;
         // Paramters
         private int _inputLength;
         private int _outputLength;
@@ -85,7 +86,7 @@ namespace MyProject01.Reinforcement
             if( _previousState != null)
             {
                 double error;
-                _previousOutput[_previousOutputSelete] = state.Reward + _discountRate * actionQValueArr[greedActionIndex];
+                _previousOutput[_previousOutputSelete] = ((1 - _learnRate) * _previousOutput[_previousOutputSelete]) + _learnRate * (state.Reward + _discountRate * actionQValueArr[greedActionIndex]);
                 error = network.Training(_previousState.RateDataArray, _previousOutput);
                 // LogFile.WriteLine(error.ToString("G"));
                 _totalError += error;

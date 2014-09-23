@@ -17,6 +17,7 @@ namespace MyProject01.Networks
             BasicNetwork network = new BasicNetwork();
             network.AddLayer(new BasicLayer(null, true, parm.InputSize));
             network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(parm.InputSize * parm.hidenLayerRaio)));
+            network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, (int)(parm.InputSize * parm.hidenLayerRaio)));
             network.AddLayer(new BasicLayer(new ActivationSigmoid(), true, parm.OutputSize));
             network.Structure.FinalizeStructure();
             network.Reset();

@@ -22,6 +22,10 @@ using Encog.ML.EA.Train;
 using Encog.Util.Simple;
 using Encog.Util.Banchmark;
 using Encog.Util;
+using MyProject01.TrainingMethods;
+using MyProject01.Networks;
+using MyProject01.Test;
+using Encog.Neural.Networks;
 
 namespace MyProject01
 {
@@ -46,7 +50,7 @@ namespace MyProject01
                 new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
                 new TestCaseObject("RateAnalyzeTest", "", new TestCaseObject.TestFucntion(RateAnalyzeTest)),
                 new TestCaseObject("TestNEATNet", "", new TestCaseObject.TestFucntion(TestNEATNet)),
-                new TestCaseObject("SampleCase", "", new TestCaseObject.TestFucntion(TestCase01)),
+                new TestCaseObject("TestBPTrain", "", new TestCaseObject.TestFucntion(TestBPTrain)),
             };
 
             ;
@@ -173,6 +177,25 @@ namespace MyProject01
             // test the neural network
             LogFile.WriteLine(@"Neural Network Results:");
             EncogUtility.Evaluate(network, trainingSet);
+
+        }
+
+        private void TestBPTrain()
+        {
+            NetworkTestParameter parm = new NetworkTestParameter("QLearn", 0.5, 10, 10);
+            parm.InputSize = 30;
+            parm.OutputSize = 3;
+            FeedForwardNet net = new FeedForwardNet();
+            BasicNetwork network = net.GetNet(parm);
+            BackpropagationTraining method = new BackpropagationTraining();
+            method.errorLimit = 0.0000001;
+            method.maxTryCount = 10;
+            IMLDataSet trainingSet = RandomTrainingFactory.Generate(1000, 1500,
+                                         parm.InputSize, parm.OutputSize, -1, 1);
+
+            LogFile.WriteLine(@"Beginning training...");
+            method.TrainNetwork(network, trainingSet);
+            LogFile.WriteLine(@"Neural Network Results:");
 
         }
 

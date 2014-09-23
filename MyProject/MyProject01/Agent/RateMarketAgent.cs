@@ -88,7 +88,7 @@ namespace MyProject01.Agent
                         break;// end
                     index++;
                 }
-                LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString() + "\tErrorRate:" + user.TotalErrorRate.ToString());
+                LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString("G6") + "\tErrorRate:" + user.TotalErrorRate.ToString("G6"));
                 testStep++;
             }
 

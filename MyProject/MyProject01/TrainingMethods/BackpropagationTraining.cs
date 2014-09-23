@@ -18,26 +18,27 @@ namespace MyProject01.TrainingMethods
     {
         public override double TrainNetwork(BasicNetwork network, IMLDataSet trainingSet)
         {
-            double idealSum = 0;
+            double targetError = 0;
             for (int i = 0; i < trainingSet[0].Ideal.Count; i++)
-                idealSum += Math.Abs( trainingSet[0].Ideal[i]);
-            idealSum /= trainingSet[0].Ideal.Count;
-            
+                targetError += Math.Abs( trainingSet[0].Ideal[i]);
+            targetError /= trainingSet[0].Ideal.Count;
+            targetError *= this.errorLimit; 
             // train the neural network
             ICalculateScore score = new TrainingSetScore(trainingSet);
             IMLTrain trainAlt = new NeuralSimulatedAnnealing(network, score, 10, 2, 100);
             
             var trainMain = new Backpropagation(network, trainingSet);
-            var stop = new StopTrainingStrategy(idealSum * errorLimit, maxTryCount);
-            trainMain.AddStrategy(new Greedy());
-            // trainMain.AddStrategy(new HybridStrategy(trainAlt));
+            trainMain.ThreadCount = 8;
+            var stop = new StopTrainingStrategy(targetError, maxTryCount);
+            // trainMain.AddStrategy(new Greedy());
+            trainMain.AddStrategy(new HybridStrategy(trainAlt));
             trainMain.AddStrategy(stop);
 
             int epoch = 0;
             while (!stop.ShouldStop())
             {
                 trainMain.Iteration();
-                // LogFile.WriteLine("Epoch #" + epoch + " Error:" + trainMain.Error);
+                // LogFile.WriteLine("Epoch #" + epoch.ToString("D4") + " Error:" + trainMain.Error.ToString("G6") + "\tTarget: " + targetError.ToString("G6"));
                 //SaveNetworkToFile(network, testName);
                 epoch++;
                 if (epoch > 1000)
