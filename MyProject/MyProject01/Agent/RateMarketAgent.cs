@@ -24,6 +24,8 @@ namespace MyProject01.Agent
     {
         MarketActions Determine(RateMarketAgentData inputData);
         double TotalErrorRate{ set; get; }
+
+        void EpsodeEnd();
     }
 
     class RateMarketAgent
@@ -90,6 +92,7 @@ namespace MyProject01.Agent
                 }
                 LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString("G6") + "\tErrorRate:" + user.TotalErrorRate.ToString("G6"));
                 testStep++;
+                user.EpsodeEnd();
             }
 
         }

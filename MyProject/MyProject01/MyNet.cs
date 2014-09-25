@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MyProject01.DAO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace MyProject01
 {
@@ -19,6 +22,9 @@ namespace MyProject01
         //-----------------------------------------------
         private BasicNetwork _network;
 
+        //--------------
+        private TestCaseDAO testCaseDao;
+
         public MyNet(BasicNet net, BasicTrainingMethod method, NetworkTestParameter parm)
         {
             this.net = net;
@@ -26,6 +32,7 @@ namespace MyProject01
             this.parm = parm;
             method.errorLimit = parm.errorlimit;
             method.maxTryCount = parm.retryCnt;
+            testCaseDao = TestCaseDAO.GetDAO("QLearn01");
         }
 
         public void Init(int inputSize, int outputSize)
@@ -87,9 +94,23 @@ namespace MyProject01
                 data.Real = realArr;
             }
         }
-        public void Save()
+        public void SaveNetwork()
         {
-            // TODO:
+            testCaseDao.NetworkParamter = this.parm;
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter  formatter = new BinaryFormatter();
+            formatter.Serialize(stream, this._network);
+
+            testCaseDao.NetworkData = stream.ToArray();
+            stream.Close();
+            testCaseDao.Save();
+        }
+        public void LoadNetwork()
+        {
+            MemoryStream stream = new MemoryStream(testCaseDao.NetworkData);
+            BinaryFormatter formatter = new BinaryFormatter();
+            this._network = (BasicNetwork)formatter.Deserialize(stream);
+            stream.Close();
         }
 
     }

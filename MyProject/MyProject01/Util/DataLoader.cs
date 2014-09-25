@@ -6,6 +6,7 @@ using System.IO;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
+using MyProject01.DAO;
 
 namespace MyProject01.Util
 {
@@ -21,7 +22,7 @@ namespace MyProject01.Util
      {
          public static MarketData[] GetAllMarketData()
          {
-             DatabaseConnector connector = new DatabaseConnector();
+             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
              MongoDatabase db = connector.Connect();
 
              string collectionName = "MiddleRate";

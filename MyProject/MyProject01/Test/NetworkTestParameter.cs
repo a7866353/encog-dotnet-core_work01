@@ -9,10 +9,10 @@ namespace MyProject01.Test
     {
         //-----------------------------------------------
         // Common
-        public string name;
+        public string name { get; set;}
         public double errorlimit = 0.001;
         public double hidenLayerRaio = 10000;
-        public int retryCnt;
+        public int retryCnt { get; set; }
 
         //-----------------------------------------------
         // Network

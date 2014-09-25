@@ -19,7 +19,7 @@ namespace MyProject01.Reinforcement
         private RateMarketAgentData _previousState;
         private double[] _previousOutput;
         private int _previousOutputSelete;
-        private MyNet network;
+        public MyNet network;
         private Random rand;
 
         private int _greedRate = 95;
@@ -126,5 +126,10 @@ namespace MyProject01.Reinforcement
             }
         }
 
+        public void EpsodeEnd()
+        {
+            network.SaveNetwork();
+            _totalError = 0; _totalCount = 0;
+        }
     }
 }
