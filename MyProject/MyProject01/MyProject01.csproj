@@ -74,6 +74,7 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="DAO\DataBaseConnector.cs" />
     <Compile Include="DAO\TestCaseDAO.cs" />
     <Compile Include="MyNet.cs" />
     <Compile Include="MyNetFactory.cs" />
