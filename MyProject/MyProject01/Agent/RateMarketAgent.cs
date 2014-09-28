@@ -30,79 +30,99 @@ namespace MyProject01.Agent
 
     class RateMarketAgent
     {
-        private const string _dataFile = "data.csv";
 
-        private double initMoney = 10000;
-        private double scaleRate = 10000;
+        static private DataLoader _dataLoader;
+        static private const string _dataFile = "data.csv";
+        static RateMarketAgent()
+        {
+            _dataLoader = new DataLoader(_dataFile);
+
+        }
+
+
+
+        public double InitMoney = 10000;
         private double money;
-        private int dataLength = 30;
-        private int testLength = 100;
+        private int _dataLength = 30;
+        private int _testLength = 100;
 
-        private DataLoader dataLoader;
         private int index = 0;
         private double mountInHand;
         private IRateMarketUser user;
+        private long _step;
+        private RateMarketAgentData _stateData = new RateMarketAgentData();
 
-        public RateMarketAgent(MyNet network)
+        public long Step
         {
-            money = initMoney;
-            this.user = new QLearn(network);
-            dataLoader = new DataLoader(_dataFile);
-            testLength = Math.Min(testLength, dataLoader.Count);
+            get
+            {
+                return _step;
+            }
         }
 
-        public void Run()
+        public bool IsEnd { private set; get; }
+
+        public RateMarketAgent(IRateMarketUser user)
         {
-            long testStep = 1;
+            this.user = user;
+            _testLength = Math.Min(_testLength, _dataLoader.Count);
+            _stateData = new RateMarketAgentData();
+            Reset();
+        }
 
-            MarketActions action;
-            RateMarketAgentData inputData = new RateMarketAgentData();
-            while (true)
+        public RateMarketAgentData Reset()
+        {
+            _step = 0;
+            money = InitMoney;
+            index = _dataLength - 1;
+            mountInHand = 0;
+            money = InitMoney;
+            user.TotalErrorRate = 0;
+            IsEnd = false;
+
+            
+            _stateData.RateDataArray = _dataLoader.GetArr(index - _dataLength + 1, _dataLength);
+            _stateData.Reward = 0;
+            return _stateData;
+        }
+
+        public bool Next()
+        {
+            if (IsEnd == true)
+                return false;
+            if((index+1) > _testLength - 1)
             {
-                index = dataLength - 1;
-                mountInHand = 0;
-                money = initMoney;
-                user.TotalErrorRate = 0;
-                while (true)
-                {
-                    if (dataLoader[index].Value > 0)
-                    {
-                        // Calcute
-                        inputData.RateDataArray = dataLoader.GetArr(index - dataLength+1, dataLength);
-                        inputData.Reward = (CurrentValue() - initMoney) / initMoney / scaleRate;
-                        action = user.Determine(inputData);
-
-                        switch (action)
-                        {
-                            case MarketActions.Buy:
-                                Buy();
-                                break;
-                            case MarketActions.Sell:
-                                Sell();
-                                break;
-                            case MarketActions.Nothing:
-                                break;
-                            default:
-                                break;
-                        }
-
-                        // LogFile.WriteLine("[" + index.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString());
-                    }
-                    if (index >= testLength - 1)
-                        break;// end
-                    index++;
-                }
-                LogFile.WriteLine("[" + testStep.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString("G6") + "\tErrorRate:" + user.TotalErrorRate.ToString("G6"));
-                testStep++;
-                user.EpsodeEnd();
+                IsEnd = true;
+                return false;
             }
 
+            index++;
+            return true;
+        }
+        public RateMarketAgentData TakeAction(MarketActions action)
+        {
+            switch (action)
+            {
+                case MarketActions.Buy:
+                    Buy();
+                    break;
+                case MarketActions.Sell:
+                    Sell();
+                    break;
+                case MarketActions.Nothing:
+                    break;
+                default:
+                    break;
+            }
+            _stateData.Reward = (CurrentValue() - InitMoney) / InitMoney;
+            _stateData.RateDataArray = _dataLoader.GetArr(index - _dataLength + 1, _dataLength);
+            return _stateData;
         }
 
 
         private void Buy()
         {
-            double rate = dataLoader[index].Value;
+            double rate = _dataLoader[index].Value;
             if (money <= 0)
                 return;
 
@@ -112,16 +132,16 @@ namespace MyProject01.Agent
         }
         private void Sell()
         {
-            double rate = dataLoader[index].Value;
+            double rate = _dataLoader[index].Value;
             if (mountInHand <= 0)
                 return;
             money += mountInHand / rate;
             mountInHand = 0;
         }
         
-        private double CurrentValue()
+        public double CurrentValue()
         {
-            double rate = dataLoader[index].Value;
+            double rate = _dataLoader[index].Value;
             double res = money;
             if (mountInHand != 0)
                 res += mountInHand / rate;

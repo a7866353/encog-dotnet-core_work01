@@ -32,7 +32,7 @@ namespace MyProject01
 
         public BasicTestCase GetRateMarketTest()
         {
-            return new RateMarketTest();
+            return new RateMarketQLearnTest();
         }
     }
 }

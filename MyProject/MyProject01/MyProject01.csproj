@@ -86,6 +86,7 @@
     <Compile Include="Reinforcement\QLearn.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestCases\PredictTestCase.cs" />
+    <Compile Include="TestCases\RateMarketNEATTest.cs" />
     <Compile Include="TestCases\RateMarketTest.cs" />
     <Compile Include="TestParameters\NormalParameterSet.cs" />
     <Compile Include="Test\DealTest.cs" />
@@ -103,7 +104,6 @@
     <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
     <Compile Include="Util\MarketRateAnalyzer.cs" />
-    <Compile Include="Util\MarketRateTradeCenter.cs" />
     <Compile Include="Util\MyTestData.cs" />
     <Compile Include="Util\MyTestDataList.cs" />
     <Compile Include="Util\SlidingFilter.cs" />

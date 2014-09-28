@@ -7,10 +7,11 @@ using MyProject01.Test;
 using MyProject01.TrainingMethods;
 using MyProject01.Networks;
 using System.Threading.Tasks;
+using MyProject01.Reinforcement;
 
 namespace MyProject01.TestCases
 {
-    class RateMarketTest : BasicTestCase
+    class RateMarketQLearnTest : BasicTestCase
     {
 
         public override void RunTest()
@@ -26,11 +27,12 @@ namespace MyProject01.TestCases
             List<RateMarketAgent> agentList = new List<RateMarketAgent>();
             for(int i=0;i<1;i++)
             {
-                RateMarketAgent agent = new RateMarketAgent(network);
+                QLearn qlearn = new QLearn(network);
+                RateMarketAgent agent = new RateMarketAgent(qlearn);
                 agentList.Add(agent);
             }
 
-            Parallel.ForEach(agentList, currentAgent => currentAgent.Run());
+            Parallel.ForEach(agentList, currentAgent => currentAgent.TakeAction());
         }
     }
 }

@@ -134,7 +134,7 @@ namespace MyProject01
 
         private void TestRateMarketAgent()
         {
-            RateMarketTest test = new RateMarketTest();
+            RateMarketQLearnTest test = new RateMarketQLearnTest();
             test.RunTest();
         }
 
