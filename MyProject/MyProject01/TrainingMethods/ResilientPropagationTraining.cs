@@ -23,7 +23,7 @@ namespace MyProject01.TrainingMethods
             for (int i = 0; i < trainingSet[0].Ideal.Count; i++)
                 idealSum += Math.Abs(trainingSet[0].Ideal[i]);
             idealSum /= trainingSet[0].Ideal.Count;
-            idealSum *= errorLimit;
+            idealSum *= ErrorChangeLimit;
 
             var trainMain = new ResilientPropagation(network, trainingSet);
             trainMain.ThreadCount = 16;
@@ -31,7 +31,7 @@ namespace MyProject01.TrainingMethods
             ICalculateScore score = new TrainingSetScore(trainingSet);
             IMLTrain trainAlt = new NeuralSimulatedAnnealing(network, score, 10, 2, 100);
 
-            var stop = new StopTrainingStrategy(idealSum * errorLimit, maxTryCount);
+            var stop = new StopTrainingStrategy(idealSum, ErrorChangeTryMaxCount);
             // trainMain.AddStrategy(new Greedy());
             // trainMain.AddStrategy(new HybridStrategy(trainAlt));
             trainMain.AddStrategy(stop);
@@ -42,10 +42,10 @@ namespace MyProject01.TrainingMethods
                 trainMain.Iteration();
                 // LogFile.WriteLine("Training Epoch #" + epoch + " Error:" + trainMain.Error);
                 // SaveNetworkToFile(network, testName);
-                if (trainMain.Error < errorLimit)
+                if (trainMain.Error < idealSum)
                 {
                     torenteCount++;
-                    if (torenteCount >= maxTryCount)
+                    if (torenteCount >= ErrorChangeTryMaxCount)
                         break;
                 }
                 else

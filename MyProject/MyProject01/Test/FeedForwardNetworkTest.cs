@@ -90,9 +90,9 @@ namespace MyProject01.Test
                 // Save network each train.
                 SaveNetworkToFile(network,parm.name);
                 epoch++;
-                if (epoch > parm.retryCnt)
+                if (epoch > parm.ErrorChangeRetryCount)
                     break;
-                if(filter.Add(train.Error) < parm.errorlimit)
+                if(filter.Add(train.Error) < parm.ErrorChangeLimit)
                     break;
             } while (true);
             train.FinishTraining();
@@ -130,9 +130,9 @@ namespace MyProject01.Test
                 // Save network each train.
                 SaveNetworkToFile(network, parm.name);
                 epoch++;
-                if (epoch > parm.retryCnt)
+                if (epoch > parm.ErrorChangeRetryCount)
                     break;
-                if (filter.Add(train.Error) < parm.errorlimit)
+                if (filter.Add(train.Error) < parm.ErrorChangeLimit)
                     break;
             } while (true);
             train.FinishTraining();

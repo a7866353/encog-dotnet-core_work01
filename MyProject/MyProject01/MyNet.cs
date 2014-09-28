@@ -30,8 +30,8 @@ namespace MyProject01
             this.net = net;
             this.method = method;
             this.parm = parm;
-            method.errorLimit = parm.errorlimit;
-            method.maxTryCount = parm.retryCnt;
+            method.ErrorChangeLimit = parm.ErrorChangeLimit;
+            method.ErrorChangeTryMaxCount = parm.ErrorChangeRetryCount;
             testCaseDao = TestCaseDAO.GetDAO("QLearn01");
         }
 
@@ -56,7 +56,14 @@ namespace MyProject01
            
 
         }
-         public double Training(double[] inputData, double[] ideaOutputData)
+        public double Training(double[][] inputData, double[][] ideaOutputData)
+        {   
+            // Trainning
+            IMLDataSet trainingSet = new BasicMLDataSet(inputData, ideaOutputData);
+            return method.TrainNetwork(_network, trainingSet);
+        }
+
+        public double Training(double[] inputData, double[] ideaOutputData)
         {
             if (_network == null)
             {

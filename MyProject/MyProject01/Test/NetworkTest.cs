@@ -142,7 +142,7 @@ namespace MyProject01.Test
             int loopCnt = 1;
             ResultPrintf("------------------------");
             ResultPrintf("Neural Network Results:");
-            ResultPrintf("ErrorLimit:\t" + parm.errorlimit.ToString() + "\tNerul:\t" + parm.hidenLayerRaio.ToString());
+            ResultPrintf("ErrorLimit:\t" + parm.ErrorChangeLimit.ToString() + "\tNerul:\t" + parm.hidenLayerRaio.ToString());
             ResultPrintf("TotalError:\t" + data.TestList.ResultError.ToString("000.0000"));
             ResultPrintf(data.ToStringResults());
             LogPrintf("Test end!");

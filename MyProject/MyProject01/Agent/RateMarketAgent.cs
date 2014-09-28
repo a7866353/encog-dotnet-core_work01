@@ -36,6 +36,7 @@ namespace MyProject01.Agent
         private double scaleRate = 10000;
         private double money;
         private int dataLength = 30;
+        private int testLength = 100;
 
         private DataLoader dataLoader;
         private int index = 0;
@@ -47,6 +48,7 @@ namespace MyProject01.Agent
             money = initMoney;
             this.user = new QLearn(network);
             dataLoader = new DataLoader(_dataFile);
+            testLength = Math.Min(testLength, dataLoader.Count);
         }
 
         public void Run()
@@ -86,7 +88,7 @@ namespace MyProject01.Agent
 
                         // LogFile.WriteLine("[" + index.ToString("D6") + "]" + "Current Value: " + CurrentValue().ToString());
                     }
-                    if (index >= dataLoader.Count-1)
+                    if (index >= testLength - 1)
                         break;// end
                     index++;
                 }

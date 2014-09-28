@@ -39,6 +39,7 @@ namespace MyProject01
         private delegate void func();
         private Thread workThread;
         private TestCaseObject _testObject;
+        private StreamWriter _fileLogStream;
         public MainWindow(TestCaseObject testObject)
         {
             InitializeComponent();
@@ -68,8 +69,12 @@ namespace MyProject01
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            _fileLogStream = new StreamWriter("Log.txt", false);
+            _fileLogStream.AutoFlush = true;
+            
             LogFile.FuncList.Add(new LogFile.WriteLineFunction(WriteText));
-            workThread = new Thread(new ThreadStart(MainWorkFunction));
+            LogFile.FuncList.Add(new LogFile.WriteLineFunction(WriteToFile));
+           workThread = new Thread(new ThreadStart(MainWorkFunction));
             workThread.Priority = ThreadPriority.BelowNormal;
             workThread.Start();
 
@@ -78,7 +83,10 @@ namespace MyProject01
         {
             this.Dispatcher.BeginInvoke(new func(delegate
             {
+                if (_fileLogStream != null)
+                    _fileLogStream.Close();
                 this.Close();
+
             }));
         }
         private void WriteText(string str)
@@ -92,6 +100,10 @@ namespace MyProject01
             }));
         }
         
+        private void WriteToFile(string str)
+        {
+            _fileLogStream.WriteLine(str);
+        }
 
         private void MainWorkFunction()
         {

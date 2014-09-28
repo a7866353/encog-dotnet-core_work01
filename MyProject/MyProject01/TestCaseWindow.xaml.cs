@@ -151,7 +151,7 @@ namespace MyProject01
             targetErrorLimit /= trainingSet[0].Ideal.Count;
             targetErrorLimit *= errorLimit;
 
-            NEATPopulation pop = new NEATPopulation(2, 1, 10000);
+            NEATPopulation pop = new NEATPopulation(30, 3, 100);
             pop.Reset();
             pop.InitialConnectionDensity = 1.0; // not required, but speeds processing.
             ICalculateScore score = new TrainingSetScore(trainingSet);
@@ -188,8 +188,8 @@ namespace MyProject01
             FeedForwardNet net = new FeedForwardNet();
             BasicNetwork network = net.GetNet(parm);
             BackpropagationTraining method = new BackpropagationTraining();
-            method.errorLimit = 0.0000001;
-            method.maxTryCount = 10;
+            method.ErrorChangeLimit = 0.0000001;
+            method.ErrorChangeTryMaxCount = 10;
             IMLDataSet trainingSet = RandomTrainingFactory.Generate(1000, 1500,
                                          parm.InputSize, parm.OutputSize, -1, 1);
 

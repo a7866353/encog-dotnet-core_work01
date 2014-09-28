@@ -19,6 +19,7 @@ namespace MyProject01.TestCases
             // Init network
             NetworkTestParameter parm = new NetworkTestParameter("QLearn", 0.5, 2, 10);
             // network = new MyNet(new FeedForwardNet(), new ResilientPropagationTraining(), parm);
+            parm.MaxTryCount = 1000;
             MyNet network = new MyNet(new FeedForwardNet(), new BackpropagationTraining(), parm);
             network.Init(30, 3);
 

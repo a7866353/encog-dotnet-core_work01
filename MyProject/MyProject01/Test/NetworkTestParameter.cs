@@ -9,26 +9,28 @@ namespace MyProject01.Test
     {
         //-----------------------------------------------
         // Common
-        public string name { get; set;}
-        public double errorlimit = 0.001;
-        public double hidenLayerRaio = 10000;
-        public int retryCnt { get; set; }
+        public string name;
+        public double ErrorChangeLimit = 0.01;
+        public int ErrorChangeRetryCount = 10;
+        public double ErrorLimit = 0.01;
+        public int MaxTryCount = 1000;
 
         //-----------------------------------------------
         // Network
         public int InputSize;
         public int OutputSize;
         public int HidenLayerNum;
+        public double hidenLayerRaio = 10000;
 
         //-----------------------------------------------
         // Test
 
-        public NetworkTestParameter(string name, double error, double hidenLayerRaio, int retryCnt)
+        public NetworkTestParameter(string name, double changeErrorLimit, double hidenLayerRaio, int changeErrorRetryCnt)
         {
             this.name = name;
-            this.errorlimit = error;
             this.hidenLayerRaio = hidenLayerRaio;
-            this.retryCnt = retryCnt;
+            this.ErrorChangeLimit = changeErrorLimit;
+            this.ErrorChangeRetryCount = changeErrorRetryCnt;
         }
         public NetworkTestParameter(string name, int hidenLayerNum)
         {
@@ -38,7 +40,7 @@ namespace MyProject01.Test
 
         public override string ToString()
         {
-            return "Err:" + errorlimit.ToString("G2") + " NeroRaio:" + hidenLayerRaio.ToString();
+            return "Err:" + ErrorChangeLimit.ToString("G2") + " NeroRaio:" + hidenLayerRaio.ToString();
         }
     }
 }

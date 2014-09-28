@@ -16,8 +16,8 @@ namespace MyProject01.Reinforcement
     {
         public double _totalError;
         public int _totalCount;
-        private RateMarketAgentData _previousState;
-        private double[] _previousOutput;
+        private List<double[]> _previousStateList;
+        private List<double[]> _outputDataArrayList;
         private int _previousOutputSelete;
         public MyNet network;
         private Random rand;
@@ -27,23 +27,15 @@ namespace MyProject01.Reinforcement
         private double _scaleRate = 1000;
         private double _learnRate = 0.7;
         // Paramters
-        private int _inputLength;
-        private int _outputLength;
-
-        private double[] _inputDataArray;
-        private double[] _outputDataArray;
 
         public QLearn(MyNet network)
         {
             rand = new Random();
-            _previousState = null;
-            _previousOutput = null;
             _previousOutputSelete = -1;
 
-            this._inputLength = network.parm.InputSize; ;
-            _inputDataArray = new double[_inputLength];
+            this._previousStateList = new List<double[]>();
+            this._outputDataArrayList = new List<double[]>();
 
-            _outputLength = 3;
 
             _totalError = 0;
             _totalCount = 0;
@@ -83,18 +75,22 @@ namespace MyProject01.Reinforcement
             }
 
             // Learn
-            if( _previousState != null)
+            if (_previousStateList.Count != 0)
             {
                 double error;
-                _previousOutput[_previousOutputSelete] = ((1 - _learnRate) * _previousOutput[_previousOutputSelete]) + _learnRate * (state.Reward + _discountRate * actionQValueArr[greedActionIndex]);
-                error = network.Training(_previousState.RateDataArray, _previousOutput);
+                int index = _previousStateList.Count - 1;
+                double value = _outputDataArrayList[_previousStateList.Count - 1][_previousOutputSelete];
+                _outputDataArrayList[_previousStateList.Count - 1][_previousOutputSelete] = ((1 - _learnRate) * value) + _learnRate * (state.Reward + _discountRate * actionQValueArr[greedActionIndex]);
+                error = network.Training(_previousStateList.ToArray(), _outputDataArrayList.ToArray());
+                // error = network.Training(_previousStateList[index], _outputDataArrayList[index]);
                 // LogFile.WriteLine(error.ToString("G"));
                 _totalError += error;
                 _totalCount++;
             }
 
-            _previousState = state;
-            _previousOutput = actionQValueArr;
+            _previousStateList.Add(state.RateDataArray);
+            _outputDataArrayList.Add(actionQValueArr);
+
             _previousOutputSelete = actionIndex;
 
             switch(actionIndex)
@@ -115,9 +111,9 @@ namespace MyProject01.Reinforcement
             get
             {
                 double errorSum = 0;
-                foreach (double d in _previousOutput)
+                foreach (double d in _outputDataArrayList[_outputDataArrayList.Count-1])
                     errorSum += Math.Abs(d);
-                errorSum /= _previousOutput.Length;
+                errorSum /= _outputDataArrayList[_outputDataArrayList.Count-1].Length;
                 return _totalError / errorSum / _totalCount;
             }
             set

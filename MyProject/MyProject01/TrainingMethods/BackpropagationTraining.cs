@@ -22,14 +22,14 @@ namespace MyProject01.TrainingMethods
             for (int i = 0; i < trainingSet[0].Ideal.Count; i++)
                 targetError += Math.Abs( trainingSet[0].Ideal[i]);
             targetError /= trainingSet[0].Ideal.Count;
-            targetError *= this.errorLimit; 
+            targetError *= this.ErrorChangeLimit; 
             // train the neural network
             ICalculateScore score = new TrainingSetScore(trainingSet);
             IMLTrain trainAlt = new NeuralSimulatedAnnealing(network, score, 10, 2, 100);
             
             var trainMain = new Backpropagation(network, trainingSet);
             trainMain.ThreadCount = 8;
-            var stop = new StopTrainingStrategy(targetError, maxTryCount);
+            var stop = new StopTrainingStrategy(targetError, ErrorChangeTryMaxCount);
             // trainMain.AddStrategy(new Greedy());
             trainMain.AddStrategy(new HybridStrategy(trainAlt));
             trainMain.AddStrategy(stop);
@@ -41,7 +41,7 @@ namespace MyProject01.TrainingMethods
                 // LogFile.WriteLine("Epoch #" + epoch.ToString("D4") + " Error:" + trainMain.Error.ToString("G6") + "\tTarget: " + targetError.ToString("G6"));
                 //SaveNetworkToFile(network, testName);
                 epoch++;
-                if (epoch > 1000)
+                if (epoch > MaxTryCount)
                     break;
             }
             return trainMain.Error;
