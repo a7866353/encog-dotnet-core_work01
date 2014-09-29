@@ -10,7 +10,7 @@ namespace MyProject01.Agent
 {
     enum MarketActions
     {
-        Nothing,
+        Nothing = 0,
         Buy,
         Sell,
     };
@@ -32,7 +32,7 @@ namespace MyProject01.Agent
     {
 
         static private DataLoader _dataLoader;
-        static private const string _dataFile = "data.csv";
+        static private string _dataFile = "data.csv";
         static RateMarketAgent()
         {
             _dataLoader = new DataLoader(_dataFile);
@@ -43,12 +43,11 @@ namespace MyProject01.Agent
 
         public double InitMoney = 10000;
         private double money;
-        private int _dataLength = 30;
-        private int _testLength = 100;
+        public  int DataLength = 30;
+        private int _testLength = _dataLoader.Count;
 
         private int index = 0;
         private double mountInHand;
-        private IRateMarketUser user;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
 
@@ -62,9 +61,10 @@ namespace MyProject01.Agent
 
         public bool IsEnd { private set; get; }
 
-        public RateMarketAgent(IRateMarketUser user)
+        public double CurrentRateValue { get { return _dataLoader[index].Value; } }
+
+        public RateMarketAgent()
         {
-            this.user = user;
             _testLength = Math.Min(_testLength, _dataLoader.Count);
             _stateData = new RateMarketAgentData();
             Reset();
@@ -74,14 +74,13 @@ namespace MyProject01.Agent
         {
             _step = 0;
             money = InitMoney;
-            index = _dataLength - 1;
+            index = DataLength - 1;
             mountInHand = 0;
             money = InitMoney;
-            user.TotalErrorRate = 0;
             IsEnd = false;
 
             
-            _stateData.RateDataArray = _dataLoader.GetArr(index - _dataLength + 1, _dataLength);
+            _stateData.RateDataArray = _dataLoader.GetArr(index - DataLength + 1, DataLength);
             _stateData.Reward = 0;
             return _stateData;
         }
@@ -115,7 +114,7 @@ namespace MyProject01.Agent
                     break;
             }
             _stateData.Reward = (CurrentValue() - InitMoney) / InitMoney;
-            _stateData.RateDataArray = _dataLoader.GetArr(index - _dataLength + 1, _dataLength);
+            _stateData.RateDataArray = _dataLoader.GetArr(index - DataLength + 1, DataLength);
             return _stateData;
         }
 

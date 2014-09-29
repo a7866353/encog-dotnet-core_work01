@@ -45,6 +45,7 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
                 new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
                 new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
                 new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
@@ -198,6 +199,14 @@ namespace MyProject01
             LogFile.WriteLine(@"Neural Network Results:");
 
         }
+        private void TestRateMarketNEAT()
+        {
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.RunTest();
+        }
+
+        // Class end
+        //---------------------------------
 
     }
 

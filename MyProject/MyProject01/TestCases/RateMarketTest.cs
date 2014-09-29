@@ -28,11 +28,12 @@ namespace MyProject01.TestCases
             for(int i=0;i<1;i++)
             {
                 QLearn qlearn = new QLearn(network);
-                RateMarketAgent agent = new RateMarketAgent(qlearn);
-                agentList.Add(agent);
+                // TODO
+                // RateMarketAgent agent = new RateMarketAgent(qlearn);
+                // agentList.Add(agent);
             }
 
-            Parallel.ForEach(agentList, currentAgent => currentAgent.TakeAction());
+            // Parallel.ForEach(agentList, currentAgent => currentAgent.TakeAction());
         }
     }
 }
