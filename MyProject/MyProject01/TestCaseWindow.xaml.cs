@@ -26,6 +26,7 @@ using MyProject01.TrainingMethods;
 using MyProject01.Networks;
 using MyProject01.Test;
 using Encog.Neural.Networks;
+using MyProject01.DAO;
 
 namespace MyProject01
 {
@@ -45,6 +46,7 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
                 new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
                 new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
                 new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
@@ -205,8 +207,38 @@ namespace MyProject01
             test.RunTest();
         }
 
+        private void TestDAO()
+        {
+            string testName = "QLearn01";
+            if (RateMarketTestDAO.IsExist(testName) == true)
+                RateMarketTestDAO.Remove(testName);
+            RateMarketTestDAO dao = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(testName);
+
+
+            NetworkTestParameter parm = new NetworkTestParameter("QLearn", 0.5, 2, 10);
+            // network = new MyNet(new FeedForwardNet(), new ResilientPropagationTraining(), parm);
+            parm.MaxTryCount = 1000;
+            MyNet network = new MyNet(new FeedForwardNet(), new BackpropagationTraining(), parm);
+            network.Init(30, 3);
+
+            dao.NetworkData = network.NetworkToByte();
+            dao.NetworkParamter = network.parm;
+
+            dao.Save();
+
+            RateMarketTestEpisodeDAO episodeDAO;
+
+            for (int i = 0; i < 100; i++)
+            {
+                episodeDAO = new RateMarketTestEpisodeDAO();
+                episodeDAO.EpisodeNumber = i;
+                dao.AddEpisode(episodeDAO);
+            }
         // Class end
         //---------------------------------
+
+
+        }
 
     }
 

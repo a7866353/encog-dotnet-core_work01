@@ -23,7 +23,7 @@ namespace MyProject01
         private BasicNetwork _network;
 
         //--------------
-        private TestCaseDAO testCaseDao;
+        private RateMarketTestDAO myNetDao;
 
         public MyNet(BasicNet net, BasicTrainingMethod method, NetworkTestParameter parm)
         {
@@ -32,7 +32,7 @@ namespace MyProject01
             this.parm = parm;
             method.ErrorChangeLimit = parm.ErrorChangeLimit;
             method.ErrorChangeTryMaxCount = parm.ErrorChangeRetryCount;
-            testCaseDao = TestCaseDAO.GetDAO("QLearn01");
+            myNetDao = BasicTestCaseDAO.GetDAO<RateMarketTestDAO>("QLearn01");
         }
 
         public void Init(int inputSize, int outputSize)
@@ -103,21 +103,33 @@ namespace MyProject01
         }
         public void SaveNetwork()
         {
-            testCaseDao.NetworkParamter = this.parm;
+            myNetDao.NetworkParamter = this.parm;
             MemoryStream stream = new MemoryStream();
             BinaryFormatter  formatter = new BinaryFormatter();
             formatter.Serialize(stream, this._network);
 
-            testCaseDao.NetworkData = stream.ToArray();
+            myNetDao.NetworkData = stream.ToArray();
             stream.Close();
-            testCaseDao.Save();
+            myNetDao.Save();
         }
         public void LoadNetwork()
         {
-            MemoryStream stream = new MemoryStream(testCaseDao.NetworkData);
+            MemoryStream stream = new MemoryStream(myNetDao.NetworkData);
             BinaryFormatter formatter = new BinaryFormatter();
             this._network = (BasicNetwork)formatter.Deserialize(stream);
             stream.Close();
+        }
+
+        public byte[] NetworkToByte()
+        {
+            myNetDao.NetworkParamter = this.parm;
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, this._network);
+
+            byte[] res = stream.ToArray();
+            stream.Close();
+            return res;
         }
 
     }
