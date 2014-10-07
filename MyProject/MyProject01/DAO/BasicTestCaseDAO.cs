@@ -67,12 +67,17 @@ namespace MyProject01.DAO
 
         static public string CollectionName = "TestCases";
         static public string EpisodeCollectionName = "TestEpisode";
-        static public T GetDAO<T>(string testCaseName) 
+        static public T GetDAO<T>(string testCaseName, bool isNew = false) 
             where T : BasicTestCaseDAO, new()
         {
             if (string.IsNullOrWhiteSpace(testCaseName) == true)
             {
                 return null;
+            }
+            if (isNew == true)
+            {
+                if (RateMarketTestDAO.IsExist(testCaseName) == true)
+                    RateMarketTestDAO.Remove(testCaseName);
             }
             T retDao;
             TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();

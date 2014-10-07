@@ -39,14 +39,21 @@ namespace MyProject01.Agent
 
         }
 
+        static public int CaseLength = 30;
+        static public int TotalDataLength
+        {
+            get
+            {
+                return _dataLoader.Count;
+            }
+        }
 
 
         public double InitMoney = 10000;
         private double money;
-        public  int DataLength = 30;
-        private int _testLength = _dataLoader.Count;
+        public int TestDataLength = _dataLoader.Count;
 
-        private int index = 0;
+        public int index = 0;
         private double mountInHand;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
@@ -65,7 +72,7 @@ namespace MyProject01.Agent
 
         public RateMarketAgent()
         {
-            _testLength = Math.Min(_testLength, _dataLoader.Count);
+            TestDataLength = Math.Min(TestDataLength, _dataLoader.Count);
             _stateData = new RateMarketAgentData();
             Reset();
         }
@@ -74,13 +81,13 @@ namespace MyProject01.Agent
         {
             _step = 0;
             money = InitMoney;
-            index = DataLength - 1;
+            index = CaseLength - 1;
             mountInHand = 0;
             money = InitMoney;
             IsEnd = false;
 
             
-            _stateData.RateDataArray = _dataLoader.GetArr(index - DataLength + 1, DataLength);
+            _stateData.RateDataArray = _dataLoader.GetArr(index - CaseLength + 1, CaseLength);
             _stateData.Reward = 0;
             return _stateData;
         }
@@ -89,7 +96,7 @@ namespace MyProject01.Agent
         {
             if (IsEnd == true)
                 return false;
-            if((index+1) > _testLength - 1)
+            if((index+1) > TestDataLength - 1)
             {
                 IsEnd = true;
                 return false;
@@ -114,7 +121,7 @@ namespace MyProject01.Agent
                     break;
             }
             _stateData.Reward = (CurrentValue() - InitMoney) / InitMoney;
-            _stateData.RateDataArray = _dataLoader.GetArr(index - DataLength + 1, DataLength);
+            _stateData.RateDataArray = _dataLoader.GetArr(index - CaseLength + 1, CaseLength);
             return _stateData;
         }
 

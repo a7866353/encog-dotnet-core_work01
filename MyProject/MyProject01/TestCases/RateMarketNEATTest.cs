@@ -9,14 +9,44 @@ using Encog.Util;
 using Encog.Util.Banchmark;
 using Encog.Util.Simple;
 using MyProject01.Agent;
+using MyProject01.DAO;
 using MyProject01.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MyProject01.DAO;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace MyProject01.TestCases
 {
+    class DealLog
+    {
+        public MarketActions Action { set; get; }
+        public double CurrentMoney { set; get; }
+    }
+    class EpisodeLog : BasicTestEpisodeDAO
+    {
+        public double ResultMoney { set; get; }
+        public int DealCount { set; get; }
+        public double TrainedDataEarnRate { set; get; }
+        public double UnTrainedDataEarnRate { set; get; }
+        public List<DealLog> DealLogs { set; get; }
+
+
+        // ================
+        // Network
+        public int HidenNodeCount { set; get; }
+
+        // ====================
+        // Functions
+        public EpisodeLog()
+        {
+            DealLogs = new List<DealLog>();
+        }
+    }
+
     public class RateMarketScore : ICalculateScore
     {
 
@@ -32,6 +62,7 @@ namespace MyProject01.TestCases
         public double CalculateScore(IMLMethod network)
         {
             RateMarketAgent agent = new RateMarketAgent();
+            agent.TestDataLength = (int)(RateMarketAgent.TotalDataLength * RateMarketNEATTest.TrainDataRadio);
             IMLRegression reg = (IMLRegression)network;
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
@@ -116,6 +147,7 @@ namespace MyProject01.TestCases
     }
     class RateMarketNEATTest : BasicTestCase
     {
+        public static double TrainDataRadio = 0.8;
         public override void RunTest()
         {
             LogFormater log = new LogFormater();
@@ -123,6 +155,8 @@ namespace MyProject01.TestCases
             int toleratedCycles = 10;
             double targetErrorLimit = 0;
             StopTrainingStrategy stopStrategy = null;
+            string testName = "QLearn03";
+            RateMarketTestDAO dao = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(testName, true);
 
             NEATPopulation pop = new NEATPopulation(30, 3, 500);
             pop.Reset();
@@ -151,6 +185,11 @@ namespace MyProject01.TestCases
 
                 LogFile.WriteLine(log.GetLog());
                 epoch++;
+
+                NEATNetwork episodeNet = (NEATNetwork)train.CODEC.Decode(train.BestGenome);
+                TestResult(episodeNet, dao);
+                dao.NetworkData = NetworkToByte(episodeNet);
+                dao.Save();
             } while ((stopStrategy.ShouldStop() == false) && !train.TrainingDone);
             train.FinishTraining();
 
@@ -159,6 +198,93 @@ namespace MyProject01.TestCases
             
             // test the neural network
             LogFile.WriteLine(@"Training end");
+        }
+
+        private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
+        {
+            RateMarketAgent agent = new RateMarketAgent();
+            agent.TestDataLength = (int)(RateMarketAgent.TotalDataLength);
+            RateMarketAgentData stateData = agent.Reset();
+            int maxActionIndex = -1;
+            MarketActions currentAction;
+
+            EpisodeLog epsodeLog = new EpisodeLog();
+            int dealCount = 0;
+            DealLog dealLog;
+            int trainedDataIndex = (int)(RateMarketAgent.TotalDataLength * RateMarketNEATTest.TrainDataRadio);
+            double startMoney = agent.InitMoney;
+            double trainedMoney = 0;
+            double endMoney = 0;
+            while(true)
+            {
+                if (agent.CurrentRateValue > 0)
+                {
+                    // Get Action Value
+                    IMLData output = network.Compute(new BasicMLData(stateData.RateDataArray));
+
+                    // Choose an action
+                    maxActionIndex = 0;
+                    for (int i = 1; i < output.Count; i++)
+                    {
+                        if (output[maxActionIndex] < output[i])
+                            maxActionIndex = i;
+                    }
+
+                    // Do action
+                    switch (maxActionIndex)
+                    {
+                        case 0:
+                            currentAction = MarketActions.Nothing;
+                            break;
+                        case 1:
+                            currentAction = MarketActions.Buy;
+                            dealCount++;
+                            break;
+                        case 2:
+                            currentAction = MarketActions.Sell;
+                            dealCount++;
+                            break;
+                        default:
+                            currentAction = MarketActions.Nothing;
+                            break;
+                    }
+
+                    dealLog = new DealLog()
+                    {
+                        Action = currentAction,
+                        CurrentMoney = agent.CurrentValue(),
+
+                    };
+                    epsodeLog.DealLogs.Add(dealLog);
+                    if (agent.index == trainedDataIndex)
+                        trainedMoney = agent.CurrentValue();
+
+                    stateData = agent.TakeAction(currentAction);
+                }
+                if (agent.Next() == false)
+                    break;
+            } // end while
+            endMoney = agent.CurrentValue();
+
+            epsodeLog.TrainedDataEarnRate = (trainedMoney / startMoney) * 100;
+            epsodeLog.UnTrainedDataEarnRate = (endMoney / trainedMoney) * 100;
+            epsodeLog.DealCount = dealCount;
+            epsodeLog.HidenNodeCount = network.Links.Length;
+            epsodeLog.ResultMoney = endMoney;
+            dao.AddEpisode(epsodeLog);
+
+            
+        }
+
+        private byte[] NetworkToByte(NEATNetwork network)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, network);
+
+            byte[] res = stream.ToArray();
+            stream.Close();
+            return res;
         }
     }
 }
