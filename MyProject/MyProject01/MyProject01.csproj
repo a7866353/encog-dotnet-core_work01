@@ -108,6 +108,8 @@
     <Compile Include="Util\MyTestData.cs" />
     <Compile Include="Util\MyTestDataList.cs" />
     <Compile Include="Util\SlidingFilter.cs" />
+    <Compile Include="Util\View\GraphLine.cs" />
+    <Compile Include="Util\View\GraphMark.cs" />
     <Compile Include="Util\View\GraphViewer.xaml.cs">
       <DependentUpon>GraphViewer.xaml</DependentUpon>
     </Compile>
