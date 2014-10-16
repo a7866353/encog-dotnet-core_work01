@@ -101,6 +101,7 @@ namespace MyProject01.Util.View
         private TranslateTransform translate;
         private GeometryGroup geometrys;
 
+        private List<GraphLine> _graphLineList;
         //-------------
         private double mouseWheelStep = 0.1;
         private Point mouseLastPoint;
@@ -140,6 +141,7 @@ namespace MyProject01.Util.View
             GraphViewer._Instance = this;
 
             RateSetDataList = new List<RateSetUtility>();
+            _graphLineList = new List<GraphLine>();
 
         }
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -309,8 +311,15 @@ namespace MyProject01.Util.View
         }
 
         #region Pulic_Function
-        public int AddRateSet(RateSet[] rateSetArr)
+        public GraphLine AddRateSet(RateSet[] rateSetArr)
         {
+            double[] dataArray = new double[rateSetArr.Length];
+            for (int i = 0; i < dataArray.Length; i++)
+                dataArray[i] = rateSetArr[i].Value;
+            return AddRateSet(dataArray);
+
+
+            /*
             RateSetUtility rateSetObj = new RateSetUtility(rateSetArr);
             RateSetDataList.Add(rateSetObj);
             this.Dispatcher.BeginInvoke(new func(delegate
@@ -328,9 +337,11 @@ namespace MyProject01.Util.View
             }));
             // Return Index
             return RateSetDataList.Count - 1;
+            */
         }
-        public int AddRateSet(double[] rateSetArr)
+        public GraphLine AddRateSet(double[] rateSetArr)
         {
+            /*
             RateSetUtility rateSetObj = new RateSetUtility(rateSetArr);
             RateSetDataList.Add(rateSetObj);
             this.Dispatcher.BeginInvoke(new func(delegate
@@ -346,8 +357,16 @@ namespace MyProject01.Util.View
                 rateSetObj.scaleY = transformScaleY;
                 geometrys.Children.Add(rateSetObj.GetLine());
             }));
-            // Return Index
+             // Return Index
             return RateSetDataList.Count - 1;
+           */
+            GraphLine line = new GraphLine(target, rateSetArr, Brushes.Black, 1);
+            _graphLineList.Add(line);
+            this.Dispatcher.BeginInvoke(new func(delegate
+            {
+                line.Update();
+            }));
+            return line;
         }
         public void AddMark(int index, DealPointInfomation[] markInfoArr)
         {

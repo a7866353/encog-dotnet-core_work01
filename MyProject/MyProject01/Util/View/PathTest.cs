@@ -60,26 +60,7 @@ namespace MyProject01
 
 
         //---------------------------------------------------------
-        public Geometry StreamGeometryLineExample()
-        {
-            double startPos = -100;
-            double endPos = 100;
-            int point = 1000;
-
-            double step = (endPos - startPos) / point;
-            Point[] pointArr = new Point[point];
-            double pos = startPos;
-            for (int i = 0; i < pointArr.Length; i++)
-            {
-
-                double y = -pos * pos ;
-                pointArr[i] = new Point(pos, y);
-                pos += step;
-            }
-             movePointArr(pointArr, 100, 0);
-            // scalePointArr(pointArr, 3, 1);
-            return DrawLineByPointArr(pointArr);
-        }
+      
         public static Geometry DrawLineByPointArr(Point[] pointArr)
         {
             // Create a StreamGeometry to use to specify myPath.

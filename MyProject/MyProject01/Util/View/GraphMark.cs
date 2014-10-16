@@ -9,7 +9,7 @@ using System.Windows.Shapes;
 
 namespace MyProject01.Util.View
 {
-    class GraphMark
+    public class GraphMark
     {
         private Panel _partenPanel;
         private Brush _color;
@@ -20,33 +20,44 @@ namespace MyProject01.Util.View
         
         private Shape _referedShape;
 
-        
+        public double ScaleX = 1.0;
+        public double ScaleY = 1.0;
+
         public GraphMark( Panel parentPanel, Point point, Brush color, int thickness = 1 )
         {
             this._partenPanel = parentPanel;
             this._point = point;
             this._color = color;
             this._thickness = thickness; 
+
         }
 
         public void Update()
         {
-            Remvoe();
-            _referedShape = new Ellipse();
+            bool isNew = false;
+            if (_referedShape == null)
+            {
+                _referedShape = new Ellipse();
+                isNew = true;
+            }
             _referedShape.StrokeThickness = _thickness;
             _referedShape.Stroke = this._color;
-            _referedShape.Width = (int)_width;
-            _referedShape.Height = (int)_height;
-            _referedShape.Margin = new Thickness(_point.X, _point.Y, 0, 0);
+            _referedShape.Width = (int)(_width * ScaleX);
+            _referedShape.Height = (int)(_height * ScaleY);
+            _referedShape.Margin = new Thickness(_point.X*ScaleX, _point.Y*ScaleY, 0, 0);
 
-            _partenPanel.Children.Add(_referedShape);
+            if( isNew == true)
+                _partenPanel.Children.Add(_referedShape);
             
         }
 
         public void Remvoe()
         {
             if (_referedShape != null)
+            {
                 _partenPanel.Children.Remove(_referedShape);
+                _partenPanel = null;
+            }
 
         }
     }

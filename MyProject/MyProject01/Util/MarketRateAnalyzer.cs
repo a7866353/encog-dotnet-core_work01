@@ -32,7 +32,7 @@ namespace MyProject01.Util
 
         private delegate List<DealPointInfomation> DealPointFunction(List<DealPointInfomation> infoArr);
         // Debug
-        private int[] viewId;
+        private GraphLine[] _graphLineArr;
         
         public MarketRateAnalyzer(RateSet[] rateSetArr)
         {
@@ -43,7 +43,7 @@ namespace MyProject01.Util
                 _sourceDataArr[i] = rateSetArr[i].Value;
             }
 
-            viewId = new int[4];
+            _graphLineArr = new GraphLine[4];
         }
 
         public DealPointInfomation[] GetDealInfo()
@@ -56,8 +56,8 @@ namespace MyProject01.Util
             dealFuncs.Add(FindAroundMaximin);
             dealFuncs.Add(ThredHoldFilter);
             // Debug
-            viewId[0] = GraphViewer.Instance.AddRateSet(_sourceDataArr);
-            viewId[1] = GraphViewer.Instance.AddRateSet(aveDataArr);
+            _graphLineArr[0] = GraphViewer.Instance.AddRateSet(_sourceDataArr);
+            _graphLineArr[1] = GraphViewer.Instance.AddRateSet(aveDataArr);
 
 
 
@@ -69,7 +69,10 @@ namespace MyProject01.Util
 
             // Debug
             DealPointInfomation[] infoArr = infoList.ToArray();
-            GraphViewer.Instance.AddMark(viewId[0], infoArr);
+            foreach( DealPointInfomation info in infoList)
+            {
+                _graphLineArr[0].AddMark(info.Index);
+            }
 
             return infoList.ToArray();
         }
