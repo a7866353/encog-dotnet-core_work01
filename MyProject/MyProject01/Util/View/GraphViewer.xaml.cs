@@ -108,6 +108,13 @@ namespace MyProject01.Util.View
 
         //------------------------------
         private static GraphViewer _Instance = null;
+
+        //---------------------
+        private bool isMouseSet;
+        private Point sourceMousePoint;
+        private Point sourcePoint;
+        private Point preScalePoint;
+
         public static GraphViewer Instance
         {
             get
@@ -119,8 +126,8 @@ namespace MyProject01.Util.View
         //-------------------
         private double transformPosX = 0;
         private double transformPosY = 0;
-        private double transformScaleX = 0;
-        private double transformScaleY = 0;
+        private double transformScaleX = 1;
+        private double transformScaleY = -400;
         private double transformPosStep = 10;
         private double transformScaleStep = 1.2;
 
@@ -135,8 +142,8 @@ namespace MyProject01.Util.View
         {
             InitializeComponent();
 
-            this.KeyDown += new KeyEventHandler(MainWindow_KeyDown);
             this.MouseWheel += new MouseWheelEventHandler(MainWindow_MouseWheel);
+            this.MouseMove += GraphViewer_MouseMove;
             this.Loaded += MainWindow_Loaded;
             GraphViewer._Instance = this;
 
@@ -144,6 +151,7 @@ namespace MyProject01.Util.View
             _graphLineList = new List<GraphLine>();
 
         }
+
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Init Panel
@@ -154,7 +162,7 @@ namespace MyProject01.Util.View
             transGroup.Children.Add(scale);
             translate = new TranslateTransform(0, 0);
             transGroup.Children.Add(translate);
-            // target.RenderTransform = transGroup;
+            target.RenderTransform = transGroup;
             this.Content = target;
             /*
                         target.MaxWidth = 5000;
@@ -183,8 +191,33 @@ namespace MyProject01.Util.View
                 + scale.ScaleX.ToString() + "\t"
                 + scale.ScaleY.ToString());
         }
+        void GraphViewer_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+            {
+                isMouseSet = false;
+                return;
+            }
+            if (isMouseSet == false)
+            {
+                isMouseSet = true;
+                sourceMousePoint = e.GetPosition(this);
+                sourcePoint.X = translate.X;
+                sourcePoint.Y = translate.Y;
+                return;
+            }
+
+            Point center = e.GetPosition(this);
+
+            translate.X = sourcePoint.X + (center.X - sourceMousePoint.X);
+            translate.Y = sourcePoint.Y + (center.Y - sourceMousePoint.Y);
+            System.Console.WriteLine("Y:" + translate.Y.ToString());
+
+        }
+
         private void MainWindow_MouseWheel(object sender, MouseWheelEventArgs e)
         {
+            
             bool isImage = false;
             if (target == null)
                 return;
@@ -270,46 +303,42 @@ namespace MyProject01.Util.View
                         transformScaleY /= transformScaleStep;
                     }
                 }
-                geometrys.Children.Clear();
-                foreach (RateSetUtility set in RateSetDataList)
+                foreach( GraphLine line in _graphLineList)
                 {
-                    set.scaleX = transformScaleX;
-                    set.scaleY = transformScaleY * -1;
-                    geometrys.Children.Add(set.GetLine());
-                    geometrys.Children.Add(set.GetMark());
+                    line.ScaleX = transformScaleX;
+                    line.ScaleY = transformScaleY;
+                    line.Update();
                 }
-
-
             }
             // scale.CenterX = mouseLastPoint.X;
             // scale.CenterY = mouseLastPoint.Y;
             printTrans();
-        }
+            
 
-        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (target == null)
+            /*
+            int radio = 500;
+            double imageScaleRadio = target.Height / target.ActualHeight;
+            Point center;
+            center = e.GetPosition(target);
+            double delta = (double)e.Delta / radio;
+            double x = scale.ScaleX + delta;
+            double y = scale.ScaleY + delta;
+
+            scale.CenterX = center.X;
+            scale.CenterY = center.Y;
+
+
+            if ((target.ActualWidth * x < 100) ||
+                (target.ActualWidth * y < 100) ||
+                (x > 100) ||
+                (y > 100))
                 return;
-            const int step = 10;
-            switch (e.Key)
-            {
-                case Key.Left:
-                    translate.X -= step;
-                    break;
-                case Key.Right:
-                    translate.X += step;
-                    break;
-                case Key.Up:
-                    translate.Y -= step;
-                    break;
-                case Key.Down:
-                    translate.Y += step;
-                    break;
 
-            }
-            printTrans();
+            scale.ScaleX = x;
+            scale.ScaleY = y;
+            */
+
         }
-
         #region Pulic_Function
         public GraphLine AddRateSet(RateSet[] rateSetArr)
         {
