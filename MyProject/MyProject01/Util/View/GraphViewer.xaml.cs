@@ -127,7 +127,7 @@ namespace MyProject01.Util.View
         private double transformPosX = 0;
         private double transformPosY = 0;
         private double transformScaleX = 1;
-        private double transformScaleY = -400;
+        private double transformScaleY = 400;
         private double transformPosStep = 10;
         private double transformScaleStep = 1.2;
 

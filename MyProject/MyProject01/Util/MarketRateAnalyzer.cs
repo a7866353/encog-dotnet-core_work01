@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media;
 
 namespace MyProject01.Util
 {
@@ -71,9 +72,12 @@ namespace MyProject01.Util
             DealPointInfomation[] infoArr = infoList.ToArray();
             foreach( DealPointInfomation info in infoList)
             {
-                _graphLineArr[0].AddMark(info.Index);
+                if(info.Type == DealPointInfomation.DealTypes.Buy)
+                    _graphLineArr[0].AddMark(info.Index, Brushes.Red);
+                else
+                    _graphLineArr[0].AddMark(info.Index, Brushes.Green);
             }
-
+            _graphLineArr[0].Update();
             return infoList.ToArray();
         }
 

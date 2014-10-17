@@ -17,6 +17,18 @@ namespace MyProject01.Util.View
         private double _width = 10;
         private double _height = 10;
 
+        static private Brush[] _lineColorArray = new Brush[]
+            {
+                Brushes.Black,
+                Brushes.Red,
+                Brushes.Yellow,
+                Brushes.Blue,
+                Brushes.Aqua,
+                Brushes.Coral,
+                Brushes.Peru,
+            };
+        static private int _lineColorIndex = 0;
+
         private Path _referedShape;
         private List<GraphMark> _graphMarkList;
         private double[] _dataArray;
@@ -31,13 +43,18 @@ namespace MyProject01.Util.View
             this._color = color;
             this._thickness = thickness;
 
+            this._color = _lineColorArray[_lineColorIndex];
+            _lineColorIndex++;
+            if (_lineColorIndex >= _lineColorArray.Length)
+                _lineColorIndex = 0;
+
             _graphMarkList = new List<GraphMark>();
 
         }
 
-        public void AddMark(int index)
+        public void AddMark(int index, Brush color)
         {
-            GraphMark mark = new GraphMark(_partenPanel, new Point(index, _dataArray[index]), Brushes.Black, 1);
+            GraphMark mark = new GraphMark(_partenPanel, new Point(index, _dataArray[index]), color, 1);
             mark.ScaleX = ScaleX;
             mark.ScaleY = ScaleY;
             _graphMarkList.Add(mark);
