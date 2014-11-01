@@ -30,30 +30,13 @@ namespace MyProject01.Agent
 
     class RateMarketAgent
     {
-
-        static private DataLoader _dataLoader;
-        static private string _dataFile = "data.csv";
-        static RateMarketAgent()
-        {
-            _dataLoader = new DataLoader(_dataFile);
-
-        }
-
-        static public int CaseLength = 30;
-        static public int TotalDataLength
-        {
-            get
-            {
-                return _dataLoader.Count;
-            }
-        }
-
-
+        public double[] DataArray;
+        public int CaseLength = 30;
         public double InitMoney = 10000;
-        private double money;
-        public int TestDataLength = _dataLoader.Count;
-
         public int index = 0;
+
+
+        private double money;
         private double mountInHand;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
@@ -68,11 +51,10 @@ namespace MyProject01.Agent
 
         public bool IsEnd { private set; get; }
 
-        public double CurrentRateValue { get { return _dataLoader[index].Value; } }
+        public double CurrentRateValue { get { return DataArray[index]; } }
 
         public RateMarketAgent()
         {
-            TestDataLength = Math.Min(TestDataLength, _dataLoader.Count);
             _stateData = new RateMarketAgentData();
             Reset();
         }
@@ -86,8 +68,8 @@ namespace MyProject01.Agent
             money = InitMoney;
             IsEnd = false;
 
-            
-            _stateData.RateDataArray = _dataLoader.GetArr(index - CaseLength + 1, CaseLength);
+
+            _stateData.RateDataArray = GetArray(index - CaseLength + 1, CaseLength);
             _stateData.Reward = 0;
             return _stateData;
         }
@@ -96,7 +78,7 @@ namespace MyProject01.Agent
         {
             if (IsEnd == true)
                 return false;
-            if((index+1) > TestDataLength - 1)
+            if ((index + 1) > DataArray.Length - 1)
             {
                 IsEnd = true;
                 return false;
@@ -121,14 +103,24 @@ namespace MyProject01.Agent
                     break;
             }
             _stateData.Reward = (CurrentValue() - InitMoney) / InitMoney;
-            _stateData.RateDataArray = _dataLoader.GetArr(index - CaseLength + 1, CaseLength);
+            _stateData.RateDataArray = GetArray(index - CaseLength + 1, CaseLength);
             return _stateData;
+        }
+
+        public double CurrentValue()
+        {
+            double rate = DataArray[index];
+            double res = money;
+            if (mountInHand != 0)
+                res += mountInHand / rate;
+
+            return res;
         }
 
 
         private void Buy()
         {
-            double rate = _dataLoader[index].Value;
+            double rate = DataArray[index];
             if (money <= 0)
                 return;
 
@@ -138,22 +130,21 @@ namespace MyProject01.Agent
         }
         private void Sell()
         {
-            double rate = _dataLoader[index].Value;
+            double rate = DataArray[index];
             if (mountInHand <= 0)
                 return;
             money += mountInHand / rate;
             mountInHand = 0;
         }
         
-        public double CurrentValue()
+        private double[] GetArray(int index, int length)
         {
-            double rate = _dataLoader[index].Value;
-            double res = money;
-            if (mountInHand != 0)
-                res += mountInHand / rate;
-
+            length = Math.Min(length, DataArray.Length - index);
+            double[] res = new double[length];
+            Array.Copy(DataArray, index, res, 0, length);
             return res;
         }
+
         
     }
 }

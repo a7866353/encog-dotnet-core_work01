@@ -150,6 +150,10 @@ namespace MyProject01.TestCases
         public static double TrainDataRadio = 0.8;
         public override void RunTest()
         {
+            RunTestCase();
+        }
+        private void RunTestCase()
+        {
             LogFormater log = new LogFormater();
             double errorLimit = 0.001;
             int toleratedCycles = 10;
