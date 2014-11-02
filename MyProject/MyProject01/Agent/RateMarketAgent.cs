@@ -30,14 +30,13 @@ namespace MyProject01.Agent
 
     class RateMarketAgent
     {
-        public double[] DataArray;
-        public int CaseLength = 30;
-        public double InitMoney = 10000;
         public int index = 0;
+        public double InitMoney = 10000;
 
-
-        private double money;
-        private double mountInHand;
+        private double[] _dataArray;
+        private int _dataBlockLength;
+        private double _money;
+        private double _mountInHand;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
 
@@ -51,25 +50,39 @@ namespace MyProject01.Agent
 
         public bool IsEnd { private set; get; }
 
-        public double CurrentRateValue { get { return DataArray[index]; } }
+        public double CurrentRateValue { get { return _dataArray[index]; } }
+        public double CurrentValue
+        {
+            get
+            {
+                double rate = _dataArray[index];
+                double res = _money;
+                if (_mountInHand != 0)
+                    res += _mountInHand / rate;
 
-        public RateMarketAgent()
+                return res;
+            }
+        }
+
+        public RateMarketAgent(double[] dataArray, int dataBlockLength)
         {
             _stateData = new RateMarketAgentData();
+            this._dataArray = dataArray;
+            this._dataBlockLength = dataBlockLength;
             Reset();
         }
 
         public RateMarketAgentData Reset()
         {
             _step = 0;
-            money = InitMoney;
-            index = CaseLength - 1;
-            mountInHand = 0;
-            money = InitMoney;
+            _money = InitMoney;
+            index = _dataBlockLength - 1;
+            _mountInHand = 0;
+            _money = InitMoney;
             IsEnd = false;
 
-
-            _stateData.RateDataArray = GetArray(index - CaseLength + 1, CaseLength);
+            
+            _stateData.RateDataArray = GetArrayValue(index - _dataBlockLength + 1, _dataBlockLength);
             _stateData.Reward = 0;
             return _stateData;
         }
@@ -78,7 +91,7 @@ namespace MyProject01.Agent
         {
             if (IsEnd == true)
                 return false;
-            if ((index + 1) > DataArray.Length - 1)
+            if((index+1) > _dataArray.Length - 1)
             {
                 IsEnd = true;
                 return false;
@@ -102,49 +115,39 @@ namespace MyProject01.Agent
                 default:
                     break;
             }
-            _stateData.Reward = (CurrentValue() - InitMoney) / InitMoney;
-            _stateData.RateDataArray = GetArray(index - CaseLength + 1, CaseLength);
+            _stateData.Reward = (CurrentValue - InitMoney) / InitMoney;
+            _stateData.RateDataArray = GetArrayValue(index - _dataBlockLength + 1, _dataBlockLength);
             return _stateData;
-        }
-
-        public double CurrentValue()
-        {
-            double rate = DataArray[index];
-            double res = money;
-            if (mountInHand != 0)
-                res += mountInHand / rate;
-
-            return res;
         }
 
 
         private void Buy()
         {
-            double rate = DataArray[index];
-            if (money <= 0)
+            double rate = _dataArray[index];
+            if (_money <= 0)
                 return;
 
-            mountInHand += money * rate;
-            money = 0;
+            _mountInHand += _money * rate;
+            _money = 0;
 
         }
         private void Sell()
         {
-            double rate = DataArray[index];
-            if (mountInHand <= 0)
+            double rate = _dataArray[index];
+            if (_mountInHand <= 0)
                 return;
-            money += mountInHand / rate;
-            mountInHand = 0;
+            _money += _mountInHand / rate;
+            _mountInHand = 0;
         }
         
-        private double[] GetArray(int index, int length)
+        private double[] GetArrayValue(int index, int length)
         {
-            length = Math.Min(length, DataArray.Length - index);
+            length = Math.Min(length, _dataArray.Length - index);
             double[] res = new double[length];
-            Array.Copy(DataArray, index, res, 0, length);
+
+            Array.Copy(_dataArray, index, res, 0, length);
             return res;
         }
-
         
     }
 }

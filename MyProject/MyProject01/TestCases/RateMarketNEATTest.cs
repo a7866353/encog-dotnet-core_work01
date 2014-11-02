@@ -49,6 +49,13 @@ namespace MyProject01.TestCases
 
     public class RateMarketScore : ICalculateScore
     {
+        private double[] _dataArray;
+        private int _blockLength;
+        public RateMarketScore(double[] testData, int blockLength)
+        {
+            _dataArray = testData;
+            _blockLength = blockLength;
+        }
 
         public bool ShouldMinimize
         {
@@ -61,8 +68,7 @@ namespace MyProject01.TestCases
 
         public double CalculateScore(IMLMethod network)
         {
-            RateMarketAgent agent = new RateMarketAgent();
-            agent.TestDataLength = (int)(RateMarketAgent.TotalDataLength * RateMarketNEATTest.TrainDataRadio);
+            RateMarketAgent agent = new RateMarketAgent(_dataArray, _blockLength);
             IMLRegression reg = (IMLRegression)network;
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
@@ -104,7 +110,7 @@ namespace MyProject01.TestCases
                     break;
             }
 
-            return agent.CurrentValue();
+            return agent.CurrentValue;
         }
 
     }
@@ -148,24 +154,53 @@ namespace MyProject01.TestCases
     class RateMarketNEATTest : BasicTestCase
     {
         public static double TrainDataRadio = 0.8;
+        public DataLoader _dataLoader;
+        public string TestName = "DefaultTest000";
+
+        private int _testDataStartIndex;
+        private int _trainDataLength;
+        private int _testDataLength;
+        private int _dataBlockLength;
+        private double[] _trainDataArray;
+        private double[] _testDataArray;
+
+        public RateMarketNEATTest()
+        {
+            _dataLoader = new DataLoader();
+            
+        }
+
+        public void SetDataLength(int startIndex, int trainLength, int totalLength, int blockLength)
+        {
+            this._testDataStartIndex = startIndex;
+            this._trainDataLength = trainLength;
+            this._testDataLength = totalLength - blockLength - trainLength;
+            this._dataBlockLength = blockLength;
+
+            this._trainDataArray = _dataLoader.GetArr(startIndex, _dataBlockLength + _trainDataLength);
+            this._testDataArray = _dataLoader.GetArr(startIndex, _dataBlockLength + _testDataLength + _trainDataLength);
+        }
+
         public override void RunTest()
         {
+            if (_trainDataArray == null || _testDataArray == null)
+                throw (new Exception("Not Set data length!"));
             RunTestCase();
         }
         private void RunTestCase()
         {
-            LogFormater log = new LogFormater();
             double errorLimit = 0.001;
             int toleratedCycles = 10;
             double targetErrorLimit = 0;
+
+            LogFormater log = new LogFormater();
             StopTrainingStrategy stopStrategy = null;
-            string testName = "QLearn03";
-            RateMarketTestDAO dao = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(testName, true);
+            RateMarketTestDAO dao = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
 
             NEATPopulation pop = new NEATPopulation(30, 3, 500);
             pop.Reset();
             pop.InitialConnectionDensity = 1.0; // not required, but speeds processing.
-            ICalculateScore score = new RateMarketScore();
+            ICalculateScore score = new RateMarketScore(_trainDataArray, _dataBlockLength);
             // train the neural network
             TrainEA train = NEATUtil.ConstructNEATTrainer(pop, score);
 
@@ -204,10 +239,11 @@ namespace MyProject01.TestCases
             LogFile.WriteLine(@"Training end");
         }
 
+
+
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
         {
-            RateMarketAgent agent = new RateMarketAgent();
-            agent.TestDataLength = (int)(RateMarketAgent.TotalDataLength);
+            RateMarketAgent agent = new RateMarketAgent(_testDataArray, _dataBlockLength);
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
             MarketActions currentAction;
@@ -215,7 +251,7 @@ namespace MyProject01.TestCases
             EpisodeLog epsodeLog = new EpisodeLog();
             int dealCount = 0;
             DealLog dealLog;
-            int trainedDataIndex = (int)(RateMarketAgent.TotalDataLength * RateMarketNEATTest.TrainDataRadio);
+            int trainedDataIndex = _trainDataLength;
             double startMoney = agent.InitMoney;
             double trainedMoney = 0;
             double endMoney = 0;
@@ -256,19 +292,19 @@ namespace MyProject01.TestCases
                     dealLog = new DealLog()
                     {
                         Action = currentAction,
-                        CurrentMoney = agent.CurrentValue(),
+                        CurrentMoney = agent.CurrentValue,
 
                     };
                     epsodeLog.DealLogs.Add(dealLog);
                     if (agent.index == trainedDataIndex)
-                        trainedMoney = agent.CurrentValue();
+                        trainedMoney = agent.CurrentValue;
 
                     stateData = agent.TakeAction(currentAction);
                 }
                 if (agent.Next() == false)
                     break;
             } // end while
-            endMoney = agent.CurrentValue();
+            endMoney = agent.CurrentValue;
 
             epsodeLog.TrainedDataEarnRate = (trainedMoney / startMoney) * 100;
             epsodeLog.UnTrainedDataEarnRate = (endMoney / trainedMoney) * 100;

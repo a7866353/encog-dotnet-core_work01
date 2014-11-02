@@ -82,7 +82,19 @@ namespace MyProject01
             App.Current.Shutdown();
         }
 
-      
+        private string GetTestName()
+        {
+            string name = null;
+            this.Dispatcher.Invoke(new Func(delegate()
+            {
+                name = TestNameTextBox.Text;
+            }));
+            
+            if (string.IsNullOrWhiteSpace(name) == true)
+                return "DefaultTest000";
+            else
+                return name;
+        }
 
         private void TestCase01()
         {
@@ -103,11 +115,11 @@ namespace MyProject01
             {
                 win = new GraphViewer();
                 win.Show();
+                DataLoader dataLoader = new DataLoader();
+                MarketRateAnalyzer test = new MarketRateAnalyzer(dataLoader.ToArray());
+                test.GetDealInfo();
             }));
 
-            DataLoader dataLoader = new DataLoader();
-            MarketRateAnalyzer test = new MarketRateAnalyzer(dataLoader.ToArray());
-            test.GetDealInfo();
 
 
         }
@@ -203,7 +215,10 @@ namespace MyProject01
         }
         private void TestRateMarketNEAT()
         {
+            double testDataRate = 0.7;
             RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = GetTestName();
+            test.SetDataLength(0, (int)(test._dataLoader.Count * testDataRate), test._dataLoader.Count, 30);
             test.RunTest();
         }
 
