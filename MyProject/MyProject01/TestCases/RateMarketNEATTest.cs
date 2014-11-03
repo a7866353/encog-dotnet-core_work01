@@ -34,6 +34,7 @@ namespace MyProject01.TestCases
         public double UnTrainedDataEarnRate { set; get; }
         public List<DealLog> DealLogs { set; get; }
 
+        public long Step { set; get; }
 
         // ================
         // Network
@@ -163,6 +164,7 @@ namespace MyProject01.TestCases
         private int _dataBlockLength;
         private double[] _trainDataArray;
         private double[] _testDataArray;
+        private long _epoch;
 
         public RateMarketNEATTest()
         {
@@ -196,7 +198,7 @@ namespace MyProject01.TestCases
             LogFormater log = new LogFormater();
             StopTrainingStrategy stopStrategy = null;
             RateMarketTestDAO dao = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
-
+            byte[] LastNetData = null;
             NEATPopulation pop = new NEATPopulation(30, 3, 500);
             pop.Reset();
             pop.InitialConnectionDensity = 1.0; // not required, but speeds processing.
@@ -204,7 +206,7 @@ namespace MyProject01.TestCases
             // train the neural network
             TrainEA train = NEATUtil.ConstructNEATTrainer(pop, score);
 
-            int epoch = 1;
+            _epoch = 1;
 
             LogFile.WriteLine(@"Beginning training...");
             LogFile.WriteLine(log.GetTitle());
@@ -219,16 +221,24 @@ namespace MyProject01.TestCases
 //                    train.AddStrategy(stopStrategy);
                 }
                 
-                log.Set(LogFormater.ValueName.Step, epoch);
-                log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);  
-
-                LogFile.WriteLine(log.GetLog());
-                epoch++;
 
                 NEATNetwork episodeNet = (NEATNetwork)train.CODEC.Decode(train.BestGenome);
-                TestResult(episodeNet, dao);
-                dao.NetworkData = NetworkToByte(episodeNet);
+                byte[] netData = NetworkToByte(episodeNet);
+                if (ByteArrayCompare(netData, LastNetData) == false)
+                {
+                    TestResult(episodeNet, dao);
+                    LastNetData = netData;
+                }
+                dao.NetworkData = netData;
+                dao.Step = _epoch;
                 dao.Save();
+
+                log.Set(LogFormater.ValueName.Step, _epoch);
+                log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
+
+                LogFile.WriteLine(log.GetLog());
+                _epoch++;
+
             } while ((stopStrategy.ShouldStop() == false) && !train.TrainingDone);
             train.FinishTraining();
 
@@ -311,6 +321,7 @@ namespace MyProject01.TestCases
             epsodeLog.DealCount = dealCount;
             epsodeLog.HidenNodeCount = network.Links.Length;
             epsodeLog.ResultMoney = endMoney;
+            epsodeLog.Step = _epoch;
             dao.AddEpisode(epsodeLog);
 
             
@@ -325,6 +336,21 @@ namespace MyProject01.TestCases
             byte[] res = stream.ToArray();
             stream.Close();
             return res;
+        }
+
+        private bool ByteArrayCompare(byte[] arr1, byte[] arr2)
+        {
+            if (arr1 == null || arr2 == null)
+                return false;
+
+            if (arr1.Length != arr2.Length)
+                return false;
+            for(int i=0; i<arr1.Length; i++ )
+            {
+                if (arr1[i] != arr2[i])
+                    return false;
+            }
+            return true;
         }
     }
 }

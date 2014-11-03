@@ -69,6 +69,7 @@ namespace MyProject01
                 testButton.Click += new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
                     {
                         MainWindow mainWin = new MainWindow(obj);
+                        mainWin.Title = GetTestName();
                         mainWin.Show();
                     });
                 border.Child = testButton;

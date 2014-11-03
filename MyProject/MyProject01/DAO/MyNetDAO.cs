@@ -15,5 +15,7 @@ namespace MyProject01.DAO
     {
         public NetworkTestParameter NetworkParamter { set; get; }
         public byte[] NetworkData { set; get; }
+
+        public long Step { set; get; }
     }
 }
