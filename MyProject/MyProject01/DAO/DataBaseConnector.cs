@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace MyProject01.DAO
 {
@@ -47,7 +48,15 @@ namespace MyProject01.DAO
     {
         public static string DatabaseName = "NetWorkTestDB";
         public static string ConnectionString = @"mongodb://127.0.0.1";
+        //public static string ConnectionString = @"mongodb://192.168.1.15";
+
+        public static Semaphore Lock;
         // public static string ConnectionString = @"mongodb://192.168.1.11";
+
+        static TestCaseDatabaseConnector()
+        {
+            Lock = new Semaphore(1, 1);
+        }
 
         public MongoDatabase Database
         {
@@ -60,7 +69,10 @@ namespace MyProject01.DAO
 
         public MongoDatabase Connect()
         {
-            server = MongoServer.Create(ConnectionString);
+            Lock.WaitOne();
+
+            MongoClient client = new MongoClient(ConnectionString);
+            server = client.GetServer();
             if (null == server)
             {
                 throw (new Exception("Cannot connect to server!"));
@@ -79,6 +91,7 @@ namespace MyProject01.DAO
         {
             server.Disconnect();
             db = null;
+            Lock.Release();
         }
     }
 }

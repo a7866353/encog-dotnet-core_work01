@@ -27,6 +27,7 @@ using MyProject01.Networks;
 using MyProject01.Test;
 using Encog.Neural.Networks;
 using MyProject01.DAO;
+using MyProject01.Win;
 
 namespace MyProject01
 {
@@ -46,7 +47,9 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)),
                 new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
+                new TestCaseObject("TestRateMarketNEATBatch", "", new TestCaseObject.TestFucntion(TestRateMarketNEATBatch)),
                 new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
                 new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
                 new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
@@ -112,7 +115,7 @@ namespace MyProject01
         private void RateAnalyzeTest()
         {
             GraphViewer win;
-            this.Dispatcher.Invoke(new Func(delegate()
+            this.Dispatcher.BeginInvoke(new Func(delegate()
             {
                 win = new GraphViewer();
                 win.Show();
@@ -219,7 +222,14 @@ namespace MyProject01
             double testDataRate = 0.7;
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = GetTestName();
-            test.SetDataLength(0, (int)(test._dataLoader.Count * testDataRate), test._dataLoader.Count, 30);
+            test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count * testDataRate), RateMarketNEATTest._dataLoader.Count, 30);
+            test.RunTest();
+        }
+
+        private void TestRateMarketNEATBatch()
+        {
+            RateMarketNEATBatchTest test = new RateMarketNEATBatchTest();
+            test.TestCaseName = GetTestName();
             test.RunTest();
         }
 
@@ -238,7 +248,8 @@ namespace MyProject01
             network.Init(30, 3);
 
             dao.NetworkData = network.NetworkToByte();
-            dao.NetworkParamter = network.parm;
+            // TODO
+            // dao.NetworkParamter = network.parm;
 
             dao.Save();
 
@@ -254,6 +265,14 @@ namespace MyProject01
         //---------------------------------
 
 
+        }
+        private void TestDataBaseViewer()
+        {
+            this.Dispatcher.BeginInvoke(new Func(delegate()
+            {
+                DataBaseViewer win = new DataBaseViewer();
+                win.Show();
+            }));
         }
 
     }

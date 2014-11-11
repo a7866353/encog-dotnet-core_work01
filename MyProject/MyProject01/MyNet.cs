@@ -103,7 +103,8 @@ namespace MyProject01
         }
         public void SaveNetwork()
         {
-            myNetDao.NetworkParamter = this.parm;
+            // TODO
+            // myNetDao.NetworkParamter = this.parm;
             MemoryStream stream = new MemoryStream();
             BinaryFormatter  formatter = new BinaryFormatter();
             formatter.Serialize(stream, this._network);
@@ -122,7 +123,8 @@ namespace MyProject01
 
         public byte[] NetworkToByte()
         {
-            myNetDao.NetworkParamter = this.parm;
+            // TODO
+            // myNetDao.NetworkParamter = this.parm;
             MemoryStream stream = new MemoryStream();
             BinaryFormatter formatter = new BinaryFormatter();
             formatter.Serialize(stream, this._network);

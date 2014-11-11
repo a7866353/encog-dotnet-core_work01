@@ -87,6 +87,7 @@
     <Compile Include="Reinforcement\QLearn.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestCases\PredictTestCase.cs" />
+    <Compile Include="TestCases\RateMarketNEATBatchTest.cs" />
     <Compile Include="TestCases\RateMarketNEATTest.cs" />
     <Compile Include="TestCases\RateMarketTest.cs" />
     <Compile Include="TestParameters\NormalParameterSet.cs" />
@@ -117,6 +118,9 @@
     <Compile Include="TestCaseWindow.xaml.cs">
       <DependentUpon>TestCaseWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Win\DataBaseViewer.xaml.cs">
+      <DependentUpon>DataBaseViewer.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -134,6 +138,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TestCaseWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Win\DataBaseViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

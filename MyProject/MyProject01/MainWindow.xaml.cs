@@ -69,9 +69,28 @@ namespace MyProject01
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            _fileLogStream = new StreamWriter("Log.txt", false);
-            _fileLogStream.AutoFlush = true;
-            
+            string logName = "Log.txt";
+            bool isLogFileLocked = false;
+            FileStream fs = null;
+            try
+            {
+                fs = File.Open(logName, FileMode.Create);
+            }
+            catch(Exception excp)
+            {
+                isLogFileLocked = true;
+            }
+            finally
+            {
+                if (fs != null)
+                    fs.Close();
+            }
+            if (isLogFileLocked == false)
+            {
+                _fileLogStream = new StreamWriter(logName, false);
+                _fileLogStream.AutoFlush = true;
+                
+            }
             LogFile.FuncList.Add(new LogFile.WriteLineFunction(WriteText));
             LogFile.FuncList.Add(new LogFile.WriteLineFunction(WriteToFile));
            workThread = new Thread(new ThreadStart(MainWorkFunction));
@@ -102,6 +121,8 @@ namespace MyProject01
         
         private void WriteToFile(string str)
         {
+            if (_fileLogStream == null)
+                return;
             _fileLogStream.WriteLine(str);
         }
 

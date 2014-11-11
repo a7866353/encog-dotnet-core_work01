@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MyProject01.Agent;
 using MyProject01.Test;
+using MyProject01.TestCases;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,7 +101,29 @@ namespace MyProject01.DAO
             connector.Close();
             return retDao;
         }
+        static public T[] GetAllDAOs<T>()
+            where T : BasicTestCaseDAO, new()
+        {
+           
+            T[] retDaoArr = null;
+            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
+            MongoDatabase db = connector.Connect();
 
+            MongoCollection<T> collection = db.GetCollection<T>(CollectionName);
+            var curst = collection.FindAll();
+            long resultCount = curst.Count();
+            if (resultCount != 0)
+            {
+                retDaoArr = new T[resultCount];
+                int index = 0;
+                foreach( T obj in curst)
+                {
+                    retDaoArr[index++] = obj;
+                }
+            }
+            connector.Close();
+            return retDaoArr;
+        }
         static public void SaveDao(BasicTestCaseDAO dao)
         {
             if (dao == null)
@@ -190,6 +213,32 @@ namespace MyProject01.DAO
             dao.TestCaseID = this._id;
             collection.Insert(dao);
             connector.Close();
+        }
+        public T[] GetAllEpisodes<T>()
+        {
+            T[] daoArr = null;
+            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
+            MongoDatabase db = connector.Connect();
+            MongoCollection<T> collection = db.GetCollection<T>(EpisodeCollectionName);
+            var query = new QueryDocument { { "TestCaseID", _id } };
+            var curst = collection.Find(query);
+            long count = curst.Count();
+            if ( count != 0 )
+            {
+                daoArr = new T[count];
+                int i = 0;
+                foreach (T dao in curst)
+                {
+                    daoArr[i++] = dao;
+                }
+            }
+            connector.Close();
+
+            return daoArr;
+        }
+        public void Remove()
+        {
+            RateMarketTestDAO.Remove(this.TestCaseName);
         }
 
         #endregion

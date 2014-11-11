@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using MyProject01.Test;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,13 @@ namespace MyProject01.DAO
     }
     class RateMarketTestDAO : BasicTestCaseDAO
     {
-        public NetworkTestParameter NetworkParamter { set; get; }
-        public byte[] NetworkData { set; get; }
-
+        public int DataBlockCount { set; get; }
+        public int TestDataStartIndex { set; get; }
+        public int TotalDataCount { set; get; }
         public long Step { set; get; }
+        public double LastTrainedDataEarnRate { set; get; }
+        public double LastTestDataEarnRate { set; get; }
+        public double[] TestData { set; get; }
+        public byte[] NetworkData { set; get; }
     }
 }

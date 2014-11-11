@@ -154,8 +154,8 @@ namespace MyProject01.TestCases
     }
     class RateMarketNEATTest : BasicTestCase
     {
+        static public DataLoader _dataLoader;
         public static double TrainDataRadio = 0.8;
-        public DataLoader _dataLoader;
         public string TestName = "DefaultTest000";
 
         private int _testDataStartIndex;
@@ -165,8 +165,9 @@ namespace MyProject01.TestCases
         private double[] _trainDataArray;
         private double[] _testDataArray;
         private long _epoch;
+        private RateMarketTestDAO _testCaseDAO;
 
-        public RateMarketNEATTest()
+        static RateMarketNEATTest()
         {
             _dataLoader = new DataLoader();
             
@@ -181,6 +182,8 @@ namespace MyProject01.TestCases
 
             this._trainDataArray = _dataLoader.GetArr(startIndex, _dataBlockLength + _trainDataLength);
             this._testDataArray = _dataLoader.GetArr(startIndex, _dataBlockLength + _testDataLength + _trainDataLength);
+
+
         }
 
         public override void RunTest()
@@ -197,7 +200,13 @@ namespace MyProject01.TestCases
 
             LogFormater log = new LogFormater();
             StopTrainingStrategy stopStrategy = null;
-            RateMarketTestDAO dao = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
+            _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
+            _testCaseDAO.DataBlockCount = _dataBlockLength;
+            _testCaseDAO.TestDataStartIndex = _trainDataArray.Length;
+            _testCaseDAO.TotalDataCount = _testDataArray.Length;
+            _testCaseDAO.TestData = _testDataArray;
+
+
             byte[] LastNetData = null;
             NEATPopulation pop = new NEATPopulation(30, 3, 500);
             pop.Reset();
@@ -226,12 +235,12 @@ namespace MyProject01.TestCases
                 byte[] netData = NetworkToByte(episodeNet);
                 if (ByteArrayCompare(netData, LastNetData) == false)
                 {
-                    TestResult(episodeNet, dao);
+                    TestResult(episodeNet, _testCaseDAO);
                     LastNetData = netData;
                 }
-                dao.NetworkData = netData;
-                dao.Step = _epoch;
-                dao.Save();
+                _testCaseDAO.NetworkData = netData;
+                _testCaseDAO.Step = _epoch;
+                _testCaseDAO.Save();
 
                 log.Set(LogFormater.ValueName.Step, _epoch);
                 log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
@@ -323,6 +332,10 @@ namespace MyProject01.TestCases
             epsodeLog.ResultMoney = endMoney;
             epsodeLog.Step = _epoch;
             dao.AddEpisode(epsodeLog);
+
+            // update dao
+            dao.LastTestDataEarnRate = epsodeLog.UnTrainedDataEarnRate;
+            dao.LastTrainedDataEarnRate = epsodeLog.TrainedDataEarnRate;
 
             
         }
