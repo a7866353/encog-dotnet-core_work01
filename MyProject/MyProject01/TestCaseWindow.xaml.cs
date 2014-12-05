@@ -107,7 +107,7 @@ namespace MyProject01
 
         private void TestMarketAnalyz()
         {
-            DataLoader loader = new DataLoader();
+            DataLoader loader = new FenghuangDataLoader();
             MarketRateAnalyzer analyzer = new MarketRateAnalyzer(loader.ToArray());
             DealPointInfomation[] info = analyzer.GetDealInfo();
         }
@@ -119,7 +119,7 @@ namespace MyProject01
             {
                 win = new GraphViewer();
                 win.Show();
-                DataLoader dataLoader = new DataLoader();
+                DataLoader dataLoader = new FenghuangDataLoader();
                 MarketRateAnalyzer test = new MarketRateAnalyzer(dataLoader.ToArray());
                 test.GetDealInfo();
             }));
@@ -222,7 +222,9 @@ namespace MyProject01
             double testDataRate = 0.7;
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = GetTestName();
-            test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count * testDataRate), RateMarketNEATTest._dataLoader.Count, 30);
+            // test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count * testDataRate), RateMarketNEATTest._dataLoader.Count, 30);
+            test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count / 4 * testDataRate), RateMarketNEATTest._dataLoader.Count/4, 3600);
+
             test.RunTest();
         }
 

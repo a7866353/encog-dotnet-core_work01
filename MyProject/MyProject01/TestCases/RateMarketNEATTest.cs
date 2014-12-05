@@ -79,7 +79,7 @@ namespace MyProject01.TestCases
                 if (agent.CurrentRateValue > 0)
                 {
                     // Get Action Value
-                    IMLData output = reg.Compute(new BasicMLData(stateData.RateDataArray));
+                    IMLData output = reg.Compute(new BasicMLData(stateData.RateDataArray, false));
 
                     // Choose an action
                     maxActionIndex = 0;
@@ -169,7 +169,8 @@ namespace MyProject01.TestCases
 
         static RateMarketNEATTest()
         {
-            _dataLoader = new DataLoader();
+            // _dataLoader = new FenghuangDataLoader();
+            _dataLoader = MTDataLoader.GetLoader("USDJPY");
             
         }
 
@@ -204,7 +205,7 @@ namespace MyProject01.TestCases
             _testCaseDAO.DataBlockCount = _dataBlockLength;
             _testCaseDAO.TestDataStartIndex = _trainDataArray.Length;
             _testCaseDAO.TotalDataCount = _testDataArray.Length;
-            _testCaseDAO.TestData = _testDataArray;
+            // _testCaseDAO.TestData = _testDataArray;
 
 
             byte[] LastNetData = null;
@@ -279,7 +280,7 @@ namespace MyProject01.TestCases
                 if (agent.CurrentRateValue > 0)
                 {
                     // Get Action Value
-                    IMLData output = network.Compute(new BasicMLData(stateData.RateDataArray));
+                    IMLData output = network.Compute(new BasicMLData(stateData.RateDataArray, false));
 
                     // Choose an action
                     maxActionIndex = 0;
@@ -314,7 +315,8 @@ namespace MyProject01.TestCases
                         CurrentMoney = agent.CurrentValue,
 
                     };
-                    epsodeLog.DealLogs.Add(dealLog);
+                    // To large for test
+                    // epsodeLog.DealLogs.Add(dealLog);
                     if (agent.index == trainedDataIndex)
                         trainedMoney = agent.CurrentValue;
 

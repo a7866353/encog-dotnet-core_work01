@@ -143,10 +143,13 @@ namespace MyProject01.Agent
         private double[] GetArrayValue(int index, int length)
         {
             length = Math.Min(length, _dataArray.Length - index);
-            double[] res = new double[length];
+            ArraySegment<double> seg = new ArraySegment<double>(_dataArray, index, length);
+            
 
-            Array.Copy(_dataArray, index, res, 0, length);
-            return res;
+            // double[] res = new double[length];
+            // Array.Copy(_dataArray, index, res, 0, length);
+
+            return seg.Array;
         }
         
     }

@@ -20,7 +20,7 @@ namespace MyProject01.DAO
         public long Step { set; get; }
         public double LastTrainedDataEarnRate { set; get; }
         public double LastTestDataEarnRate { set; get; }
-        public double[] TestData { set; get; }
+        // public double[] TestData { set; get; }
         public byte[] NetworkData { set; get; }
     }
 }

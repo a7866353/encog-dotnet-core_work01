@@ -29,14 +29,14 @@ namespace MyProject01.Util
              MongoCollection collection = db.GetCollection(collectionName);
               
              MongoCursor cursor = collection.FindAllAs<MarketData>();
-             List<MarketData> dataList = new List<MarketData>();
+             MarketData[] dataArr = new MarketData[cursor.Count()];
+
+             long index = 0;
              foreach (MarketData dataObj in cursor)
              {
-                 dataList.Add(dataObj);
+                 dataArr[index++] = dataObj;
              }
              connector.Close();
-
-             MarketData[] dataArr = dataList.ToArray();
              return dataArr;
          }
      }
@@ -59,7 +59,7 @@ namespace MyProject01.Util
             return (RateSet)MemberwiseClone();
         }
     }
-    public class DataLoader : List<RateSet>
+    public abstract class DataLoader : List<RateSet>
     {
         private double _dataMaxValue;
         private double _dataMinValue;
@@ -69,44 +69,7 @@ namespace MyProject01.Util
         private const double _targDataMax = 1.0;
         private const double _targDataMin = 0.0;
 
-        public DataLoader(string path=null)
-        {
-            if (true != string.IsNullOrWhiteSpace(path))
-            {
-                StreamReader sr = new StreamReader(path);
-                string str = null;
-                RateSet currRateSet;
-                // read title
-                str = sr.ReadLine();
-                while (true)
-                {
-                    str = sr.ReadLine();
-                    if (str == null)
-                        break;
-
-                    string[] strArr = str.Split(',');
-                    // Data Check
-                    if (string.IsNullOrWhiteSpace(strArr[0]) == true)
-                        continue;
-                    if (string.IsNullOrWhiteSpace(strArr[1]) == true)
-                        continue;
-                    currRateSet = new RateSet(DateTime.Parse(strArr[0]), double.Parse(strArr[1]));
-                    Add(currRateSet);
-                }
-                sr.Close();
-            }
-            else
-            {
-                MarketData[] rawDataArr = DataProvider.GetAllMarketData();
-                foreach (MarketData rawObj in rawDataArr)
-                {
-                    RateSet currRateSet;
-                    currRateSet = new RateSet(DateTime.Parse(rawObj.Data), double.Parse(rawObj.MiddleRate));
-                    Add(currRateSet);
-                }
-            }
-            DataNormalize();
-        }
+    
         public double[] GetArr(DateTime date)
         {
             int index = SerachByDate(date);
@@ -127,7 +90,9 @@ namespace MyProject01.Util
 
         public double[] GetArr(int startIndex, int length)
         {
+
             if ((startIndex + length) > this.Count)
+                //     length = this.Count - startIndex;
                 return null;
             double[] res = new double[length];
             for (int i = 0; i < length; i++)
@@ -154,19 +119,12 @@ namespace MyProject01.Util
             }
             return valueList.ToArray();
         }
-        public void SortByDate()
+        protected void SortByDate()
         {
-            Sort(new DateComparer());
+            Sort(new DateComparer(true));
         }
 
-
-
-        private void DataNormalize()
-        {
-            SortByDate();
-            DataValueAdjust();
-        }
-        private void DataValueAdjust()
+        protected void DataValueAdjust()
         {
             _dataMaxValue = _dataMinValue = this[0].Value;
             foreach (RateSet data in this)
@@ -194,15 +152,21 @@ namespace MyProject01.Util
         }
         private int SerachByDate(DateTime date)
         {
-            return BinarySearch(new RateSet(date, 0), new DateComparer());
+            return BinarySearch(new RateSet(date, 0), new DateComparer(true));
         }
     }
     // Compare By Date
     class DateComparer : IComparer<RateSet>  
     {
+        private bool _isIncr = false;
+
+        public DateComparer(bool isIncr)
+        {
+            _isIncr = isIncr;
+        }
         public int Compare(RateSet x, RateSet y)
         {
-            if (true)
+            if (_isIncr)
             {
                 if (x.Date > y.Date)
                     return 1;

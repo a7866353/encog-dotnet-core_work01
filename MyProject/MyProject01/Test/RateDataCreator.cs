@@ -18,7 +18,7 @@ namespace MyProject01.Test
 
         public RateDataCreator()
         {
-            _loader = new DataLoader(_dataFile);
+            _loader = new FenghuangDataLoader(_dataFile);
         }
         public TestData GetTestData()
         {
