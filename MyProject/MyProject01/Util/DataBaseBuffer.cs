@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MyProject01.Util
 {
@@ -45,6 +46,7 @@ namespace MyProject01.Util
     class MTDataBuffer : List<MtDataObject>
     {
         static List<MTDataBuffer> _loaderList;
+        static Semaphore _getLock;
         static MTDataBuffer()
         {
             _loaderList = new List<MTDataBuffer>();
@@ -53,9 +55,9 @@ namespace MyProject01.Util
         {
             // find saved loader
             MTDataBuffer loader = null;
-            foreach( MTDataBuffer l in _loaderList)
+            foreach (MTDataBuffer l in _loaderList)
             {
-                if(l.TickerName == tickerName)
+                if (l.TickerName == tickerName)
                 {
                     loader = l;
                     break;
@@ -72,6 +74,7 @@ namespace MyProject01.Util
 
             _loaderList.Add(loader);
             return loader;
+            
         }
 
         private string _tickerName;

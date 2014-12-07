@@ -34,6 +34,7 @@ namespace MyProject01.Util
             {
                 AddByTime(dataBuffer, (int)type);
             }
+            // DataValueAdjust();
         }
 
         private void AddAll(MTDataBuffer buffer)

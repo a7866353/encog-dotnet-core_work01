@@ -209,7 +209,7 @@ namespace MyProject01.TestCases
 
 
             byte[] LastNetData = null;
-            NEATPopulation pop = new NEATPopulation(30, 3, 500);
+            NEATPopulation pop = new NEATPopulation(_dataBlockLength, 3, 500);
             pop.Reset();
             pop.InitialConnectionDensity = 1.0; // not required, but speeds processing.
             ICalculateScore score = new RateMarketScore(_trainDataArray, _dataBlockLength);
