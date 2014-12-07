@@ -170,7 +170,7 @@ namespace MyProject01.TestCases
         static RateMarketNEATTest()
         {
             // _dataLoader = new FenghuangDataLoader();
-            _dataLoader = MTDataLoader.GetLoader("USDJPY");
+            _dataLoader = new MTDataLoader("USDJPY");
             
         }
 

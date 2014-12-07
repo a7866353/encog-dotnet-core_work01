@@ -105,6 +105,7 @@
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
     <Compile Include="TrainingMethods\ResilientPropagationTraining.cs" />
+    <Compile Include="Util\DataBaseBuffer.cs" />
     <Compile Include="Util\DataLoader.cs" />
     <Compile Include="Util\FenghuangDataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />
