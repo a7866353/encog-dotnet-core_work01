@@ -223,7 +223,7 @@ namespace MyProject01
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = GetTestName();
             // test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count * testDataRate), RateMarketNEATTest._dataLoader.Count, 30);
-            test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count / 4 * testDataRate), RateMarketNEATTest._dataLoader.Count/4, 3600);
+//            test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count / 4 * testDataRate), RateMarketNEATTest._dataLoader.Count/4, 3600);
 
             test.RunTest();
         }

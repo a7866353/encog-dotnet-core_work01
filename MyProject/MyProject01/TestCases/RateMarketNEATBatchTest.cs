@@ -22,7 +22,7 @@ namespace MyProject01.TestCases
             int blockLength = 30;
             double dataLengthPer = 0.4;
             double trainPer = 0.5;
-
+            /*
             int totalDataCount = RateMarketNEATTest._dataLoader.Count;
             int dataLength = (int)(totalDataCount * dataLengthPer);
             int trainLength = (int)(dataLength * trainPer);
@@ -37,7 +37,7 @@ namespace MyProject01.TestCases
             }
 
             Parallel.ForEach(testList, currentTest => currentTest.RunTest());
-
+            */
         }
 
         class BatchParam
