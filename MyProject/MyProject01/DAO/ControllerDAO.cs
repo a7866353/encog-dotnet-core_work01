@@ -13,29 +13,29 @@ namespace MyProject01.DAO
         #region Static Region
 
         static public string CollectionName = "Controllers";
-        static public ControllerDAO GetDAO(string controllerName, bool isNew = false)
+        static public ControllerDAO GetDAO(string name, bool isNew = false)
         {
-            if (string.IsNullOrWhiteSpace(controllerName) == true)
+            if (string.IsNullOrWhiteSpace(name) == true)
             {
                 return null;
             }
             if (isNew == true)
             {
-                if (RateMarketTestDAO.IsExist(controllerName) == true)
-                    RateMarketTestDAO.Remove(controllerName);
+                if (RateMarketTestDAO.IsExist(name) == true)
+                    RateMarketTestDAO.Remove(name);
             }
             ControllerDAO retDao;
             TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
             MongoDatabase db = connector.Connect();
 
             MongoCollection<ControllerDAO> collection = db.GetCollection<ControllerDAO>(CollectionName);
-            var query = new QueryDocument { { "TestCaseName", controllerName } };
+            var query = new QueryDocument { { "Name", name } };
             var curst = collection.Find(query);
             if (curst.Count() == 0)
             {
                 // not existed.
                 retDao = new ControllerDAO();
-                retDao.TestCaseName = controllerName;
+                retDao.Name = name;
                 collection.Save(retDao);
             }
             else

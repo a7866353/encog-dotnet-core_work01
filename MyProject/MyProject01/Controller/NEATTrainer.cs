@@ -188,6 +188,20 @@ namespace MyProject01.Controller
         }
         public void RunTestCase()
         {
+            if (Controller.InputVectorLength == -1 && Controller.OutputVectorLength == -1)
+            {
+                Controller.InputVectorLength = _dataBlockLength;
+                Controller.OutputVectorLength = 3;
+            }
+            else
+            {
+                if (Controller.InputVectorLength != _dataBlockLength || Controller.OutputVectorLength != 3)
+                {
+                    throw (new Exception("Parm wrong!"));
+                    return;
+                }
+            }
+
             LogFormater log = new LogFormater();
             _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
             _testCaseDAO.DataBlockCount = _dataBlockLength;
@@ -233,6 +247,7 @@ namespace MyProject01.Controller
                 log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
 
                 LogFile.WriteLine(log.GetLog());
+                Controller.Save();
                 _epoch++;
 
 

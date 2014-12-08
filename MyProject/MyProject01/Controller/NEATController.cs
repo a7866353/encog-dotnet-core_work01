@@ -4,30 +4,54 @@ using Encog.ML.EA.Train;
 using Encog.ML.Train.Strategy;
 using Encog.Neural.NEAT;
 using Encog.Neural.Networks.Training;
+using MyProject01.DAO;
 using MyProject01.TestCases;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
+    [Serializable]
     class NEATController
     {
-        private int _testDataStartIndex;
-        private int _trainDataLength;
-        private int _testDataLength;
-        private int _dataBlockLength;
-
         private NEATPopulation _population;
         public NEATNetwork BestNetwork;
-        
-        public void OpenOrNew()
-        {
 
+        public string Name;
+        public int InputVectorLength;
+        public int OutputVectorLength;
+        public int PopulationNumeber;
+
+        public static NEATController Open(string name)
+        {
+            ControllerDAO dao = ControllerDAO.GetDAO(name);
+            NEATController controller;
+
+            if (dao.Data == null)
+            {
+                controller = null;
+            }
+            else
+            {
+                MemoryStream stream = new MemoryStream(dao.Data);
+                BinaryFormatter formatter = new BinaryFormatter();
+                controller = (NEATController)formatter.Deserialize(stream);
+            }
+
+            return controller;
         }
 
+        public NEATController(string name)
+        {
+            this.Name = name;
+            InputVectorLength = OutputVectorLength = PopulationNumeber = -1;
+
+        }
         public double[] Compute(double[] input)
         {
             if (BestNetwork == null)
@@ -45,7 +69,7 @@ namespace MyProject01.Controller
             {
                 if (_population == null)
                 {
-                    _population = new NEATPopulation(_dataBlockLength, 3, 500);
+                    _population = new NEATPopulation(InputVectorLength, OutputVectorLength, PopulationNumeber);
                     _population.Reset();
                     _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
                 }
@@ -53,6 +77,23 @@ namespace MyProject01.Controller
             }
         }
 
+        public void Save()
+        {
+            ControllerDAO dao = ControllerDAO.GetDAO(Name);
+            dao.Data = ToByte();
+            dao.Save();
+        }
+
+        private byte[] ToByte()
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, this);
+
+            byte[] res = stream.ToArray();
+            stream.Close();
+            return res;
+        }
 
         
     }
