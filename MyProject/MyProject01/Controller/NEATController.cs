@@ -16,41 +16,58 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    [Serializable]
     class NEATController
     {
         private NEATPopulation _population;
         public NEATNetwork BestNetwork;
 
-        public string Name;
-        public int InputVectorLength;
-        public int OutputVectorLength;
-        public int PopulationNumeber;
+        public ControllerDAO Dao;
+
+        public string Name
+        {
+            get { return Dao.Name; }
+        }
+        public int InputVectorLength
+        {
+            set { Dao.InputVectorLength = value; }
+            get { return Dao.InputVectorLength; }
+        }
+        public int OutputVectorLength
+        {
+            set { Dao.OutputVectorLength = value; }
+            get { return Dao.OutputVectorLength; }
+        }
+        public int PopulationNumeber
+        {
+            set { Dao.PopulationNumeber = value; }
+            get { return Dao.PopulationNumeber; }
+        }
 
         public static NEATController Open(string name)
         {
             ControllerDAO dao = ControllerDAO.GetDAO(name);
             NEATController controller;
 
-            if (dao.Data == null)
+            if (dao.BestNetwork == null)
             {
-                controller = null;
+                controller = new NEATController(dao);
+                controller.InputVectorLength = controller.OutputVectorLength = controller.PopulationNumeber = -1;
+
             }
             else
             {
-                MemoryStream stream = new MemoryStream(dao.Data);
-                BinaryFormatter formatter = new BinaryFormatter();
-                controller = (NEATController)formatter.Deserialize(stream);
+                controller = new NEATController(dao);
+                controller._population = dao.GetPopulation();
+                controller.BestNetwork = dao.GetBestNetwork();
+
             }
 
             return controller;
         }
 
-        public NEATController(string name)
+        private NEATController(ControllerDAO dao)
         {
-            this.Name = name;
-            InputVectorLength = OutputVectorLength = PopulationNumeber = -1;
-
+            this.Dao = dao;
         }
         public double[] Compute(double[] input)
         {
@@ -79,22 +96,10 @@ namespace MyProject01.Controller
 
         public void Save()
         {
-            ControllerDAO dao = ControllerDAO.GetDAO(Name);
-            dao.Data = ToByte();
-            dao.Save();
+            Dao.SetBestNetwork(BestNetwork);
+            Dao.Save();
+            Dao.UpdatePopulation(_population);
         }
 
-        private byte[] ToByte()
-        {
-            MemoryStream stream = new MemoryStream();
-            BinaryFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, this);
-
-            byte[] res = stream.ToArray();
-            stream.Close();
-            return res;
-        }
-
-        
     }
 }

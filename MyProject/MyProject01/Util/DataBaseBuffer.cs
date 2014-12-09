@@ -104,7 +104,7 @@ namespace MyProject01.Util
             }
             else // for parallel
             {
-                var collc = collection.ParallelScanAs<MtDataObject>(new ParallelScanArgs() { NumberOfCursors = 32, BatchSize = 1000 });
+                var collc = collection.ParallelScanAs<MtDataObject>(new ParallelScanArgs() { NumberOfCursors = 128, BatchSize = 1000 });
 
                 Parallel.ForEach(collc, curs =>
                 {

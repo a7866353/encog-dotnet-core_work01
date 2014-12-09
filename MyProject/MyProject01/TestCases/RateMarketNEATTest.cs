@@ -39,12 +39,11 @@ namespace MyProject01.TestCases
         {
             double testDataRate = 0.7;
             _train.SetDataLength(0, (int)(NEATTrainer._dataLoader.Count / 4 * testDataRate), NEATTrainer._dataLoader.Count / 4, 3600);
-            string controllerName = "Test01";
+            string controllerName = TestName;
             NEATController controller = NEATController.Open(controllerName);
-            if( controller == null)
+            if (controller.InputVectorLength == -1)
             {
-                controller = new NEATController("Test01");
-                controller.PopulationNumeber = 1000;
+                controller.PopulationNumeber = 20;
             }
             _train.Controller = controller;
             _train.IterationCount = 1000;

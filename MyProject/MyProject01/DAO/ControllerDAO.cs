@@ -1,8 +1,12 @@
-﻿using MongoDB.Bson;
+﻿using Encog.Neural.NEAT;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,6 +75,7 @@ namespace MyProject01.DAO
         {
             if (dao == null)
                 return;
+            dao.UpdateTime = DateTime.Now;
             TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
             MongoDatabase db = connector.Connect();
             MongoCollection<ControllerDAO> collection = db.GetCollection<ControllerDAO>(CollectionName);
@@ -115,6 +120,10 @@ namespace MyProject01.DAO
             MongoCollection<BsonDocument> collection = db.GetCollection<BsonDocument>(CollectionName);
             var query = new QueryDocument { { "Name", name } };
             collection.Remove(query);
+
+            MongoGridFS fs = new MongoGridFS(db);
+            fs.Delete(name);
+
             connector.Close();
 
         }
@@ -142,6 +151,71 @@ namespace MyProject01.DAO
             ControllerDAO.Remove(this.Name);
         }
 
+        public NEATPopulation GetPopulation()
+        {
+            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
+            MongoDatabase db = connector.Connect();
+
+            MongoGridFS fs = new MongoGridFS(db);
+            MongoGridFSStream file = fs.OpenRead(Name);
+            if (file.Length == 0)
+                return null;
+
+            byte[] buffer = new byte[file.Length];
+            file.Read(buffer, 0, buffer.Length);
+            file.Close();
+
+            connector.Close();
+
+            MemoryStream stream = new MemoryStream(buffer);
+            BinaryFormatter formatter = new BinaryFormatter();
+            NEATPopulation pop = (NEATPopulation)formatter.Deserialize(stream);
+            stream.Close();
+
+            return pop;
+
+        }
+
+        public void UpdatePopulation(NEATPopulation pop)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, pop);
+            byte[] res = stream.ToArray();
+            stream.Close();
+
+            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
+            MongoDatabase db = connector.Connect();
+
+            MongoGridFS fs = new MongoGridFS(db);
+            MongoGridFSStream file = fs.Create(Name);
+            file.Write(res, 0, res.Length);
+            file.Close();
+
+            connector.Close();
+        }
+
+        public NEATNetwork GetBestNetwork()
+        {
+            if (BestNetwork == null)
+                return null;
+
+            MemoryStream stream = new MemoryStream(BestNetwork);
+            BinaryFormatter formatter = new BinaryFormatter();
+            NEATNetwork obj = (NEATNetwork)formatter.Deserialize(stream);
+
+            return obj;
+        }
+
+        public void SetBestNetwork(NEATNetwork net)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, net);
+            BestNetwork = stream.ToArray();
+            stream.Close();
+
+        }
         #endregion
         // =============================
         // Data for saving into database.
@@ -150,7 +224,12 @@ namespace MyProject01.DAO
         public ObjectId _id;
         public string Name { set; get; }
         public DateTime UpdateTime { set; get; }
-        public byte[] Data { set; get; }
+        public int InputVectorLength { set; get; }
+        public int OutputVectorLength { set; get; }
+        public int PopulationNumeber { set; get; }
+        public byte[] BestNetwork { set; get; }
+
+        
 
         #endregion
 
