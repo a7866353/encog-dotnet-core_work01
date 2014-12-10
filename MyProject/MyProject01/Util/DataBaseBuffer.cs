@@ -92,14 +92,17 @@ namespace MyProject01.Util
             string collectionName = _tickerName;
             MongoCollection collection = db.GetCollection(collectionName);
 
-            if (false)
+            if (true)
             {
                 MongoCursor cursor = collection.FindAllAs<MtDataObject>();
                 cursor.BatchSize = 1000;
-
+                int loadMaxCount = 200000;
                 foreach (MtDataObject dataObj in cursor)
                 {
                     Add(dataObj);
+                    loadMaxCount--;
+                    if (loadMaxCount == 0)
+                        break;
                 }
             }
             else // for parallel

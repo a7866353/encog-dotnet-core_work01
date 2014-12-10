@@ -31,22 +31,34 @@ namespace MyProject01.TestCases
 
         public RateMarketNEATTest()
         {
-            _train = new NEATTrainer();
+            _train = new NEATTrainer(); 
 
         }
 
         public override void RunTest()
         {
             double testDataRate = 0.7;
-            _train.SetDataLength(0, (int)(NEATTrainer._dataLoader.Count / 4 * testDataRate), NEATTrainer._dataLoader.Count / 4, 3600);
+            int dataBlockLength = 300;
+            int populationNum = 50;
+            _train.SetDataLength(0, (int)(NEATTrainer._dataLoader.Count * testDataRate), NEATTrainer._dataLoader.Count , dataBlockLength);
             string controllerName = TestName;
             NEATController controller = NEATController.Open(controllerName);
             if (controller.InputVectorLength == -1)
             {
-                controller.PopulationNumeber = 20;
+                controller.PopulationNumeber = populationNum;
             }
+            else
+            {
+                if (controller.InputVectorLength != dataBlockLength || controller.OutputVectorLength != 3)
+                {
+                    controller = NEATController.Open(controllerName, true);
+                    controller.PopulationNumeber = populationNum;
+                }
+            }
+
+
             _train.Controller = controller;
-            _train.IterationCount = 1000;
+            _train.IterationCount = 0;
             _train.RunTestCase();
         }
 

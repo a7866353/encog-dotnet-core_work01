@@ -169,7 +169,7 @@ namespace MyProject01.Controller
 
        static  NEATTrainer()
         {
-            _dataLoader = new MTDataLoader("USDJPY");
+            _dataLoader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
 
         }
 
@@ -214,7 +214,7 @@ namespace MyProject01.Controller
 
             ICalculateScore score = new RateMarketScore(_trainDataArray, _dataBlockLength);
             // train the neural network
-            TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.Population, score);
+            TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
 
             _epoch = 1;
 
@@ -222,7 +222,7 @@ namespace MyProject01.Controller
             LogFile.WriteLine(log.GetTitle());
             do
             {
-                 if( _epoch > IterationCount)
+                 if( (IterationCount > 0 ) && (_epoch > IterationCount) )
                  {
                      break;
                  }
@@ -238,6 +238,8 @@ namespace MyProject01.Controller
                 {
                     TestResult(episodeNet, _testCaseDAO);
                     LastNetData = netData;
+                    Controller.Save();
+
                 }
                 _testCaseDAO.NetworkData = netData;
                 _testCaseDAO.Step = _epoch;
@@ -247,7 +249,6 @@ namespace MyProject01.Controller
                 log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
 
                 LogFile.WriteLine(log.GetLog());
-                Controller.Save();
                 _epoch++;
 
 

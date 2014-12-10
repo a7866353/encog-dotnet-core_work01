@@ -149,7 +149,7 @@ namespace MyProject01.Agent
             // double[] res = new double[length];
             // Array.Copy(_dataArray, index, res, 0, length);
 
-            return seg.Array;
+            return seg.ToArray<double>();
         }
         
     }

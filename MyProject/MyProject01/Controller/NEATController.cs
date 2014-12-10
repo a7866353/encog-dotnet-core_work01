@@ -22,6 +22,19 @@ namespace MyProject01.Controller
         public NEATNetwork BestNetwork;
 
         public ControllerDAO Dao;
+        public NEATPopulation GetPopulation()
+        {
+           
+            if (_population == null)
+            {
+                _population = new NEATPopulation(InputVectorLength, OutputVectorLength, PopulationNumeber);
+                _population.Reset();
+
+                // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
+            }
+            return _population;
+
+        }
 
         public string Name
         {
@@ -43,9 +56,9 @@ namespace MyProject01.Controller
             get { return Dao.PopulationNumeber; }
         }
 
-        public static NEATController Open(string name)
+        public static NEATController Open(string name, bool isNew = false)
         {
-            ControllerDAO dao = ControllerDAO.GetDAO(name);
+            ControllerDAO dao = ControllerDAO.GetDAO(name, isNew);
             NEATController controller;
 
             if (dao.BestNetwork == null)
@@ -79,21 +92,6 @@ namespace MyProject01.Controller
                 outputArr[i] = output[i];
             return outputArr;
         }
-
-        public NEATPopulation Population
-        {
-            get
-            {
-                if (_population == null)
-                {
-                    _population = new NEATPopulation(InputVectorLength, OutputVectorLength, PopulationNumeber);
-                    _population.Reset();
-                    _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
-                }
-                return _population;
-            }
-        }
-
         public void Save()
         {
             Dao.SetBestNetwork(BestNetwork);
