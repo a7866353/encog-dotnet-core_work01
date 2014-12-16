@@ -52,6 +52,7 @@ namespace MyProject01.Util
         private void AddByTime(MTDataBuffer buffer, int interval)
         {
             DateCheck checker = new DateCheck();
+
             checker.Interval = interval;
             checker.Set(buffer[0]);
             RateSet currRateSet;
