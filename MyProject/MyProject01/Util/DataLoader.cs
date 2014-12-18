@@ -101,6 +101,12 @@ namespace MyProject01.Util
             }
             return res;
         }
+
+        public DataBlock CreateDataBlock(int startIndex, int length)
+        {
+            return new DataBlock(this, startIndex, length);
+        }
+
         public double[] GetArr(DateTime startDate, DateTime endDate)
         {
             if( endDate < startDate)
