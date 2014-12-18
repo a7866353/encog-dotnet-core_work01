@@ -150,10 +150,10 @@ namespace MyProject01.Controller
     }
     class NEATTrainer
     {
-        static public DataLoader _dataLoader;
         public string TestName = "DefaultTest000";
 
-        private int _testDataStartIndex;
+
+        private DataBlock _testDataBlock;
         private int _trainDataLength;
         private int _testDataLength;
         private int _dataBlockLength;
@@ -167,27 +167,15 @@ namespace MyProject01.Controller
         public NEATController Controller;
         public long IterationCount = 10;
 
-       static  NEATTrainer()
+        public void SetDataLength(DataBlock dataBlock, int trainLength)
         {
-            _dataLoader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
-
+            _testDataBlock = dataBlock;
+            _trainDataLength = trainLength;
         }
 
-
-        public void SetDataLength(int startIndex, int trainLength, int totalLength, int blockLength)
-        {
-            this._testDataStartIndex = startIndex;
-            this._trainDataLength = trainLength;
-            this._testDataLength = totalLength - blockLength - trainLength;
-            this._dataBlockLength = blockLength;
-
-            this._trainDataArray = _dataLoader.GetArr(startIndex, _dataBlockLength + _trainDataLength);
-            this._testDataArray = _dataLoader.GetArr(startIndex, _dataBlockLength + _testDataLength + _trainDataLength);
-
-
-        }
         public void RunTestCase()
         {
+            // Check param
             if (Controller.InputVectorLength == -1 && Controller.OutputVectorLength == -1)
             {
                 Controller.InputVectorLength = _dataBlockLength;
@@ -198,9 +186,17 @@ namespace MyProject01.Controller
                 if (Controller.InputVectorLength != _dataBlockLength || Controller.OutputVectorLength != 3)
                 {
                     throw (new Exception("Parm wrong!"));
-                    return;
                 }
             }
+
+            // Init train data
+            _dataBlockLength = Controller.InputVectorLength;
+            _testDataLength = _testDataBlock.Length - _dataBlockLength - _trainDataLength;
+            _trainDataArray = _testDataBlock.GetArray(0, _dataBlockLength + _trainDataLength);
+            _testDataArray = _testDataBlock.GetArray(0, _testDataBlock.Length);
+
+
+            //Start
 
             LogFormater log = new LogFormater();
             _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);

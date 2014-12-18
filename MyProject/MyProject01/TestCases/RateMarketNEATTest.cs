@@ -27,20 +27,16 @@ namespace MyProject01.TestCases
     {
         public string TestName = "DefaultTest000";
 
-        NEATTrainer _train = new NEATTrainer();
-
-        public RateMarketNEATTest()
-        {
-            _train = new NEATTrainer(); 
-
-        }
+        NEATTrainer _train;
 
         public override void RunTest()
         {
-            double testDataRate = 0.7;
+            double testDataRate = 0.75;
             int dataBlockLength = 300;
             int populationNum = 50;
-            _train.SetDataLength(0, (int)(NEATTrainer._dataLoader.Count * testDataRate), NEATTrainer._dataLoader.Count , dataBlockLength);
+
+
+            // init controller
             string controllerName = TestName;
             NEATController controller = NEATController.Open(controllerName);
             if (controller.InputVectorLength == -1)
@@ -56,7 +52,14 @@ namespace MyProject01.TestCases
                 }
             }
 
+            // init test data
+            DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            DataBlock testBlock = loader.CreateDataBlock(0, loader.Count);
+            _train = new NEATTrainer();
+            _train.SetDataLength(testBlock, (int)(testBlock.Length * testDataRate));
 
+            // start trainning
+            _train.TestName = TestName;
             _train.Controller = controller;
             _train.IterationCount = 0;
             _train.RunTestCase();
