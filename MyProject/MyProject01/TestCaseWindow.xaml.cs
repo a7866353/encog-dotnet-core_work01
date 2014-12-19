@@ -231,7 +231,7 @@ namespace MyProject01
         private void TestRateMarketNEATBatch()
         {
             RateMarketNEATBatchTest test = new RateMarketNEATBatchTest();
-            test.TestCaseName = GetTestName();
+            test.TestName = GetTestName();
             test.RunTest();
         }
 

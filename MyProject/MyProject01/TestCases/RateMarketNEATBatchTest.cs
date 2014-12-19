@@ -8,10 +8,54 @@ using System.Threading.Tasks;
 
 namespace MyProject01.TestCases
 {
+    class TestDataBlockCreator
+    {
+        public int DataLength = 60*24*10/5; // 2 week data
+
+        private DataLoader _loader;
+        private DataBlock[] _datablockArr;
+        private Random _rand;
+
+        public TestDataBlockCreator()
+        {
+            _rand = new Random();
+        }
+
+        public void Init()
+        {
+            _loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+
+            int count = _loader.Count / DataLength;
+            if (count == 0)
+                count = 1;
+
+            _datablockArr = new DataBlock[count];
+            for(int i=0;i<count-1;i++)
+            {
+                _datablockArr[i] = _loader.CreateDataBlock(i * DataLength, DataLength);
+            }
+            // add last block
+            _datablockArr[count - 1] = _loader.CreateDataBlock(DataLength * (count - 1), _loader.Count - (DataLength * (count - 1)));
+        }
+
+        public DataBlock GetNextBlock()
+        {
+            if (_loader == null)
+                return null;
+            return _datablockArr[_rand.Next(_datablockArr.Length)];
+
+        }
+
+    }
+
     class RateMarketNEATBatchTest : BasicTestCase
     {
         public string TestName = "DefaultTestCase00";
         public int TestCaseCount = 4;
+
+        private TestDataBlockCreator _testDataBlockContainer;
+
+        public int IterationCountPerTest = 500;
 
 
         private BatchParam[] _params = new BatchParam[]
@@ -21,29 +65,10 @@ namespace MyProject01.TestCases
 
         public override void RunTest()
         {
-            int blockLength = 30;
-            double dataLengthPer = 0.4;
-            double trainPer = 0.5;
-            /*
-            int totalDataCount = RateMarketNEATTest._dataLoader.Count;
-            int dataLength = (int)(totalDataCount * dataLengthPer);
-            int trainLength = (int)(dataLength * trainPer);
-            int startIndexInc = (totalDataCount - dataLength) / TestCaseCount;
-            List<RateMarketNEATTest> testList = new List<RateMarketNEATTest>();
-            for (int i = 0; i < TestCaseCount; i++)
-            {
-                RateMarketNEATTest test = new RateMarketNEATTest();
-                test.TestName = TestCaseName + "_" + i.ToString("D2");
-                test.SetDataLength(startIndexInc * i, trainLength, dataLength, blockLength);
-                testList.Add(test);
-            }
+            _testDataBlockContainer = new TestDataBlockCreator();
+            _testDataBlockContainer.Init();
 
-            Parallel.ForEach(testList, currentTest => currentTest.RunTest());
-            */
-        }
 
-        private void StartTest()
-        {
             double testDataRate = 0.75;
             int dataBlockLength = 300;
             int populationNum = 50;
@@ -66,18 +91,21 @@ namespace MyProject01.TestCases
             }
 
             // init test data
-            DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
-            DataBlock testBlock = loader.CreateDataBlock(0, loader.Count);
+            NEATTrainer _train;
             _train = new NEATTrainer();
-            _train.SetDataLength(testBlock, (int)(testBlock.Length * testDataRate));
-
-            // start trainning
             _train.TestName = TestName;
             _train.Controller = controller;
-            _train.IterationCount = 0;
-            _train.RunTestCase();
+
+            while (true)
+            {
+                DataBlock testBlock = _testDataBlockContainer.GetNextBlock();
+                _train.SetDataLength(testBlock, (int)(testBlock.Length * testDataRate));
+                _train.IterationCount = IterationCountPerTest;
+                _train.RunTestCase();
+            }
 
         }
+
 
         class BatchParam
         {

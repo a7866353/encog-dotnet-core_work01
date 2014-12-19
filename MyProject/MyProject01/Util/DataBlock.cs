@@ -20,7 +20,7 @@ namespace MyProject01.Util
         {
             _loader = loader;
             _startIndex = startIndex;
-            _length = length;
+            _length = Math.Min(loader.Count-_startIndex, length);
 
             _data = new double[_length];
             _scale = 1;
