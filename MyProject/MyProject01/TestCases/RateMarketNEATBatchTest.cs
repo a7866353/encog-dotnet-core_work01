@@ -54,10 +54,18 @@ namespace MyProject01.TestCases
         public int TestCaseCount = 4;
 
         private TestDataBlockCreator _testDataBlockContainer;
-
-        public int IterationCountPerTest = 500;
-
-
+#if false
+        public int IterationCountPerTest = 50;
+        public double testDataRate = 0.75;
+        public int dataBlockLength = 30;
+        public int populationNum = 1000;
+#else
+        public int IterationCountPerTest = 100;
+        public double testDataRate = 0.75;
+        public int populationNum = 1000;
+        public int dataBlockLength = 60 * 24 * 10 / 5;
+        public int TestDataLength = 60 * 24 * 10 / 5 * 12;
+#endif
         private BatchParam[] _params = new BatchParam[]
         {
             new BatchParam(){ startIndex = 0, trainLength = 10, totalLength = 100, blockLength = 30},
@@ -66,12 +74,11 @@ namespace MyProject01.TestCases
         public override void RunTest()
         {
             _testDataBlockContainer = new TestDataBlockCreator();
+            _testDataBlockContainer.DataLength = TestDataLength;
             _testDataBlockContainer.Init();
 
 
-            double testDataRate = 0.75;
-            int dataBlockLength = 300;
-            int populationNum = 50;
+
 
 
             // init controller
@@ -79,6 +86,8 @@ namespace MyProject01.TestCases
             NEATController controller = NEATController.Open(controllerName);
             if (controller.InputVectorLength == -1)
             {
+                controller.InputVectorLength = dataBlockLength;
+                controller.OutputVectorLength = 3;
                 controller.PopulationNumeber = populationNum;
             }
             else
@@ -86,6 +95,8 @@ namespace MyProject01.TestCases
                 if (controller.InputVectorLength != dataBlockLength || controller.OutputVectorLength != 3)
                 {
                     controller = NEATController.Open(controllerName, true);
+                    controller.InputVectorLength = dataBlockLength;
+                    controller.OutputVectorLength = 3;
                     controller.PopulationNumeber = populationNum;
                 }
             }

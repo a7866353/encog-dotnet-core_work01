@@ -178,15 +178,7 @@ namespace MyProject01.Controller
             // Check param
             if (Controller.InputVectorLength == -1 && Controller.OutputVectorLength == -1)
             {
-                Controller.InputVectorLength = _dataBlockLength;
-                Controller.OutputVectorLength = 3;
-            }
-            else
-            {
-                if (Controller.InputVectorLength != _dataBlockLength || Controller.OutputVectorLength != 3)
-                {
-                    throw (new Exception("Parm wrong!"));
-                }
+                throw (new Exception("Parm wrong!"));
             }
 
             // Init train data
@@ -223,28 +215,34 @@ namespace MyProject01.Controller
                      break;
                  }
 
+                 try
+                 {
+                     train.Iteration();
 
-                train.Iteration();
 
+                     NEATNetwork episodeNet = (NEATNetwork)train.CODEC.Decode(train.BestGenome);
+                     Controller.BestNetwork = episodeNet;
+                     byte[] netData = NetworkToByte(episodeNet);
+                     if (ByteArrayCompare(netData, LastNetData) == false)
+                     {
+                         TestResult(episodeNet, _testCaseDAO);
+                         LastNetData = netData;
+                         Controller.Save();
 
-                NEATNetwork episodeNet = (NEATNetwork)train.CODEC.Decode(train.BestGenome);
-                Controller.BestNetwork = episodeNet;
-                byte[] netData = NetworkToByte(episodeNet);
-                if (ByteArrayCompare(netData, LastNetData) == false)
-                {
-                    TestResult(episodeNet, _testCaseDAO);
-                    LastNetData = netData;
-                    Controller.Save();
+                     }
+                     _testCaseDAO.NetworkData = netData;
+                     _testCaseDAO.Step = _epoch;
+                     _testCaseDAO.Save();
 
-                }
-                _testCaseDAO.NetworkData = netData;
-                _testCaseDAO.Step = _epoch;
-                _testCaseDAO.Save();
+                     log.Set(LogFormater.ValueName.Step, _epoch);
+                     log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
 
-                log.Set(LogFormater.ValueName.Step, _epoch);
-                log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
-
-                LogFile.WriteLine(log.GetLog());
+                     LogFile.WriteLine(log.GetLog());
+                 }
+                catch(Exception e)
+                 {
+                     LogFile.WriteLine("Error!");
+                 }
                 _epoch++;
 
 

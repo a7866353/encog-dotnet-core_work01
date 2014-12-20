@@ -60,7 +60,7 @@ namespace MyProject01.Util
 
         public double[] GetArray(int startIndex, int length)
         {
-            int remain = _data.Length - _startIndex;
+            int remain = _data.Length - startIndex;
             length = Math.Min(remain, length);
 
             if (length <= 0)
@@ -74,7 +74,7 @@ namespace MyProject01.Util
 
         public int Copy(double[] array, int offset, int startIndex, int length)
         {
-            int remain = _data.Length - _startIndex;
+            int remain = _data.Length - startIndex;
             length = Math.Min(remain, length);
 
             if (length <= 0)
