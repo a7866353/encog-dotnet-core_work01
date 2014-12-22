@@ -13,7 +13,7 @@ namespace MyProject01.TestCases
         public int DataLength = 60*24*10/5; // 2 week data
 
         private DataLoader _loader;
-        private DataBlock[] _datablockArr;
+        public DataBlock[] DataBlockArr;
         private Random _rand;
 
         public TestDataBlockCreator()
@@ -29,24 +29,25 @@ namespace MyProject01.TestCases
             if (count == 0)
                 count = 1;
 
-            _datablockArr = new DataBlock[count];
+            DataBlockArr = new DataBlock[count];
             for(int i=0;i<count-1;i++)
             {
-                _datablockArr[i] = _loader.CreateDataBlock(i * DataLength, DataLength);
+                DataBlockArr[i] = _loader.CreateDataBlock(i * DataLength, DataLength);
             }
             // add last block
-            _datablockArr[count - 1] = _loader.CreateDataBlock(DataLength * (count - 1), _loader.Count - (DataLength * (count - 1)));
+            DataBlockArr[count - 1] = _loader.CreateDataBlock(DataLength * (count - 1), _loader.Count - (DataLength * (count - 1)));
         }
 
         public DataBlock GetNextBlock()
         {
             if (_loader == null)
                 return null;
-            return _datablockArr[_rand.Next(_datablockArr.Length)];
+            return DataBlockArr[_rand.Next(DataBlockArr.Length)];
 
         }
 
     }
+
 
     class RateMarketNEATBatchTest : BasicTestCase
     {
@@ -54,11 +55,13 @@ namespace MyProject01.TestCases
         public int TestCaseCount = 4;
 
         private TestDataBlockCreator _testDataBlockContainer;
-#if false
+#if true
         public int IterationCountPerTest = 50;
         public double testDataRate = 0.75;
-        public int dataBlockLength = 30;
-        public int populationNum = 1000;
+        public int dataBlockLength = 1000;
+        public int populationNum = 100;
+        public int TestDataLength = 5000;
+
 #else
         public int IterationCountPerTest = 100;
         public double testDataRate = 0.75;
@@ -106,14 +109,14 @@ namespace MyProject01.TestCases
             _train = new NEATTrainer();
             _train.TestName = TestName;
             _train.Controller = controller;
-
-            while (true)
+            foreach(DataBlock block in _testDataBlockContainer.DataBlockArr)
             {
-                DataBlock testBlock = _testDataBlockContainer.GetNextBlock();
-                _train.SetDataLength(testBlock, (int)(testBlock.Length * testDataRate));
-                _train.IterationCount = IterationCountPerTest;
-                _train.RunTestCase();
+                _train.DataList.Add(new TrainingData(block, (int)(block.Length * testDataRate)));
             }
+
+            _train.IterationCount = IterationCountPerTest;
+            _train.RunTestCase();
+           
 
         }
 

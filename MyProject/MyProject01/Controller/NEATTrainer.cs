@@ -48,7 +48,8 @@ namespace MyProject01.Controller
     {
         private double[] _dataArray;
         private int _blockLength;
-        public RateMarketScore(double[] testData, int blockLength)
+
+        public void SetData(double[] testData, int blockLength)
         {
             _dataArray = testData;
             _blockLength = blockLength;
@@ -148,10 +149,46 @@ namespace MyProject01.Controller
         }
 
     }
+    class TrainingData
+    {
+        private DataBlock _dataBlock;
+        private int _testLength;
+
+        public DataBlock DataBlock
+        {
+            get { return _dataBlock; }
+        }
+        public int TestLength
+        {
+            get { return _testLength; }
+        }
+
+
+        public TrainingData(DataBlock block, int testLength)
+        {
+            _dataBlock = block;
+            _testLength = testLength;
+        }
+
+    }
+    class TrainDataList : List<TrainingData> 
+    {
+        private Random _rand;
+
+        public TrainDataList()
+        {
+            _rand = new Random();
+        }
+        public TrainingData GetNext()
+        {
+            return this[_rand.Next(Count)];
+        }
+    }
+
     class NEATTrainer
     {
         public string TestName = "DefaultTest000";
-
+        public TrainDataList DataList;
 
         private DataBlock _testDataBlock;
         private int _trainDataLength;
@@ -167,29 +204,38 @@ namespace MyProject01.Controller
         public NEATController Controller;
         public long IterationCount = 10;
 
-        public void SetDataLength(DataBlock dataBlock, int trainLength)
+        public NEATTrainer()
+        {
+            DataList = new TrainDataList();
+        }
+        private void SetDataLength(DataBlock dataBlock, int trainLength)
         {
             _testDataBlock = dataBlock;
             _trainDataLength = trainLength;
+
+            // Update test data
+            _dataBlockLength = Controller.InputVectorLength;
+            _testDataLength = _testDataBlock.Length - _dataBlockLength - _trainDataLength;
+            _trainDataArray = _testDataBlock.GetArray(0, _dataBlockLength + _trainDataLength);
+            _testDataArray = _testDataBlock.GetArray(0, _testDataBlock.Length);
+
         }
 
         public void RunTestCase()
         {
+            TrainingData trainData;
             // Check param
             if (Controller.InputVectorLength == -1 && Controller.OutputVectorLength == -1)
             {
                 throw (new Exception("Parm wrong!"));
             }
 
-            // Init train data
-            _dataBlockLength = Controller.InputVectorLength;
-            _testDataLength = _testDataBlock.Length - _dataBlockLength - _trainDataLength;
-            _trainDataArray = _testDataBlock.GetArray(0, _dataBlockLength + _trainDataLength);
-            _testDataArray = _testDataBlock.GetArray(0, _testDataBlock.Length);
 
+            // Set test data
+            trainData = DataList.GetNext();
+            SetDataLength(trainData.DataBlock, trainData.TestLength);
 
             //Start
-
             LogFormater log = new LogFormater();
             _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
             _testCaseDAO.DataBlockCount = _dataBlockLength;
@@ -200,7 +246,9 @@ namespace MyProject01.Controller
 
             byte[] LastNetData = null;
 
-            ICalculateScore score = new RateMarketScore(_trainDataArray, _dataBlockLength);
+            RateMarketScore score = new RateMarketScore();
+            score.SetData(_trainDataArray, _dataBlockLength);
+
             // train the neural network
             TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
 
@@ -210,9 +258,15 @@ namespace MyProject01.Controller
             LogFile.WriteLine(log.GetTitle());
             do
             {
-                 if( (IterationCount > 0 ) && (_epoch > IterationCount) )
+                if ((IterationCount > 0) && (_epoch % IterationCount == 0))
                  {
-                     break;
+                     // set next test data
+                     trainData = DataList.GetNext();
+                     SetDataLength(trainData.DataBlock, trainData.TestLength);
+                     score.SetData(_trainDataArray, _dataBlockLength);
+                     train.FinishTraining();
+                     train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score); 
+                     LogFile.WriteLine("Change data!");
                  }
 
                  try
@@ -248,7 +302,7 @@ namespace MyProject01.Controller
 
             } while (true);
             train.FinishTraining();
-
+            
             // test the neural network
             LogFile.WriteLine(@"Training end");
         }

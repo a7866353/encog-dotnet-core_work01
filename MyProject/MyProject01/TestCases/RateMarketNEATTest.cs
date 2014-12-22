@@ -65,7 +65,7 @@ namespace MyProject01.TestCases
             }
             DataBlock testBlock = loader.CreateDataBlock(0, loader.Count);
             _train = new NEATTrainer();
-            _train.SetDataLength(testBlock, (int)(testBlock.Length * testDataRate));
+            _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * testDataRate) ));
 
             // start trainning
             _train.TestName = TestName;

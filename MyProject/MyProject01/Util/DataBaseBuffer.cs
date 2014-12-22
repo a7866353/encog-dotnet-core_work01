@@ -92,7 +92,7 @@ namespace MyProject01.Util
             string collectionName = _tickerName;
             MongoCollection collection = db.GetCollection(collectionName);
 
-            if (false)
+            if (true)
             {
                 MongoCursor cursor = collection.FindAllAs<MtDataObject>();
                 cursor.BatchSize = 1000;
