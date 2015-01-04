@@ -32,6 +32,8 @@ namespace MyProject01.Agent
     {
         public int index = 0;
         public double InitMoney = 10000;
+        public double BuyOffset = 0.1;
+        public double SellOffset = 0.01;
 
         private DataBlock _dataBlock;
         private double[] _dataArray;
@@ -56,10 +58,10 @@ namespace MyProject01.Agent
         {
             get
             {
-                double rate = _dataBlock.GetRate(index);
+                double rate = _dataBlock.GetRate(index)+SellOffset;
                 double res = _money;
                 if (_mountInHand != 0)
-                    res += _mountInHand / rate;
+                    res += _mountInHand * rate;
 
                 return res;
             }
@@ -68,6 +70,7 @@ namespace MyProject01.Agent
         public RateMarketAgent(DataBlock dataBlock, int dataBlockLength)
         {
             _stateData = new RateMarketAgentData();
+            _stateData.RateDataArray = new double[dataBlockLength];
             _dataBlock = dataBlock;
             this._dataArray = _dataBlock.GetArray(0, _dataBlock.Length);
             this._dataBlockLength = dataBlockLength;
@@ -83,8 +86,8 @@ namespace MyProject01.Agent
             _money = InitMoney;
             IsEnd = false;
 
-            
-            _stateData.RateDataArray = GetArrayValue(index - _dataBlockLength + 1, _dataBlockLength);
+
+            GetArrayValue(_stateData.RateDataArray, index - _dataBlockLength + 1, _dataBlockLength);
             _stateData.Reward = 0;
             return _stateData;
         }
@@ -118,40 +121,42 @@ namespace MyProject01.Agent
                     break;
             }
             _stateData.Reward = (CurrentValue - InitMoney) / InitMoney;
-            _stateData.RateDataArray = GetArrayValue(index - _dataBlockLength + 1, _dataBlockLength);
+            GetArrayValue(_stateData.RateDataArray, index - _dataBlockLength + 1, _dataBlockLength);
             return _stateData;
         }
 
 
         private void Buy()
         {
-            double rate = _dataBlock.GetRate(index);
+            double rate = _dataBlock.GetRate(index) + BuyOffset;
             if (_money <= 0)
                 return;
 
-            _mountInHand += _money * rate;
+            _mountInHand += _money / rate;
             _money = 0;
 
         }
         private void Sell()
         {
-            double rate = _dataBlock.GetRate(index);
+            double rate = _dataBlock.GetRate(index) + SellOffset;
             if (_mountInHand <= 0)
                 return;
-            _money += _mountInHand / rate;
+            _money += _mountInHand * rate;
             _mountInHand = 0;
         }
         
-        private double[] GetArrayValue(int index, int length)
+        private void GetArrayValue(double[] buffer, int offset, int length)
         {
             length = Math.Min(length, _dataArray.Length - index);
-            ArraySegment<double> seg = new ArraySegment<double>(_dataArray, index, length);
-            
+            if (buffer == null)
+                buffer = new double[length];
+
+            Array.Copy(_dataArray, offset, buffer, 0, length);
 
             // double[] res = new double[length];
             // Array.Copy(_dataArray, index, res, 0, length);
 
-            return seg.ToArray<double>();
+            return ;
         }
         
     }
