@@ -46,12 +46,12 @@ namespace MyProject01.Controller
 
     public class RateMarketScore : ICalculateScore
     {
-        private double[] _dataArray;
+        private DataBlock _dataBlock;
         private int _blockLength;
 
-        public void SetData(double[] testData, int blockLength)
+        public void SetData(DataBlock dataBlock, int blockLength)
         {
-            _dataArray = testData;
+            _dataBlock = dataBlock;
             _blockLength = blockLength;
         }
 
@@ -66,7 +66,7 @@ namespace MyProject01.Controller
 
         public double CalculateScore(IMLMethod network)
         {
-            RateMarketAgent agent = new RateMarketAgent(_dataArray, _blockLength);
+            RateMarketAgent agent = new RateMarketAgent(_dataBlock, _blockLength);
             IMLRegression reg = (IMLRegression)network;
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
@@ -191,11 +191,9 @@ namespace MyProject01.Controller
         public TrainDataList DataList;
 
         private DataBlock _testDataBlock;
+        private DataBlock _trainDataBlock;
         private int _trainDataLength;
-        private int _testDataLength;
         private int _dataBlockLength;
-        private double[] _trainDataArray;
-        private double[] _testDataArray;
         private long _epoch;
 
 
@@ -215,9 +213,7 @@ namespace MyProject01.Controller
 
             // Update test data
             _dataBlockLength = Controller.InputVectorLength;
-            _testDataLength = _testDataBlock.Length - _dataBlockLength - _trainDataLength;
-            _trainDataArray = _testDataBlock.GetArray(0, _dataBlockLength + _trainDataLength);
-            _testDataArray = _testDataBlock.GetArray(0, _testDataBlock.Length);
+            _trainDataBlock = _testDataBlock.GetNewBlock(0, _dataBlockLength + _trainDataLength);
 
         }
 
@@ -239,15 +235,15 @@ namespace MyProject01.Controller
             LogFormater log = new LogFormater();
             _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
             _testCaseDAO.DataBlockCount = _dataBlockLength;
-            _testCaseDAO.TestDataStartIndex = _trainDataArray.Length;
-            _testCaseDAO.TotalDataCount = _testDataArray.Length;
+            _testCaseDAO.TestDataStartIndex = _trainDataBlock.Length;
+            _testCaseDAO.TotalDataCount = _testDataBlock.Length;
             // _testCaseDAO.TestData = _testDataArray;
 
 
             byte[] LastNetData = null;
 
             RateMarketScore score = new RateMarketScore();
-            score.SetData(_trainDataArray, _dataBlockLength);
+            score.SetData(_trainDataBlock, _dataBlockLength);
 
             // train the neural network
             TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
@@ -263,7 +259,7 @@ namespace MyProject01.Controller
                      // set next test data
                      trainData = DataList.GetNext();
                      SetDataLength(trainData.DataBlock, trainData.TestLength);
-                     score.SetData(_trainDataArray, _dataBlockLength);
+                     score.SetData(_trainDataBlock, _dataBlockLength);
                      train.FinishTraining();
                      train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score); 
                      LogFile.WriteLine("Change data!");
@@ -311,7 +307,7 @@ namespace MyProject01.Controller
 
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
         {
-            RateMarketAgent agent = new RateMarketAgent(_testDataArray, _dataBlockLength);
+            RateMarketAgent agent = new RateMarketAgent(_testDataBlock, _dataBlockLength);
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
             MarketActions currentAction;

@@ -33,6 +33,7 @@ namespace MyProject01.Agent
         public int index = 0;
         public double InitMoney = 10000;
 
+        private DataBlock _dataBlock;
         private double[] _dataArray;
         private int _dataBlockLength;
         private double _money;
@@ -50,12 +51,12 @@ namespace MyProject01.Agent
 
         public bool IsEnd { private set; get; }
 
-        public double CurrentRateValue { get { return _dataArray[index]; } }
+        public double CurrentRateValue { get { return _dataBlock.GetRate(index); } }
         public double CurrentValue
         {
             get
             {
-                double rate = _dataArray[index];
+                double rate = _dataBlock.GetRate(index);
                 double res = _money;
                 if (_mountInHand != 0)
                     res += _mountInHand / rate;
@@ -64,10 +65,11 @@ namespace MyProject01.Agent
             }
         }
 
-        public RateMarketAgent(double[] dataArray, int dataBlockLength)
+        public RateMarketAgent(DataBlock dataBlock, int dataBlockLength)
         {
             _stateData = new RateMarketAgentData();
-            this._dataArray = dataArray;
+            _dataBlock = dataBlock;
+            this._dataArray = _dataBlock.GetArray(0, _dataBlock.Length);
             this._dataBlockLength = dataBlockLength;
             Reset();
         }
@@ -123,7 +125,7 @@ namespace MyProject01.Agent
 
         private void Buy()
         {
-            double rate = _dataArray[index];
+            double rate = _dataBlock.GetRate(index);
             if (_money <= 0)
                 return;
 
@@ -133,7 +135,7 @@ namespace MyProject01.Agent
         }
         private void Sell()
         {
-            double rate = _dataArray[index];
+            double rate = _dataBlock.GetRate(index);
             if (_mountInHand <= 0)
                 return;
             _money += _mountInHand / rate;

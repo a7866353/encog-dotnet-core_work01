@@ -42,6 +42,8 @@ namespace MyProject01.TestCases
             if (controller.InputVectorLength == -1)
             {
                 controller.PopulationNumeber = populationNum;
+                controller.InputVectorLength = dataBlockLength;
+                controller.OutputVectorLength = 3;
             }
             else
             {

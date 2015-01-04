@@ -40,6 +40,14 @@ namespace MyProject01.Util
         {
             return _loader[_startIndex + i];
         }
+        public double GetValue(int i)
+        {
+            return _loader[_startIndex + i].Value;
+        }
+        public double GetRate(int i)
+        {
+            return _loader[_startIndex + i].RealValue;
+        }
 
         public void SetScale(double scale, double offset)
         {
@@ -59,7 +67,7 @@ namespace MyProject01.Util
 
         public DataBlock GetNewBlock(int startIndex, int length)
         {
-            DataBlock res = new DataBlock(_loader, _startIndex + startIndex, _length);
+            DataBlock res = new DataBlock(_loader, _startIndex + startIndex, length);
             return res;
         }
 
