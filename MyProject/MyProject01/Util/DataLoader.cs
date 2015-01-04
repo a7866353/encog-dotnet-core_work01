@@ -45,10 +45,12 @@ namespace MyProject01.Util
     {
         public DateTime Date;
         public double Value;
+        public double RealValue;
         public RateSet(DateTime date, double value)
         {
             this.Date = date;
             this.Value = value;
+            this.RealValue = value;
         }
         public override string ToString()
         {
@@ -64,11 +66,19 @@ namespace MyProject01.Util
         private double _dataMaxValue;
         private double _dataMinValue;
         private double _dataOffset;
-        private double _dataRadio;
+        private double _dataScale;
 
         private const double _targDataMax = 1.0;
         private const double _targDataMin = 0.0;
 
+        public double Offset
+        {
+            get { return _dataOffset; }
+        }
+        public double Scale
+        {
+            get { return _dataScale; }
+        }
     
         public double[] GetArr(DateTime date)
         {
@@ -125,6 +135,17 @@ namespace MyProject01.Util
             }
             return valueList.ToArray();
         }
+
+        public void Normallize(double offset, double scale)
+        {
+            _dataOffset = offset;
+            _dataScale = scale;
+            foreach (RateSet data in this)
+            {
+                data.Value = DataConv(data.RealValue, _dataOffset, _dataScale);
+            }
+        }
+
         protected void SortByDate()
         {
             Sort(new DateComparer(true));
@@ -141,21 +162,20 @@ namespace MyProject01.Util
                     _dataMinValue = data.Value;
             }
 
-            _dataRadio = (_dataMaxValue - _dataMinValue) / (_targDataMax - _targDataMin);
-            _dataRadio *= 2; // output value maybe large than inputs.
+            _dataScale = (_dataMaxValue - _dataMinValue) / (_targDataMax - _targDataMin);
+            _dataScale *= 2; // output value maybe large than inputs.
+            _dataScale = 1 / _dataScale;
+
             _dataOffset = _dataMinValue - _targDataMin;
 
-            foreach (RateSet data in this)
-            {
-                data.Value = DataConv(data.Value,_dataOffset, _dataRadio);
-            }
-
-
+            Normallize(_dataOffset, _dataScale);
         }
-        private double DataConv(double value, double offset, double radio)
+
+        private double DataConv(double value, double offset, double scale)
         {
-            return (value - offset) / radio;
+            return (value - offset) * scale;
         }
+
         private int SerachByDate(DateTime date)
         {
             return BinarySearch(new RateSet(date, 0), new DateComparer(true));

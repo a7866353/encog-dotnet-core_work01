@@ -54,6 +54,15 @@ namespace MyProject01.TestCases
 
             // init test data
             DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            if(controller.DataScale == 0)
+            {
+                controller.DataScale = loader.Scale;
+                controller.DataOffset = loader.Offset;
+            }
+            else
+            {
+                loader.Normallize(controller.DataOffset, controller.DataScale);
+            }
             DataBlock testBlock = loader.CreateDataBlock(0, loader.Count);
             _train = new NEATTrainer();
             _train.SetDataLength(testBlock, (int)(testBlock.Length * testDataRate));

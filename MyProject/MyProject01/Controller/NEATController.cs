@@ -55,7 +55,16 @@ namespace MyProject01.Controller
             set { Dao.PopulationNumeber = value; }
             get { return Dao.PopulationNumeber; }
         }
-
+        public double DataOffset
+        {
+            set { Dao.DataOffset = value; }
+            get { return Dao.DataOffset; }
+        }
+        public double DataScale
+        {
+            set { Dao.DataScale = value; }
+            get { return Dao.DataScale; }
+        }
         public static NEATController Open(string name, bool isNew = false)
         {
             ControllerDAO dao = ControllerDAO.GetDAO(name, isNew);

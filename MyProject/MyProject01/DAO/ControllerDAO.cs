@@ -227,6 +227,8 @@ namespace MyProject01.DAO
         public int InputVectorLength { set; get; }
         public int OutputVectorLength { set; get; }
         public int PopulationNumeber { set; get; }
+        public double DataOffset { set; get; }
+        public double DataScale { set; get; }
         public byte[] BestNetwork { set; get; }
 
         

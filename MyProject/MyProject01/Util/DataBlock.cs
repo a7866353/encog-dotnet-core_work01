@@ -57,6 +57,11 @@ namespace MyProject01.Util
             get { return _offset; }
         }
 
+        public DataBlock GetNewBlock(int startIndex, int length)
+        {
+            DataBlock res = new DataBlock(_loader, _startIndex + startIndex, _length);
+            return res;
+        }
 
         public double[] GetArray(int startIndex, int length)
         {
