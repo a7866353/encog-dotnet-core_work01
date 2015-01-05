@@ -68,8 +68,8 @@ namespace MyProject01.Util
         private double _dataOffset;
         private double _dataScale;
 
-        private const double _targDataMax = 1.0;
-        private const double _targDataMin = 0.0;
+        private const double _targDataMax = 0.9;
+        private const double _targDataMin = 0.1;
 
         public double Offset
         {
@@ -196,18 +196,17 @@ namespace MyProject01.Util
                     _dataMinValue = data.Value;
             }
 
-            _dataScale = (_dataMaxValue - _dataMinValue) / (_targDataMax - _targDataMin);
-            _dataScale *= 2; // output value maybe large than inputs.
-            _dataScale = 1 / _dataScale;
+            _dataScale = (_targDataMax - _targDataMin) / (_dataMaxValue - _dataMinValue);
 
-            _dataOffset = _dataMinValue - _targDataMin;
+            _dataOffset = (_dataMaxValue - _dataMinValue) * _targDataMax / (_targDataMax - _targDataMin) - _dataMaxValue;
+            
 
             Normallize(_dataOffset, _dataScale);
         }
 
         private double DataConv(double value, double offset, double scale)
         {
-            return (value - offset) * scale;
+            return (value + offset) * scale;
         }
 
         private int SerachByDate(DateTime date)
