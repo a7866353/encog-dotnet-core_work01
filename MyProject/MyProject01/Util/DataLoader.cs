@@ -145,6 +145,40 @@ namespace MyProject01.Util
                 data.Value = DataConv(data.RealValue, _dataOffset, _dataScale);
             }
         }
+        public void Fillter(DateTime startTime, DateTime endTime)
+        {
+            int startIndex = -1;
+            int stopIndex = -1;
+
+            for(int idx=0;idx<this.Count;idx++)
+            {
+                if(startIndex == -1)
+                {
+                    if (this[idx].Date >= startTime)
+                        startIndex = idx;
+                }
+                if(stopIndex == -1)
+                {
+                    if (this[idx].Date > endTime)
+                        stopIndex = idx;
+                }
+                if(stopIndex != -1 && startIndex != -1)
+                    break;
+            }
+
+            
+            if( stopIndex != -1)
+            {
+                // Remove after
+                this.RemoveRange(stopIndex, this.Count - stopIndex);
+            }
+            if( startIndex != -1)
+            {
+                // Remove before
+                this.RemoveRange(0, startIndex);
+            }
+
+        }
 
         protected void SortByDate()
         {

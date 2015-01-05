@@ -26,43 +26,36 @@ namespace MyProject01.TestCases
     class RateMarketNEATTest : BasicTestCase
     {
         public string TestName = "DefaultTest000";
+        public double TestDataRate = 0.75;
+        public int DataBlockLength = 300;
+        public  int PopulationNum = 50;
 
         NEATTrainer _train;
         public override void RunTest()
         {
-#if true
-            double testDataRate = 0.75;
-            int dataBlockLength = 300;
-            int populationNum = 50;
-#else
-            double testDataRate = 0.75;
-            int dataBlockLength = 60 * 24 * 10 / 5;
-            int populationNum = 1000;
-
-#endif
-
             // init controller
             string controllerName = TestName;
             NEATController controller = NEATController.Open(controllerName);
             if (controller.InputVectorLength == -1)
             {
-                controller.PopulationNumeber = populationNum;
-                controller.InputVectorLength = dataBlockLength;
+                controller.PopulationNumeber = PopulationNum;
+                controller.InputVectorLength = DataBlockLength;
                 controller.OutputVectorLength = 3;
             }
             else
             {
-                if (controller.InputVectorLength != dataBlockLength || controller.OutputVectorLength != 3)
+                if (controller.InputVectorLength != DataBlockLength || controller.OutputVectorLength != 3)
                 {
                     controller = NEATController.Open(controllerName, true);
-                    controller.PopulationNumeber = populationNum;
-                    controller.InputVectorLength = dataBlockLength;
+                    controller.PopulationNumeber = PopulationNum;
+                    controller.InputVectorLength = DataBlockLength;
                     controller.OutputVectorLength = 3;
                 }
             }
 
             // init test data
             DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
             if(controller.DataScale == 0)
             {
                 controller.DataScale = loader.Scale;
@@ -74,7 +67,7 @@ namespace MyProject01.TestCases
             }
             DataBlock testBlock = loader.CreateDataBlock(0, loader.Count);
             _train = new NEATTrainer();
-            _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * testDataRate) ));
+            _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
             // start trainning
             _train.TestName = TestName;

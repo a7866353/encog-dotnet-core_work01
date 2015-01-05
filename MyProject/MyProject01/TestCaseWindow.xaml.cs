@@ -47,10 +47,11 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
+                new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
                 new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)),
                 new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
                 new TestCaseObject("TestRateMarketNEATBatch", "", new TestCaseObject.TestFucntion(TestRateMarketNEATBatch)),
-                new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
                 new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
                 new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
                 new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
@@ -219,12 +220,22 @@ namespace MyProject01
         }
         private void TestRateMarketNEAT()
         {
-            double testDataRate = 0.7;
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = GetTestName();
-            // test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count * testDataRate), RateMarketNEATTest._dataLoader.Count, 30);
-//            test.SetDataLength(0, (int)(RateMarketNEATTest._dataLoader.Count / 4 * testDataRate), RateMarketNEATTest._dataLoader.Count/4, 3600);
+            test.TestDataRate = 0.8;
+            test.PopulationNum = 1000;
+            test.DataBlockLength = 2880;
+            test.RunTest();
+        }
 
+        private void TestRateMarketNEAT_Short()
+        {
+            string prefix = "Short_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.8;
+            test.PopulationNum = 256;
+            test.DataBlockLength = 2880;
             test.RunTest();
         }
 

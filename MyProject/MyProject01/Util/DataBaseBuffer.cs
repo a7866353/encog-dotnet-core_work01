@@ -94,6 +94,7 @@ namespace MyProject01.Util
 
             if (true)
             {
+                /*
                 MongoCursor cursor = collection.FindAllAs<MtDataObject>();
                 cursor.BatchSize = 1000;
                 int loadMaxCount = 200000;
@@ -104,6 +105,20 @@ namespace MyProject01.Util
                     if (loadMaxCount == 0)
                         break;
                 }
+                */
+                QueryDocument query = new QueryDocument();
+                BsonDocument b = new BsonDocument();
+                b.Add("$gt", DateTime.Now.AddMonths(-12));
+                b.Add("$lt", DateTime.Now);
+                query.Add("Date", b);
+
+                var curst = collection.FindAs<MtDataObject>(query);
+                curst.BatchSize = 1000;
+                foreach (MtDataObject dataObj in curst)
+                {
+                    Add(dataObj);
+                }
+
             }
             else // for parallel
             {
