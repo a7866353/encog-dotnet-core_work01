@@ -47,6 +47,7 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("TestRateMarketNEAT_Long", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Long)),
                 new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
                 new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
                 new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)),
@@ -234,7 +235,17 @@ namespace MyProject01
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = prefix + GetTestName();
             test.TestDataRate = 0.8;
-            test.PopulationNum = 256;
+            test.PopulationNum = 50;
+            test.DataBlockLength = 30;
+            test.RunTest();
+        }
+        private void TestRateMarketNEAT_Long()
+        {
+            string prefix = "Long_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.8;
+            test.PopulationNum = 500;
             test.DataBlockLength = 2880;
             test.RunTest();
         }

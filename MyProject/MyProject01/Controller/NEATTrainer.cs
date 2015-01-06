@@ -213,7 +213,7 @@ namespace MyProject01.Controller
 
             // Update test data
             _dataBlockLength = Controller.InputVectorLength;
-            _trainDataBlock = _testDataBlock.GetNewBlock(0, _dataBlockLength + _trainDataLength);
+            _trainDataBlock = _testDataBlock.GetNewBlock(0, _trainDataLength);
 
         }
 
