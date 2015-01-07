@@ -16,7 +16,7 @@ namespace SocketTestClient.ConnectionContoller
         public string SymbolName;
         public int Timeframe;
     }
-    class RateDataController
+    class RateDataController : IRequestController
     {
         private RateDataDAOList _rateDataList;
         private RateDataControlDAO _currentTargetDao;

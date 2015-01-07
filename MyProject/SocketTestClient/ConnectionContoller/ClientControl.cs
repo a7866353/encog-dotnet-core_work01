@@ -24,7 +24,12 @@ namespace SocketTestClient.ConnectionContoller
         {
             IRequest rcvReq, sendReq;
             bool isDoSend;
+            List<IRequestController> ctrlList = new List<IRequestController>();
+            OrderSendController orderCtrl = new OrderSendController();
+            ctrlList.Add(orderCtrl);
             RateDataController rateDataCtrl = new RateDataController();
+            ctrlList.Add(rateDataCtrl);
+
             _sender = new SocketDeamonSender();
             while (true)
             {
@@ -40,13 +45,17 @@ namespace SocketTestClient.ConnectionContoller
                     // DealWithSend
                     isDoSend = false;
 
-                    sendReq = rateDataCtrl.GetRequest();
-                    if( sendReq != null )
+                    foreach(IRequestController ctrl in ctrlList)
                     {
-                        isDoSend = true;
-                        _sender.Send(sendReq);
+                        sendReq = ctrl.GetRequest();
+                        if (sendReq != null)
+                        {
+                            isDoSend = true;
+                            _sender.Send(sendReq);
+                            break;
+                        }
                     }
-
+                    
                     if (isDoSend == false)
                         Thread.Sleep(100);
                 }

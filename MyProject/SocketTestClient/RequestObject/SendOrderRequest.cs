@@ -17,7 +17,8 @@ namespace SocketTestClient.RequestObject
     class SendOrderRequest : IRequest
     {
         public RequestType OrderType = RequestType.SendOrderRequire;
-        public double Price;
+        public string SymbolName;
+        public Cmd OrderCmd;
 
         private SendOrderResult _result;
 
@@ -28,7 +29,8 @@ namespace SocketTestClient.RequestObject
 
             DataSendBuffer sb = new DataSendBuffer();
             sb.Add((int)OrderType);
-            sb.Add(Price);
+            sb.Add(SymbolName);
+            sb.Add((char)OrderCmd);
 
             return sb.GetBytes();
         }
@@ -49,6 +51,13 @@ namespace SocketTestClient.RequestObject
         public SendOrderResult Result
         {
             get { return _result; }
+        }
+
+        public enum Cmd
+        {
+            Nothing = 0,
+            Buy = 1,
+            Sell = 2,
         }
     }
 }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.DAO
 {
-    class ControllerDAO
+    public class ControllerDAO
     {
         #region Static Region
 

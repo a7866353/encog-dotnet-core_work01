@@ -18,6 +18,7 @@ namespace SocketTestClient
             System.Console.WriteLine("Test Started!");
 
             TestClientDeamon();
+            // TestOrderSendRequest();
          
         }
 
@@ -61,6 +62,37 @@ namespace SocketTestClient
                 sender.Send(rateReq);
                 Thread.Sleep(2000);
 
+            }
+
+        }
+        static void TestOrderSendRequest()
+        {
+            SocketDeamonSender sender = new SocketDeamonSender();
+            SendOrderRequest req = new SendOrderRequest();
+            req.OrderCmd = SendOrderRequest.Cmd.Buy;
+            req.SymbolName = "USDJPYpro";
+
+            while (true)
+            {
+                if (sender.State != DeamonState.Connected)
+                {
+                    Thread.Sleep(2000);
+                    continue;
+                }
+                // Buy
+                req.OrderCmd = SendOrderRequest.Cmd.Buy;
+                req.SymbolName = "USDJPYpro";
+                sender.Send(req);
+                Thread.Sleep(2000);
+
+                // Sell
+                req.OrderCmd = SendOrderRequest.Cmd.Sell;
+                req.SymbolName = "USDJPYpro";
+                sender.Send(req);
+                Thread.Sleep(2000);
+
+                Thread.Sleep(20000);
+              
             }
 
         }

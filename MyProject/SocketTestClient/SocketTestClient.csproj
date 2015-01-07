@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="BasicData.cs" />
     <Compile Include="ConnectionContoller\ClientControl.cs" />
+    <Compile Include="ConnectionContoller\IRequestController.cs" />
+    <Compile Include="ConnectionContoller\OrderSendController.cs" />
     <Compile Include="ConnectionContoller\RateDataController.cs" />
     <Compile Include="DatabaseConnector.cs" />
     <Compile Include="RateDataDao\RateDataDAOList.cs" />

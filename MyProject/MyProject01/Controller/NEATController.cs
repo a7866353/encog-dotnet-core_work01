@@ -16,12 +16,12 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    class NEATController
+    public class NEATController
     {
         private NEATPopulation _population;
         public NEATNetwork BestNetwork;
 
-        public ControllerDAO Dao;
+        private ControllerDAO _dao;
         public NEATPopulation GetPopulation()
         {
            
@@ -38,34 +38,34 @@ namespace MyProject01.Controller
 
         public string Name
         {
-            get { return Dao.Name; }
+            get { return _dao.Name; }
         }
         public int InputVectorLength
         {
-            set { Dao.InputVectorLength = value; }
-            get { return Dao.InputVectorLength; }
+            set { _dao.InputVectorLength = value; }
+            get { return _dao.InputVectorLength; }
         }
         public int OutputVectorLength
         {
-            set { Dao.OutputVectorLength = value; }
-            get { return Dao.OutputVectorLength; }
+            set { _dao.OutputVectorLength = value; }
+            get { return _dao.OutputVectorLength; }
         }
         public int PopulationNumeber
         {
-            set { Dao.PopulationNumeber = value; }
-            get { return Dao.PopulationNumeber; }
+            set { _dao.PopulationNumeber = value; }
+            get { return _dao.PopulationNumeber; }
         }
         public double DataOffset
         {
-            set { Dao.DataOffset = value; }
-            get { return Dao.DataOffset; }
+            set { _dao.DataOffset = value; }
+            get { return _dao.DataOffset; }
         }
         public double DataScale
         {
-            set { Dao.DataScale = value; }
-            get { return Dao.DataScale; }
+            set { _dao.DataScale = value; }
+            get { return _dao.DataScale; }
         }
-        public static NEATController Open(string name, bool isNew = false)
+        public static NEATController Open(string name, bool isNew = false, bool needPopulation = true)
         {
             ControllerDAO dao = ControllerDAO.GetDAO(name, isNew);
             NEATController controller;
@@ -79,7 +79,8 @@ namespace MyProject01.Controller
             else
             {
                 controller = new NEATController(dao);
-                controller._population = dao.GetPopulation();
+                if (needPopulation == true)
+                    controller._population = dao.GetPopulation();
                 controller.BestNetwork = dao.GetBestNetwork();
 
             }
@@ -89,7 +90,7 @@ namespace MyProject01.Controller
 
         private NEATController(ControllerDAO dao)
         {
-            this.Dao = dao;
+            this._dao = dao;
         }
         public double[] Compute(double[] input)
         {
@@ -103,9 +104,9 @@ namespace MyProject01.Controller
         }
         public void Save()
         {
-            Dao.SetBestNetwork(BestNetwork);
-            Dao.Save();
-            Dao.UpdatePopulation(_population);
+            _dao.SetBestNetwork(BestNetwork);
+            _dao.Save();
+            _dao.UpdatePopulation(_population);
         }
 
     }
