@@ -28,18 +28,85 @@ namespace MyProject01.Agent
         void EpsodeEnd();
     }
 
+    class Order
+    {
+        public double BuyOffset = 0.02;
+        public double SellOffset = 0.01;
+
+        private double _money;
+        private OrderType _type;
+        private double _startRate;
+        private double _currentRate;
+
+        public Order(double initMoney)
+        {
+            _money = initMoney;
+            _type = OrderType.Nothing;
+            _startRate = 0;
+        }
+        public double GetCurrentMoney(double currentRate)
+        {
+            _currentRate = currentRate;
+            return _money + Benifit();
+        }
+        public void StartOrder( OrderType type, double currentRate)
+        {
+            _currentRate = currentRate;
+
+            if (_type == type)
+                return;
+            else if (_type != type)
+                CloseOrder(currentRate);
+            _type = type;
+            if (_type == OrderType.Buy)
+                _startRate = Ask();
+            else
+                _startRate = Bid();
+        }
+        public void CloseOrder(double currentRate)
+        {
+            double res = Benifit();
+            _money += res;
+            _type = OrderType.Nothing;
+        }
+
+        private double Benifit()
+        {
+            if (_type == OrderType.Nothing)
+                return 0;
+            else if (_type == OrderType.Buy)
+                return (Bid() - _startRate) * _money;
+            else // for sell order
+                return (Ask() - _startRate) * _money;
+        }
+        
+        private double Bid()
+        {
+            return _currentRate + SellOffset;
+        }
+        private double Ask()
+        {
+            return _currentRate + BuyOffset;
+        }
+        public enum OrderType
+        {
+            Nothing,
+            Buy,
+            Sell,
+        }
+
+    }
+
     class RateMarketAgent
     {
         public int index = 0;
         public double InitMoney = 10000;
-        public double BuyOffset = 0.1;
-        public double SellOffset = 0.01;
+
 
         private DataBlock _dataBlock;
         private double[] _dataArray;
         private int _dataBlockLength;
-        private double _money;
-        private double _mountInHand;
+        private Order _order;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
 
@@ -58,12 +125,7 @@ namespace MyProject01.Agent
         {
             get
             {
-                double rate = _dataBlock.GetRate(index)+SellOffset;
-                double res = _money;
-                if (_mountInHand != 0)
-                    res += _mountInHand * rate;
-
-                return res;
+                return _order.GetCurrentMoney(_currentRate);
             }
         }
 
@@ -74,16 +136,15 @@ namespace MyProject01.Agent
             _dataBlock = dataBlock;
             this._dataArray = _dataBlock.GetArray(0, _dataBlock.Length);
             this._dataBlockLength = dataBlockLength;
+            _order = new Order(InitMoney);
             Reset();
         }
 
         public RateMarketAgentData Reset()
         {
             _step = 0;
-            _money = InitMoney;
+            _order = new Order(InitMoney);
             index = _dataBlockLength - 1;
-            _mountInHand = 0;
-            _money = InitMoney;
             IsEnd = false;
 
 
@@ -110,10 +171,10 @@ namespace MyProject01.Agent
             switch (action)
             {
                 case MarketActions.Buy:
-                    Buy();
+                    _order.StartOrder(Order.OrderType.Buy, _currentRate);
                     break;
                 case MarketActions.Sell:
-                    Sell();
+                    _order.StartOrder(Order.OrderType.Sell, _currentRate);
                     break;
                 case MarketActions.Nothing:
                     break;
@@ -125,24 +186,9 @@ namespace MyProject01.Agent
             return _stateData;
         }
 
-
-        private void Buy()
+        private double _currentRate
         {
-            double rate = _dataBlock.GetRate(index) + BuyOffset;
-            if (_money <= 0)
-                return;
-
-            _mountInHand += _money / rate;
-            _money = 0;
-
-        }
-        private void Sell()
-        {
-            double rate = _dataBlock.GetRate(index) + SellOffset;
-            if (_mountInHand <= 0)
-                return;
-            _money += _mountInHand * rate;
-            _mountInHand = 0;
+            get { return _dataBlock.GetRate(index); }
         }
         
         private void GetArrayValue(double[] buffer, int offset, int length)
@@ -158,6 +204,7 @@ namespace MyProject01.Agent
 
             return ;
         }
+
         
     }
 }
