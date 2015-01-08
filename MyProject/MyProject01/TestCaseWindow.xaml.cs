@@ -234,9 +234,10 @@ namespace MyProject01
             string prefix = "Short_";
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.8;
-            test.PopulationNum = 50;
-            test.DataBlockLength = 30;
+            test.TestDataRate = 0.99;
+            test.PopulationNum = 1000;
+            test.DataBlockLength = 12*3;
+            test.RateDataControllerName = "test01";
             test.RunTest();
         }
         private void TestRateMarketNEAT_Long()
@@ -244,9 +245,9 @@ namespace MyProject01
             string prefix = "Long_";
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.8;
+            test.TestDataRate = 0.9;
             test.PopulationNum = 500;
-            test.DataBlockLength = 2880;
+            test.DataBlockLength = 300;
             test.RunTest();
         }
 

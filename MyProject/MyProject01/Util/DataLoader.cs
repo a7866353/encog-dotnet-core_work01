@@ -68,8 +68,9 @@ namespace MyProject01.Util
         private double _dataOffset;
         private double _dataScale;
 
-        private const double _targDataMax = 0.9;
-        private const double _targDataMin = 0.1;
+        private const double _targetDataMargin = 0.25;
+        private const double _targDataMax = 0.5 + _targetDataMargin;
+        private const double _targDataMin = 0.5 - _targetDataMargin;
 
         public double Offset
         {
