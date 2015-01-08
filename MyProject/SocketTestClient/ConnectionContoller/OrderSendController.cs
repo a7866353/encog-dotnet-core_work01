@@ -99,7 +99,8 @@ namespace SocketTestClient.ConnectionContoller
         public OrderSendController()
         {
             _tradeOrderList = new List<TradeOrder>();
-            _tradeOrderList.Add(new TradeOrder("test02", "Long_01"));
+            // _tradeOrderList.Add(new TradeOrder("test01", "Long_5MinTest02"));
+            _tradeOrderList.Add(new TradeOrder("test01", "Long_01"));
 
         }
         public IRequest GetRequest()
@@ -112,9 +113,15 @@ namespace SocketTestClient.ConnectionContoller
                 SendOrderRequest req = new SendOrderRequest();
                 req.SymbolName = order.SymbolName;
                 if (cmd == OrderCommand.Buy)
+                {
                     req.OrderCmd = SendOrderRequest.Cmd.Buy;
+                    Printf("Buy");
+                }
                 else if (cmd == OrderCommand.Sell)
+                {
                     req.OrderCmd = SendOrderRequest.Cmd.Sell;
+                    Printf("Sell");
+                }
                 else
                     throw (new Exception("Parm error!"));
 
@@ -125,6 +132,11 @@ namespace SocketTestClient.ConnectionContoller
         public void SetResult(IRequest req)
         {
             // Nothing to do.
+        }
+
+        private void Printf(string str)
+        {
+            System.Console.WriteLine("OrderSendController: " + str);
         }
     }
 }

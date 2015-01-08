@@ -44,15 +44,17 @@ namespace SocketTestClient.ConnectionContoller
                 {
                     // DealWithSend
                     isDoSend = false;
-
-                    foreach(IRequestController ctrl in ctrlList)
+                    if (rateDataCtrl.IsFinish == true)
                     {
-                        sendReq = ctrl.GetRequest();
-                        if (sendReq != null)
+                        foreach (IRequestController ctrl in ctrlList)
                         {
-                            isDoSend = true;
-                            _sender.Send(sendReq);
-                            break;
+                            sendReq = ctrl.GetRequest();
+                            if (sendReq != null)
+                            {
+                                isDoSend = true;
+                                _sender.Send(sendReq);
+                                break;
+                            }
                         }
                     }
                     

@@ -31,6 +31,16 @@ namespace SocketTestClient.ConnectionContoller
 
         };
 
+        public bool IsFinish
+        {
+            get 
+            {
+                if (_currentTargetDao == null)
+                    return true;
+                else
+                    return false;
+            }
+        }
 
         public RateDataController()
         {
