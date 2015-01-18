@@ -30,7 +30,7 @@ namespace MyProject01.Controller
                 _population = new NEATPopulation(InputVectorLength, OutputVectorLength, PopulationNumeber);
                 _population.Reset();
 
-                // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
+                 // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
             }
             return _population;
 

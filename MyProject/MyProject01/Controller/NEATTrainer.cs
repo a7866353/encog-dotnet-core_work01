@@ -25,7 +25,8 @@ namespace MyProject01.Controller
     class EpisodeLog : BasicTestEpisodeDAO
     {
         public double ResultMoney { set; get; }
-        public int DealCount { set; get; }
+        public int TrainedDealCount { set; get; }
+        public int UntrainedDealCount { set; get; }
         public double TrainedDataEarnRate { set; get; }
         public double UnTrainedDataEarnRate { set; get; }
         public List<DealLog> DealLogs { set; get; }
@@ -107,7 +108,10 @@ namespace MyProject01.Controller
                 if (agent.Next() == false)
                     break;
             }
-
+//            System.Console.WriteLine("S: " + agent.CurrentValue);
+            double score = agent.CurrentValue - agent.InitMoney;
+            // System.Console.WriteLine("S: " + score);
+            // return score;
             return agent.CurrentValue;
         }
 
@@ -118,7 +122,8 @@ namespace MyProject01.Controller
         public enum ValueName
         {
             Step = 0,
-            Score,
+            TrainScore,
+            UnTrainScore,
         }
 
         public LogFormater()
@@ -139,7 +144,7 @@ namespace MyProject01.Controller
         {
             string resStr = "";
             for (int i = 0; i < _valueArray.Length; i++)
-                resStr += _valueArray[i].ToString("G6") + "\t";
+                resStr += _valueArray[i].ToString("G6") + "    \t";
             return resStr;
         }
 
@@ -195,7 +200,7 @@ namespace MyProject01.Controller
         private int _trainDataLength;
         private int _dataBlockLength;
         private long _epoch;
-
+        private LogFormater _log = new LogFormater();
 
         private RateMarketTestDAO _testCaseDAO;
 
@@ -232,7 +237,7 @@ namespace MyProject01.Controller
             SetDataLength(trainData.DataBlock, trainData.TestLength);
 
             //Start
-            LogFormater log = new LogFormater();
+            _log = new LogFormater();
             _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
             _testCaseDAO.DataBlockCount = _dataBlockLength;
             _testCaseDAO.TestDataStartIndex = _trainDataBlock.Length;
@@ -247,11 +252,11 @@ namespace MyProject01.Controller
 
             // train the neural network
             TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
-
+            
             _epoch = 1;
 
             LogFile.WriteLine(@"Beginning training...");
-            LogFile.WriteLine(log.GetTitle());
+            LogFile.WriteLine(_log.GetTitle());
             do
             {
                 if ((IterationCount > 0) && (_epoch % IterationCount == 0))
@@ -284,10 +289,9 @@ namespace MyProject01.Controller
                      _testCaseDAO.Step = _epoch;
                      _testCaseDAO.Save();
 
-                     log.Set(LogFormater.ValueName.Step, _epoch);
-                     log.Set(LogFormater.ValueName.Score, train.BestGenome.Score);
+                     _log.Set(LogFormater.ValueName.Step, _epoch);
 
-                     LogFile.WriteLine(log.GetLog());
+                     LogFile.WriteLine(_log.GetLog());
                  }
                 catch(Exception e)
                  {
@@ -314,6 +318,7 @@ namespace MyProject01.Controller
 
             EpisodeLog epsodeLog = new EpisodeLog();
             int dealCount = 0;
+            int trainDealCount = 0;
             DealLog dealLog;
             int trainedDataIndex = _trainDataLength;
             double startMoney = agent.InitMoney;
@@ -362,7 +367,11 @@ namespace MyProject01.Controller
                     // To large for test
                     // epsodeLog.DealLogs.Add(dealLog);
                     if (agent.index == trainedDataIndex)
+                    {
                         trainedMoney = agent.CurrentValue;
+                        trainDealCount = dealCount;
+                        dealCount = 0;
+                    }
 
                     stateData = agent.TakeAction(currentAction);
                 }
@@ -373,7 +382,8 @@ namespace MyProject01.Controller
 
             epsodeLog.TrainedDataEarnRate = (trainedMoney / startMoney) * 100;
             epsodeLog.UnTrainedDataEarnRate = (endMoney / trainedMoney) * 100;
-            epsodeLog.DealCount = dealCount;
+            epsodeLog.TrainedDealCount = trainDealCount;
+            epsodeLog.UntrainedDealCount = dealCount;
             epsodeLog.HidenNodeCount = network.Links.Length;
             epsodeLog.ResultMoney = endMoney;
             epsodeLog.Step = _epoch;
@@ -383,6 +393,9 @@ namespace MyProject01.Controller
             dao.LastTestDataEarnRate = epsodeLog.UnTrainedDataEarnRate;
             dao.LastTrainedDataEarnRate = epsodeLog.TrainedDataEarnRate;
 
+            // update log
+            _log.Set(LogFormater.ValueName.TrainScore, epsodeLog.TrainedDataEarnRate);
+            _log.Set(LogFormater.ValueName.UnTrainScore, epsodeLog.UnTrainedDataEarnRate);
 
         }
 

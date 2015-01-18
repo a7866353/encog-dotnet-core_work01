@@ -29,6 +29,7 @@ namespace MyProject01.TestCases
         public double TestDataRate = 0.75;
         public int DataBlockLength = 300;
         public  int PopulationNum = 50;
+        public int DataSoreceType = 0;
         public string RateDataControllerName = "test01";
 
         NEATTrainer _train;
@@ -53,11 +54,17 @@ namespace MyProject01.TestCases
                     controller.OutputVectorLength = 3;
                 }
             }
-
             // init test data
-            // DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
-            // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
-            DataLoader loader = new MTData2Loader(RateDataControllerName);
+            DataLoader loader;
+            if (DataSoreceType == 0)
+            {
+                loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+                // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
+            }
+            else
+            {
+                loader = new MTData2Loader(RateDataControllerName);
+            }
             if(controller.DataScale == 0)
             {
                 controller.DataScale = loader.Scale;

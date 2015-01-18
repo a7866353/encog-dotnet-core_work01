@@ -47,6 +47,10 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("Long5Min_Simple", "", new TestCaseObject.TestFucntion(Long5Min_Simple)),
+                new TestCaseObject("Test_5Min_Short", "", new TestCaseObject.TestFucntion(Test_5Min_Short)),
+                new TestCaseObject("Test_1Min_Short", "", new TestCaseObject.TestFucntion(Test_1Min_Short)),
+                new TestCaseObject("Test_1Min_Long", "", new TestCaseObject.TestFucntion(Test_1Min_Long)),
                 new TestCaseObject("TestRateMarketNEAT_Long", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Long)),
                 new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
                 new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
@@ -234,9 +238,10 @@ namespace MyProject01
             string prefix = "Short_";
             RateMarketNEATTest test = new RateMarketNEATTest();
             test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.99;
-            test.PopulationNum = 1000;
-            test.DataBlockLength = 12*3;
+            test.TestDataRate = 0.5;
+            test.PopulationNum = 500;
+            test.DataBlockLength = 12*4;
+            test.DataSoreceType = 1;
             test.RateDataControllerName = "test01";
             test.RunTest();
         }
@@ -248,9 +253,57 @@ namespace MyProject01
             test.TestDataRate = 0.9;
             test.PopulationNum = 500;
             test.DataBlockLength = 300;
+            test.DataSoreceType = 1;
             test.RunTest();
         }
-
+        private void Test_1Min_Long()
+        {
+            string prefix = "1Min_Long_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.5;
+            test.PopulationNum = 1000;
+            test.DataBlockLength = 60 * 24;
+            test.RateDataControllerName = "test02";
+            test.DataSoreceType = 1;
+            test.RunTest();
+        }
+        private void Test_1Min_Short()
+        {
+            string prefix = "1Min_Short_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.5;
+            test.PopulationNum = 1000;
+            test.DataBlockLength = 60 * 3;
+            test.RateDataControllerName = "test02";
+            test.DataSoreceType = 1;
+            test.RunTest();
+        }
+        private void Test_5Min_Short()
+        {
+            string prefix = "5Min_Short_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.5;
+            test.PopulationNum = 1000;
+            test.DataBlockLength = 12 * 3;
+            test.RateDataControllerName = "test01";
+            test.DataSoreceType = 1;
+            test.RunTest();
+        }
+        private void Long5Min_Simple()
+        {
+            string prefix = "Long5Min_Simple_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.7;
+            test.PopulationNum = 500;
+            test.DataBlockLength = 12 * 2;
+            test.RateDataControllerName = "test01";
+            test.DataSoreceType = 0;
+            test.RunTest();
+        }
         private void TestRateMarketNEATBatch()
         {
             RateMarketNEATBatchTest test = new RateMarketNEATBatchTest();

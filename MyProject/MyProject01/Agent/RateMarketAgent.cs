@@ -14,6 +14,51 @@ namespace MyProject01.Agent
         Buy,
         Sell,
     };
+    class DataNormallizer
+    {
+        private double _targDataMax;
+        private double _targDataMin;
+        private double _dataMaxValue;
+        private double _dataMinValue;
+        private double[] _dataArr;
+
+        private double _dataScale;
+        private double _dataOffset;
+
+        public void DataValueAdjust(double[] dataArr, double max, double min)
+        {
+            _dataArr = dataArr;
+            _targDataMax = max;
+            _targDataMin = min;
+
+            _dataMaxValue = _dataMinValue = _dataArr[0];
+            foreach (double data in _dataArr)
+            {
+                if (data > _dataMaxValue)
+                    _dataMaxValue = data;
+                else if (data < _dataMinValue)
+                    _dataMinValue = data;
+            }
+
+            _dataScale = (_targDataMax - _targDataMin) / (_dataMaxValue - _dataMinValue);
+            _dataOffset = (_dataMaxValue - _dataMinValue) * _targDataMax / (_targDataMax - _targDataMin) - _dataMaxValue;
+
+            Normallize(_dataOffset, _dataScale);
+        }
+        public void Normallize(double offset, double scale)
+        {
+            _dataOffset = offset;
+            _dataScale = scale;
+            for (int i = 0; i < _dataArr.Length;i++ )
+            {
+                _dataArr[i] = DataConv(_dataArr[i], _dataOffset, _dataScale);
+            }
+        }
+        private double DataConv(double value, double offset, double scale)
+        {
+            return (value + offset) * scale;
+        }
+    }
     class RateMarketAgentData
     {
         public double[] RateDataArray;
@@ -36,6 +81,7 @@ namespace MyProject01.Agent
         private double _money;
         private OrderType _type;
         private double _startRate;
+        private double _startRatePre;
         private double _currentRate;
 
         public Order(double initMoney)
@@ -47,7 +93,8 @@ namespace MyProject01.Agent
         public double GetCurrentMoney(double currentRate)
         {
             _currentRate = currentRate;
-            return _money + Benifit();
+            // return _money + Benifit();
+            return _money;
         }
         public void StartOrder( OrderType type, double currentRate)
         {
@@ -55,19 +102,27 @@ namespace MyProject01.Agent
 
             if (_type == type)
                 return;
-            else if (_type != type)
+            else if (_type != type && (_type != OrderType.Nothing))
                 CloseOrder(currentRate);
             _type = type;
             if (_type == OrderType.Buy)
+            {
+                _startRatePre = _startRate;
                 _startRate = Ask();
+            }
             else
+            {
+                _startRatePre = _startRate;
                 _startRate = Bid();
+            }
         }
         public void CloseOrder(double currentRate)
         {
             double res = Benifit();
             _money += res;
             _type = OrderType.Nothing;
+ //           System.Console.WriteLine("M: " + _money.ToString());
+
         }
 
         private double Benifit()
@@ -75,9 +130,9 @@ namespace MyProject01.Agent
             if (_type == OrderType.Nothing)
                 return 0;
             else if (_type == OrderType.Buy)
-                return (Bid() - _startRate) * _money;
+                return (1- Bid() / _startRate) * _money;
             else // for sell order
-                return (Ask() - _startRate) * _money;
+                return (1 - Ask() / _startRate) * _money;
         }
         
         private double Bid()
@@ -142,7 +197,7 @@ namespace MyProject01.Agent
 
         public RateMarketAgentData Reset()
         {
-            _step = 0;
+            _step = 1;
             _order = new Order(InitMoney);
             index = _dataBlockLength - 1;
             IsEnd = false;
@@ -164,6 +219,7 @@ namespace MyProject01.Agent
             }
 
             index++;
+            _step++;
             return true;
         }
         public RateMarketAgentData TakeAction(MarketActions action)
@@ -199,12 +255,46 @@ namespace MyProject01.Agent
 
             Array.Copy(_dataArray, offset, buffer, 0, length);
 
-            // double[] res = new double[length];
-            // Array.Copy(_dataArray, index, res, 0, length);
+            /*
+            // adj to same end point
+            */
+            // DataNormallizer n = new DataNormallizer();
+            // n.DataValueAdjust(buffer, 1.0, 0.0);
+                // double[] res = new double[length];
+                // Array.Copy(_dataArray, index, res, 0, length);
 
-            return ;
+            // DataAdj(buffer);
+            DataAdj_Offset(buffer);
+                return;
         }
+        private void DataAdj_Offset(double[] buffer)
+        {
+            // adj to same end point
+            double offset = buffer[buffer.Length-1];
+            for (int i = 0; i < buffer.Length; i++)
+                buffer[i] = buffer[i] - offset + 0.5;
+        }
+        private void DataAdj(double[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+                buffer[i] -= buffer[buffer.Length - 1];
 
+            double min, max;
+            min = max = buffer[0];
+            foreach(double d in buffer)
+            {
+                if (d > max)
+                    max = d;
+                if (d < min)
+                    min = d;
+            }
+            double scale = 0.5 / Math.Max(Math.Abs(min), Math.Abs(max));
+
+            for (int i = 0; i < buffer.Length; i++)
+                buffer[i] = buffer[i] * scale + 0.5;
+
+
+        }
         
     }
 }
