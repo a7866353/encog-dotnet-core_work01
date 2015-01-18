@@ -11,9 +11,10 @@ namespace MyProject01.TestCases
     class TestDataBlockCreator
     {
         public int DataLength = 60*24*10/5; // 2 week data
+        public int DataBlockLength = 512;
+        public DataBlock[] DataBlockArr;
 
         private DataLoader _loader;
-        public DataBlock[] DataBlockArr;
         private Random _rand;
 
         public TestDataBlockCreator()
@@ -32,10 +33,10 @@ namespace MyProject01.TestCases
             DataBlockArr = new DataBlock[count];
             for(int i=0;i<count-1;i++)
             {
-                DataBlockArr[i] = _loader.CreateDataBlock(i * DataLength, DataLength);
+                DataBlockArr[i] = _loader.CreateDataBlock(i * DataLength, DataLength, DataBlockLength);
             }
             // add last block
-            DataBlockArr[count - 1] = _loader.CreateDataBlock(DataLength * (count - 1), _loader.Count - (DataLength * (count - 1)));
+            DataBlockArr[count - 1] = _loader.CreateDataBlock(DataLength * (count - 1), _loader.Count - (DataLength * (count - 1)), DataBlockLength);
         }
 
         public DataBlock GetNextBlock()
@@ -78,6 +79,7 @@ namespace MyProject01.TestCases
         {
             _testDataBlockContainer = new TestDataBlockCreator();
             _testDataBlockContainer.DataLength = TestDataLength;
+            _testDataBlockContainer.DataBlockLength = dataBlockLength;
             _testDataBlockContainer.Init();
 
 

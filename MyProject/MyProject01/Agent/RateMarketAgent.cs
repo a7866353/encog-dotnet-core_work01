@@ -157,10 +157,7 @@ namespace MyProject01.Agent
         public int index = 0;
         public double InitMoney = 10000;
 
-
         private DataBlock _dataBlock;
-        private double[] _dataArray;
-        private int _dataBlockLength;
         private Order _order;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
@@ -184,14 +181,13 @@ namespace MyProject01.Agent
             }
         }
 
-        public RateMarketAgent(DataBlock dataBlock, int dataBlockLength)
+        public RateMarketAgent(DataBlock dataBlock)
         {
             _stateData = new RateMarketAgentData();
-            _stateData.RateDataArray = new double[dataBlockLength];
             _dataBlock = dataBlock;
-            this._dataArray = _dataBlock.GetArray(0, _dataBlock.Length);
-            this._dataBlockLength = dataBlockLength;
             _order = new Order(InitMoney);
+            _stateData.RateDataArray = new double[_dataBlock.DataBlockLength];
+
             Reset();
         }
 
@@ -199,11 +195,10 @@ namespace MyProject01.Agent
         {
             _step = 1;
             _order = new Order(InitMoney);
-            index = _dataBlockLength - 1;
+            index = 0;
             IsEnd = false;
 
-
-            GetArrayValue(_stateData.RateDataArray, index - _dataBlockLength + 1, _dataBlockLength);
+            GetArrayValue(_stateData.RateDataArray, index);
             _stateData.Reward = 0;
             return _stateData;
         }
@@ -212,7 +207,7 @@ namespace MyProject01.Agent
         {
             if (IsEnd == true)
                 return false;
-            if((index+1) > _dataArray.Length - 1)
+            if((index+1) >=  _dataBlock.Length)
             {
                 IsEnd = true;
                 return false;
@@ -238,7 +233,7 @@ namespace MyProject01.Agent
                     break;
             }
             _stateData.Reward = (CurrentValue - InitMoney) / InitMoney;
-            GetArrayValue(_stateData.RateDataArray, index - _dataBlockLength + 1, _dataBlockLength);
+            GetArrayValue(_stateData.RateDataArray, index);
             return _stateData;
         }
 
@@ -247,13 +242,9 @@ namespace MyProject01.Agent
             get { return _dataBlock.GetRate(index); }
         }
         
-        private void GetArrayValue(double[] buffer, int offset, int length)
+        private void GetArrayValue(double[] buffer, int offset)
         {
-            length = Math.Min(length, _dataArray.Length - index);
-            if (buffer == null)
-                buffer = new double[length];
-
-            Array.Copy(_dataArray, offset, buffer, 0, length);
+            _dataBlock.Copy(buffer, offset);
 
             /*
             // adj to same end point

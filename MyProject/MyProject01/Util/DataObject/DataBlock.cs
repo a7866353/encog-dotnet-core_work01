@@ -14,13 +14,14 @@ namespace MyProject01.Util
         private double[] _data;
         private int _startIndex;
         private int _length;
+        private int _blockLength;
 
-
-        public DataBlock(DataLoader loader, int startIndex, int length)
+        public DataBlock(DataLoader loader, int startIndex, int length, int blockLength)
         {
             _loader = loader;
             _startIndex = startIndex;
             _length = Math.Min(loader.Count-_startIndex, length);
+            _blockLength = blockLength;
 
             _data = new double[_length];
             _scale = 1;
@@ -30,23 +31,15 @@ namespace MyProject01.Util
 
         public int Length
         {
-            get { return _length; }
+            get { return _length - _blockLength + 1; }
         }
-        public double this[int i]
+        public int DataBlockLength
         {
-            get { return _data[i]; }
-        }
-        public RateSet GetObject(int i)
-        {
-            return _loader[_startIndex + i];
-        }
-        public double GetValue(int i)
-        {
-            return _loader[_startIndex + i].Value;
+            get { return _blockLength; }
         }
         public double GetRate(int i)
         {
-            return _loader[_startIndex + i].RealValue;
+            return _loader[_startIndex + _blockLength - 1 + i].RealValue;
         }
 
         public void SetScale(double scale, double offset)
@@ -67,33 +60,19 @@ namespace MyProject01.Util
 
         public DataBlock GetNewBlock(int startIndex, int length)
         {
-            DataBlock res = new DataBlock(_loader, _startIndex + startIndex, length);
+            DataBlock res = new DataBlock(_loader, _startIndex + startIndex, length, _blockLength);
             return res;
         }
 
-        public double[] GetArray(int startIndex, int length)
+        public int Copy(double[] array, int index)
         {
-            int remain = _data.Length - startIndex;
-            length = Math.Min(remain, length);
-
-            if (length <= 0)
-                return null;
-
-            double[] resArr = new double[length];
-            Array.Copy(_data, startIndex, resArr, 0, length);
-
-            return resArr;
-        }
-
-        public int Copy(double[] array, int offset, int startIndex, int length)
-        {
-            int remain = _data.Length - startIndex;
-            length = Math.Min(remain, length);
+            int remain = _data.Length - index;
+            int length = Math.Min(remain, _blockLength);
 
             if (length <= 0)
                 return 0;
 
-            Array.Copy(_data, startIndex, array, offset, length);
+            Array.Copy(_data, index, array, 0, length);
 
             return length;
         }

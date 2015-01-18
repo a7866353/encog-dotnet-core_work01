@@ -113,9 +113,9 @@ namespace MyProject01.Util
             return res;
         }
 
-        public DataBlock CreateDataBlock(int startIndex, int length)
+        public DataBlock CreateDataBlock(int startIndex, int length, int blockLength)
         {
-            return new DataBlock(this, startIndex, length);
+            return new DataBlock(this, startIndex, length, blockLength);
         }
 
         public double[] GetArr(DateTime startDate, DateTime endDate)

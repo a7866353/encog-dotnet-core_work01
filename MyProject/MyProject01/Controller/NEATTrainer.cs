@@ -67,7 +67,7 @@ namespace MyProject01.Controller
 
         public double CalculateScore(IMLMethod network)
         {
-            RateMarketAgent agent = new RateMarketAgent(_dataBlock, _blockLength);
+            RateMarketAgent agent = new RateMarketAgent(_dataBlock);
             IMLRegression reg = (IMLRegression)network;
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
@@ -311,7 +311,7 @@ namespace MyProject01.Controller
 
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
         {
-            RateMarketAgent agent = new RateMarketAgent(_testDataBlock, _dataBlockLength);
+            RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
             RateMarketAgentData stateData = agent.Reset();
             int maxActionIndex = -1;
             MarketActions currentAction;

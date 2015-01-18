@@ -74,7 +74,7 @@ namespace MyProject01.TestCases
             {
                 loader.Normallize(controller.DataOffset, controller.DataScale);
             }
-            DataBlock testBlock = loader.CreateDataBlock(0, loader.Count);
+            DataBlock testBlock = loader.CreateDataBlock(0, loader.Count, DataBlockLength);
             _train = new NEATTrainer();
             _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
