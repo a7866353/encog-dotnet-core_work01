@@ -6,6 +6,7 @@ using Encog.Neural.NEAT;
 using Encog.Neural.Networks.Training;
 using MyProject01.Agent;
 using MyProject01.DAO;
+using MyProject01.ExchangeRateTrade;
 using MyProject01.Util;
 using System;
 using System.Collections.Generic;
@@ -68,44 +69,15 @@ namespace MyProject01.Controller
         public double CalculateScore(IMLMethod network)
         {
             RateMarketAgent agent = new RateMarketAgent(_dataBlock);
-            IMLRegression reg = (IMLRegression)network;
-            RateMarketAgentData stateData = agent.Reset();
-            int maxActionIndex = -1;
-            MarketActions currentAction;
+            TradeController tradeCtrl = new TradeController(agent, (IMLRegression)network);
             while (true)
             {
                 if (agent.CurrentRateValue > 0)
                 {
                     // Get Action Value
-                    IMLData output = reg.Compute(new BasicMLData(stateData.RateDataArray, false));
-
-                    // Choose an action
-                    maxActionIndex = 0;
-                    for (int i = 1; i < output.Count; i++)
-                    {
-                        if (output[maxActionIndex] < output[i])
-                            maxActionIndex = i;
-                    }
-
-                    // Do action
-                    switch (maxActionIndex)
-                    {
-                        case 0:
-                            currentAction = MarketActions.Nothing;
-                            break;
-                        case 1:
-                            currentAction = MarketActions.Buy;
-                            break;
-                        case 2:
-                            currentAction = MarketActions.Sell;
-                            break;
-                        default:
-                            currentAction = MarketActions.Nothing;
-                            break;
-                    }
-                    stateData = agent.TakeAction(currentAction);
+                    tradeCtrl.DoAction();
                 }
-                if (agent.Next() == false)
+                if (agent.IsEnd == true)
                     break;
             }
 //            System.Console.WriteLine("S: " + agent.CurrentValue);
@@ -312,10 +284,7 @@ namespace MyProject01.Controller
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
         {
             RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
-            RateMarketAgentData stateData = agent.Reset();
-            int maxActionIndex = -1;
-            MarketActions currentAction;
-
+            TradeController tradeCtrl = new TradeController(agent, network);
             EpisodeLog epsodeLog = new EpisodeLog();
             int dealCount = 0;
             int trainDealCount = 0;
@@ -329,38 +298,17 @@ namespace MyProject01.Controller
                 if (agent.CurrentRateValue > 0)
                 {
                     // Get Action Value
-                    IMLData output = network.Compute(new BasicMLData(stateData.RateDataArray, false));
+                    tradeCtrl.DoAction();
 
-                    // Choose an action
-                    maxActionIndex = 0;
-                    for (int i = 1; i < output.Count; i++)
+                    if( (tradeCtrl.LastAction == MarketActions.Buy) ||
+                        (tradeCtrl.LastAction == MarketActions.Sell) )
                     {
-                        if (output[maxActionIndex] < output[i])
-                            maxActionIndex = i;
-                    }
-
-                    // Do action
-                    switch (maxActionIndex)
-                    {
-                        case 0:
-                            currentAction = MarketActions.Nothing;
-                            break;
-                        case 1:
-                            currentAction = MarketActions.Buy;
-                            dealCount++;
-                            break;
-                        case 2:
-                            currentAction = MarketActions.Sell;
-                            dealCount++;
-                            break;
-                        default:
-                            currentAction = MarketActions.Nothing;
-                            break;
+                        dealCount++;
                     }
 
                     dealLog = new DealLog()
                     {
-                        Action = currentAction,
+                        Action = tradeCtrl.LastAction,
                         CurrentMoney = agent.CurrentValue,
 
                     };
@@ -373,9 +321,8 @@ namespace MyProject01.Controller
                         dealCount = 0;
                     }
 
-                    stateData = agent.TakeAction(currentAction);
                 }
-                if (agent.Next() == false)
+                if (agent.IsEnd == true)
                     break;
             } // end while
             endMoney = agent.CurrentValue;

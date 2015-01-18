@@ -84,6 +84,7 @@
     <Compile Include="DAO\BasicTestCaseDAO.cs" />
     <Compile Include="DAO\MyNetDAO.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
+    <Compile Include="ExchangeRateTrade\TradeController.cs" />
     <Compile Include="MyNet.cs" />
     <Compile Include="MyNetFactory.cs" />
     <Compile Include="MyNetList.cs" />
@@ -112,7 +113,7 @@
     <Compile Include="Util\DataObject\DataBaseBuffer.cs" />
     <Compile Include="Util\DataObject\DataBlock.cs" />
     <Compile Include="Util\DataObject\DataLoader.cs" />
-    <Compile Include="Util\FenghuangDataLoader.cs" />
+    <Compile Include="Util\DataObject\FenghuangDataLoader.cs" />
     <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
     <Compile Include="Util\MarketRateAnalyzer.cs" />

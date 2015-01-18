@@ -13,6 +13,7 @@ namespace MyProject01.Agent
         Nothing = 0,
         Buy,
         Sell,
+        Init,
     };
     class DataNormallizer
     {
