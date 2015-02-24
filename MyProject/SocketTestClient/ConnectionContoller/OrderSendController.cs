@@ -101,7 +101,7 @@ namespace SocketTestClient.ConnectionContoller
             _tradeOrderList = new List<TradeOrder>();
             // _tradeOrderList.Add(new TradeOrder("test01", "Long_5MinTest02"));
             // _tradeOrderList.Add(new TradeOrder("test01", "Long_01"));
-            _tradeOrderList.Add(new TradeOrder("test01", "Short_01"));
+            // _tradeOrderList.Add(new TradeOrder("test01", "Short_01"));
 
 
         }

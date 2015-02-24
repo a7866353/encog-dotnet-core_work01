@@ -28,6 +28,7 @@ namespace SocketTestClient.ConnectionContoller
         {
             new RateDataNeed(){ Name="test01", SymbolName="USDJPYpro", Timeframe=5},
             new RateDataNeed(){ Name="test02", SymbolName="USDJPYpro", Timeframe=1},
+            new RateDataNeed(){ Name="test03", SymbolName="USDJPYpro", Timeframe=1440},
 
         };
 
@@ -51,7 +52,7 @@ namespace SocketTestClient.ConnectionContoller
             {
                 if (_rateDataList.Get(info.Name) == null)
                 {
-                    _rateDataList.Add(info.Name, info.SymbolName, info.Timeframe, new DateTime(2014, 10, 1, 0, 0, 0));
+                    _rateDataList.Add(info.Name, info.SymbolName, info.Timeframe, new DateTime(1988, 1, 1, 0, 0, 0));
                 }
             }
             
@@ -121,11 +122,12 @@ namespace SocketTestClient.ConnectionContoller
             if (DateTime.Now - dao.LastGetTime <= timeDulation)
                 return null;
 
+            TimeSpan nextDulation = new TimeSpan( (long)dao.TimeFrame * TimeSpan.TicksPerMinute * 1024 );
             RateRequest req = new RateRequest();
             req.SymbolName = dao.SymbolName;
             req.TimeFrame = dao.TimeFrame;
             req.StartTime = dao.LastItemTime;
-            req.StopTime = dao.LastGetTime + _sendingBlockDuration;
+            req.StopTime = dao.LastGetTime + nextDulation;
             if (req.StopTime > DateTime.Now)
                 req.StopTime = DateTime.Now;
 
