@@ -41,3 +41,15 @@ encog-core-cs/encog-core-cs.vsdoc
 encog-core-cs.5.1.ReSharper.user.orig
 *.vsp
 /si_prj
+/MyProject/DllTools/DllTools/Debug
+/Debug
+/MyProject/DllTools/DllTools/Release
+/MyProject/DllTools/DllTools/x64/Release
+/MyProject/SocketTestClient/obj
+/MyProject/common
+/x64/Release
+/*.sdf
+/Release
+/ipch
+/*.psess
+/*.opensdf
