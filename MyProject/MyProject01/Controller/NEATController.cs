@@ -28,6 +28,8 @@ namespace MyProject01.Controller
             if (_population == null)
             {
                 _population = new NEATPopulation(InputVectorLength, OutputVectorLength, PopulationNumeber);
+                _population.InitialConnectionDensity = 1.0;
+                _population.WeightRange = 0.1;
                 _population.Reset();
 
                  // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
