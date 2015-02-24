@@ -28,6 +28,7 @@ using MyProject01.Test;
 using Encog.Neural.Networks;
 using MyProject01.DAO;
 using MyProject01.Win;
+using MyProject01.Util.DllTools;
 
 namespace MyProject01
 {
@@ -47,6 +48,10 @@ namespace MyProject01
 
             TestCaseArray = new TestCaseObject[]
             {
+                new TestCaseObject("FWT_Cuda_Test", "", new TestCaseObject.TestFucntion(FWT_Cuda_Test)),
+                new TestCaseObject("FWT_5min_Long", "", new TestCaseObject.TestFucntion(FWT_5min_Long)),
+                new TestCaseObject("FWT_5min_Simple", "", new TestCaseObject.TestFucntion(FWT_5min_Simple)),
+                new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)),
                 new TestCaseObject("Long5Min_Simple", "", new TestCaseObject.TestFucntion(Long5Min_Simple)),
                 new TestCaseObject("Test_5Min_Short", "", new TestCaseObject.TestFucntion(Test_5Min_Short)),
                 new TestCaseObject("Test_1Min_Short", "", new TestCaseObject.TestFucntion(Test_1Min_Short)),
@@ -344,6 +349,70 @@ namespace MyProject01
 
 
         }
+
+        private void TestFWT()
+        {
+            int len = 512;
+            double[] input = new double[len];
+            double[] output = new double[len];
+            double[] temp = new double[len];
+
+            // Generate test data
+            int f1 = 5;
+            int f2 = 10;
+            int f0 = 320;
+            for(int i=0;i<input.Length;i++)
+            {
+                if(i<input.Length/2)
+                 {
+                    input[i] = Math.Sin(i * 2 * Math.PI * f1 / f0);
+                }
+                else
+                {
+                    input[i] = Math.Sin(i * 2 * Math.PI * f2 / f0);
+                }
+            }
+            DllTools.FTW(input, output, temp);
+        }
+        private void FWT_5min_Simple()
+        {
+            string prefix = "FWT_5min_Simple_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.4;
+            test.PopulationNum = 100;
+            test.DataBlockLength = 32;
+            test.RateDataControllerName = "test03";
+            test.DataSoreceType = 0;
+            test.IsFWT = true;
+            test.RunTest();
+        }
+        private void FWT_5min_Long()
+        {
+            string prefix = "FWT_5min_Long_";
+            RateMarketNEATTest test = new RateMarketNEATTest();
+            test.TestName = prefix + GetTestName();
+            test.TestDataRate = 0.4;
+            test.PopulationNum = 100;
+            test.DataBlockLength = 2048;
+            test.RateDataControllerName = "test01";
+            test.DataSoreceType = 0;
+            test.IsFWT = true;
+            test.RunTest();
+        }
+        private void FWT_Cuda_Test()
+        {
+            // double[] input = new double[] {9, 7, 3, 5};
+            double[] input = new double[] { 1, 2, 3, 4 };
+            double[] result = new double[] {6, 2, 1, -1};
+            double[] output = new double[input.Length];
+            double[] temp = new double[input.Length];
+       
+            DllTools.FTW_2(input, output, temp);
+        }
+
+        
+
         private void TestDataBaseViewer()
         {
             this.Dispatcher.BeginInvoke(new Func(delegate()

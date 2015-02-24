@@ -29,7 +29,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -37,6 +37,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>
@@ -110,10 +111,14 @@
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
     <Compile Include="TrainingMethods\ResilientPropagationTraining.cs" />
+    <Compile Include="Util\DataObject\BasicDataBlock.cs" />
     <Compile Include="Util\DataObject\DataBaseBuffer.cs" />
     <Compile Include="Util\DataObject\DataBlock.cs" />
     <Compile Include="Util\DataObject\DataLoader.cs" />
     <Compile Include="Util\DataObject\FenghuangDataLoader.cs" />
+    <Compile Include="Util\DataObject\FWTDataBlock.cs" />
+    <Compile Include="Util\DataObject\IDataBlock.cs" />
+    <Compile Include="Util\DllTools\DllTools.cs" />
     <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
     <Compile Include="Util\MarketRateAnalyzer.cs" />
@@ -195,6 +200,16 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controller\NewFolder1\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\..\..\..\CUDA\Store\dwtHaar1D\Bin\win32\Debug\dwtHaar1D.dll">
+      <Link>dwtHaar1D.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\x64\Release\DllTools.dll">
+      <Link>DllTools.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

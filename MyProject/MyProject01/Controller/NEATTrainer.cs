@@ -8,6 +8,7 @@ using MyProject01.Agent;
 using MyProject01.DAO;
 using MyProject01.ExchangeRateTrade;
 using MyProject01.Util;
+using MyProject01.Util.DataObject;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,13 +49,16 @@ namespace MyProject01.Controller
 
     public class RateMarketScore : ICalculateScore
     {
-        private DataBlock _dataBlock;
+        private BasicDataBlock _dataBlock;
         private int _blockLength;
-
-        public void SetData(DataBlock dataBlock, int blockLength)
+        public int StartIndex;
+        public int Length;
+        public void SetData(BasicDataBlock dataBlock, int blockLength)
         {
             _dataBlock = dataBlock;
             _blockLength = blockLength;
+            StartIndex = 0;
+            Length = _dataBlock.Length;
         }
 
         public bool ShouldMinimize
@@ -68,7 +72,7 @@ namespace MyProject01.Controller
 
         public double CalculateScore(IMLMethod network)
         {
-            RateMarketAgent agent = new RateMarketAgent(_dataBlock);
+            RateMarketAgent agent = new RateMarketAgent(_dataBlock.GetNewBlock(StartIndex, Length));
             TradeController tradeCtrl = new TradeController(agent, (IMLRegression)network);
             while (true)
             {
@@ -128,10 +132,10 @@ namespace MyProject01.Controller
     }
     class TrainingData
     {
-        private DataBlock _dataBlock;
+        private BasicDataBlock _dataBlock;
         private int _testLength;
 
-        public DataBlock DataBlock
+        public BasicDataBlock DataBlock
         {
             get { return _dataBlock; }
         }
@@ -141,7 +145,7 @@ namespace MyProject01.Controller
         }
 
 
-        public TrainingData(DataBlock block, int testLength)
+        public TrainingData(BasicDataBlock block, int testLength)
         {
             _dataBlock = block;
             _testLength = testLength;
@@ -167,8 +171,8 @@ namespace MyProject01.Controller
         public string TestName = "DefaultTest000";
         public TrainDataList DataList;
 
-        private DataBlock _testDataBlock;
-        private DataBlock _trainDataBlock;
+        private BasicDataBlock _testDataBlock;
+        private BasicDataBlock _trainDataBlock;
         private int _trainDataLength;
         private int _dataBlockLength;
         private long _epoch;
@@ -183,7 +187,7 @@ namespace MyProject01.Controller
         {
             DataList = new TrainDataList();
         }
-        private void SetDataLength(DataBlock dataBlock, int trainLength)
+        private void SetDataLength(BasicDataBlock dataBlock, int trainLength)
         {
             _testDataBlock = dataBlock;
             _trainDataLength = trainLength;
@@ -229,6 +233,8 @@ namespace MyProject01.Controller
 
             LogFile.WriteLine(@"Beginning training...");
             LogFile.WriteLine(_log.GetTitle());
+
+            
             do
             {
                 if ((IterationCount > 0) && (_epoch % IterationCount == 0))
@@ -242,6 +248,13 @@ namespace MyProject01.Controller
                      LogFile.WriteLine("Change data!");
                  }
 
+                if( _epoch % 100 == 1)
+                {
+                    score.Length = 10;
+                    score.StartIndex++;
+                    if (score.StartIndex > _trainDataBlock.Length - 10)
+                        score.StartIndex = 0;
+                }
                  try
                  {
                      train.Iteration();
@@ -286,7 +299,6 @@ namespace MyProject01.Controller
             RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
             TradeController tradeCtrl = new TradeController(agent, network);
             EpisodeLog epsodeLog = new EpisodeLog();
-            int dealCount = 0;
             int trainDealCount = 0;
             DealLog dealLog;
             int trainedDataIndex = _trainDataLength;
@@ -300,12 +312,6 @@ namespace MyProject01.Controller
                     // Get Action Value
                     tradeCtrl.DoAction();
 
-                    if( (tradeCtrl.LastAction == MarketActions.Buy) ||
-                        (tradeCtrl.LastAction == MarketActions.Sell) )
-                    {
-                        dealCount++;
-                    }
-
                     dealLog = new DealLog()
                     {
                         Action = tradeCtrl.LastAction,
@@ -317,8 +323,8 @@ namespace MyProject01.Controller
                     if (agent.index == trainedDataIndex)
                     {
                         trainedMoney = agent.CurrentValue;
-                        trainDealCount = dealCount;
-                        dealCount = 0;
+                        // trainDealCount = dealCount;
+                        trainDealCount = agent.DealCount;
                     }
 
                 }
@@ -330,7 +336,7 @@ namespace MyProject01.Controller
             epsodeLog.TrainedDataEarnRate = (trainedMoney / startMoney) * 100;
             epsodeLog.UnTrainedDataEarnRate = (endMoney / trainedMoney) * 100;
             epsodeLog.TrainedDealCount = trainDealCount;
-            epsodeLog.UntrainedDealCount = dealCount;
+            epsodeLog.UntrainedDealCount = agent.DealCount - trainDealCount;
             epsodeLog.HidenNodeCount = network.Links.Length;
             epsodeLog.ResultMoney = endMoney;
             epsodeLog.Step = _epoch;

@@ -19,6 +19,7 @@ using MyProject01.DAO;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using MyProject01.Controller;
+using MyProject01.Util.DataObject;
 
 namespace MyProject01.TestCases
 {
@@ -31,6 +32,7 @@ namespace MyProject01.TestCases
         public  int PopulationNum = 50;
         public int DataSoreceType = 0;
         public string RateDataControllerName = "test01";
+        public bool IsFWT = false;
 
         NEATTrainer _train;
         public override void RunTest()
@@ -74,7 +76,17 @@ namespace MyProject01.TestCases
             {
                 loader.Normallize(controller.DataOffset, controller.DataScale);
             }
-            DataBlock testBlock = loader.CreateDataBlock(0, loader.Count, DataBlockLength);
+            BasicDataBlock testBlock;
+            if( IsFWT == false )
+            {
+                // testBlock = loader.CreateDataBlock(0, loader.Count, DataBlockLength);
+                testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
+            }
+            else
+            {
+                testBlock = new FWTDataBlock(loader, 0, loader.Count, DataBlockLength);
+
+            }
             _train = new NEATTrainer();
             _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 

@@ -12,7 +12,7 @@ namespace MyProject01.TestCases
     {
         public int DataLength = 60*24*10/5; // 2 week data
         public int DataBlockLength = 512;
-        public DataBlock[] DataBlockArr;
+        public RateDataBlock[] DataBlockArr;
 
         private DataLoader _loader;
         private Random _rand;
@@ -30,7 +30,7 @@ namespace MyProject01.TestCases
             if (count == 0)
                 count = 1;
 
-            DataBlockArr = new DataBlock[count];
+            DataBlockArr = new RateDataBlock[count];
             for(int i=0;i<count-1;i++)
             {
                 DataBlockArr[i] = _loader.CreateDataBlock(i * DataLength, DataLength, DataBlockLength);
@@ -39,7 +39,7 @@ namespace MyProject01.TestCases
             DataBlockArr[count - 1] = _loader.CreateDataBlock(DataLength * (count - 1), _loader.Count - (DataLength * (count - 1)), DataBlockLength);
         }
 
-        public DataBlock GetNextBlock()
+        public RateDataBlock GetNextBlock()
         {
             if (_loader == null)
                 return null;
@@ -111,7 +111,7 @@ namespace MyProject01.TestCases
             _train = new NEATTrainer();
             _train.TestName = TestName;
             _train.Controller = controller;
-            foreach(DataBlock block in _testDataBlockContainer.DataBlockArr)
+            foreach(RateDataBlock block in _testDataBlockContainer.DataBlockArr)
             {
                 _train.DataList.Add(new TrainingData(block, (int)(block.Length * testDataRate)));
             }

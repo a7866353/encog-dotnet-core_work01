@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MyProject01.Reinforcement;
+using MyProject01.Util.DataObject;
 
 namespace MyProject01.Agent
 {
@@ -76,26 +77,38 @@ namespace MyProject01.Agent
 
     class Order
     {
+#if true
+        public double BuyOffset = 0.0;
+        public double SellOffset = 0.0;
+#else
         public double BuyOffset = 0.02;
         public double SellOffset = 0.01;
 
+#endif
         private double _money;
         private OrderType _type;
         private double _startRate;
         private double _startRatePre;
         private double _currentRate;
 
+        private int _dealCount;
+
         public Order(double initMoney)
         {
             _money = initMoney;
             _type = OrderType.Nothing;
             _startRate = 0;
+            _dealCount = 0;
+        }
+        public int DealCount
+        {
+            get { return _dealCount; }
         }
         public double GetCurrentMoney(double currentRate)
         {
             _currentRate = currentRate;
-            // return _money + Benifit();
-            return _money;
+            return _money + Benifit();
+            // return _money;
         }
         public void StartOrder( OrderType type, double currentRate)
         {
@@ -105,6 +118,7 @@ namespace MyProject01.Agent
                 return;
             else if (_type != type && (_type != OrderType.Nothing))
                 CloseOrder(currentRate);
+            _dealCount++;
             _type = type;
             if (_type == OrderType.Buy)
             {
@@ -131,9 +145,9 @@ namespace MyProject01.Agent
             if (_type == OrderType.Nothing)
                 return 0;
             else if (_type == OrderType.Buy)
-                return (1- Bid() / _startRate) * _money;
+                return (Bid() / _startRate - 1) * _money;
             else // for sell order
-                return (1 - Ask() / _startRate) * _money;
+                return (_startRate / Ask() - 1) * _money;
         }
         
         private double Bid()
@@ -158,7 +172,7 @@ namespace MyProject01.Agent
         public int index = 0;
         public double InitMoney = 10000;
 
-        private DataBlock _dataBlock;
+        private BasicDataBlock _dataBlock;
         private Order _order;
         private long _step;
         private RateMarketAgentData _stateData = new RateMarketAgentData();
@@ -181,11 +195,14 @@ namespace MyProject01.Agent
                 return _order.GetCurrentMoney(_currentRate);
             }
         }
-
-        public RateMarketAgent(DataBlock dataBlock)
+        public int DealCount
+        {
+            get { return _order.DealCount; }
+        }
+        public RateMarketAgent(BasicDataBlock dataBlock)
         {
             _stateData = new RateMarketAgentData();
-            _dataBlock = dataBlock;
+            _dataBlock = dataBlock.Clone() ;
             _order = new Order(InitMoney);
             _stateData.RateDataArray = new double[_dataBlock.DataBlockLength];
 
@@ -256,7 +273,7 @@ namespace MyProject01.Agent
                 // Array.Copy(_dataArray, index, res, 0, length);
 
             // DataAdj(buffer);
-            DataAdj_Offset(buffer);
+            // DataAdj_Offset(buffer);
                 return;
         }
         private void DataAdj_Offset(double[] buffer)

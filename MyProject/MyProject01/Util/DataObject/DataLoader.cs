@@ -69,8 +69,8 @@ namespace MyProject01.Util
         private double _dataScale;
 
         private const double _targetDataMargin = 0.25;
-        private const double _targDataMax = 0.5 + _targetDataMargin;
-        private const double _targDataMin = 0.5 - _targetDataMargin;
+        private const double _targDataMax = 0 + _targetDataMargin;
+        private const double _targDataMin = 0 - _targetDataMargin;
 
         public double Offset
         {
@@ -113,9 +113,9 @@ namespace MyProject01.Util
             return res;
         }
 
-        public DataBlock CreateDataBlock(int startIndex, int length, int blockLength)
+        public RateDataBlock CreateDataBlock(int startIndex, int length, int blockLength)
         {
-            return new DataBlock(this, startIndex, length, blockLength);
+            return new RateDataBlock(this, startIndex, length, blockLength);
         }
 
         public double[] GetArr(DateTime startDate, DateTime endDate)

@@ -92,7 +92,7 @@ namespace MyProject01.Util
             string collectionName = _tickerName;
             MongoCollection collection = db.GetCollection(collectionName);
 
-            if (false)
+            if (true)
             {
                 /*
                 MongoCursor cursor = collection.FindAllAs<MtDataObject>();
@@ -108,7 +108,7 @@ namespace MyProject01.Util
                 */
                 QueryDocument query = new QueryDocument();
                 BsonDocument b = new BsonDocument();
-                b.Add("$gt", DateTime.Now.AddMonths(-24));
+                b.Add("$gt", DateTime.Now.AddMonths(-6));
                 b.Add("$lt", DateTime.Now);
                 query.Add("Date", b);
 
