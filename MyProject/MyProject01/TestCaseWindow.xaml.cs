@@ -341,7 +341,7 @@ namespace MyProject01
             for (int i = 0; i < 100; i++)
             {
                 episodeDAO = new RateMarketTestEpisodeDAO();
-                episodeDAO.EpisodeNumber = i;
+                episodeDAO.Step = i;
                 dao.AddEpisode(episodeDAO);
             }
         // Class end

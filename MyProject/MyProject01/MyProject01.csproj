@@ -83,6 +83,7 @@
     <Compile Include="DAO\ControllerDAO.cs" />
     <Compile Include="DAO\DataBaseConnector.cs" />
     <Compile Include="DAO\BasicTestCaseDAO.cs" />
+    <Compile Include="DAO\MongoDBUtility.cs" />
     <Compile Include="DAO\MyNetDAO.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="ExchangeRateTrade\TradeController.cs" />

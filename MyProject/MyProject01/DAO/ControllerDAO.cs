@@ -153,46 +153,14 @@ namespace MyProject01.DAO
 
         public NEATPopulation GetPopulation()
         {
-            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
-            MongoDatabase db = connector.Connect();
-
-            MongoGridFS fs = new MongoGridFS(db);
-            MongoGridFSStream file = fs.OpenRead(Name);
-            if (file.Length == 0)
-                return null;
-
-            byte[] buffer = new byte[file.Length];
-            file.Read(buffer, 0, buffer.Length);
-            file.Close();
-
-            connector.Close();
-
-            MemoryStream stream = new MemoryStream(buffer);
-            BinaryFormatter formatter = new BinaryFormatter();
-            NEATPopulation pop = (NEATPopulation)formatter.Deserialize(stream);
-            stream.Close();
-
+            NEATPopulation pop = MongoDBUtility.GetFromFS<NEATPopulation>(new TestCaseDatabaseConnector(), Name);
             return pop;
 
         }
 
         public void UpdatePopulation(NEATPopulation pop)
         {
-            MemoryStream stream = new MemoryStream();
-            BinaryFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, pop);
-            byte[] res = stream.ToArray();
-            stream.Close();
-
-            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
-            MongoDatabase db = connector.Connect();
-
-            MongoGridFS fs = new MongoGridFS(db);
-            MongoGridFSStream file = fs.Create(Name);
-            file.Write(res, 0, res.Length);
-            file.Close();
-
-            connector.Close();
+            MongoDBUtility.SaveToFS<NEATPopulation>(new TestCaseDatabaseConnector(), pop, Name);
         }
 
         public NEATNetwork GetBestNetwork()

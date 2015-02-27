@@ -54,7 +54,7 @@ namespace MyProject01.Win
             if (e.AddedItems.Count == 0)
                 return;
             RateMarketTestDAO currentDao = (RateMarketTestDAO)e.AddedItems[0];
-            EpisodeDataGrid.ItemsSource = currentDao.GetAllEpisodes<EpisodeLog>();
+            EpisodeDataGrid.ItemsSource = currentDao.GetAllEpisodes<RateMarketTestEpisodeDAO>();
         }
 
         void DataBaseViewer_Loaded(object sender, RoutedEventArgs e)

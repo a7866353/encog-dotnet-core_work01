@@ -19,33 +19,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    class DealLog
-    {
-        public MarketActions Action { set; get; }
-        public double CurrentMoney { set; get; }
-    }
-    class EpisodeLog : BasicTestEpisodeDAO
-    {
-        public double ResultMoney { set; get; }
-        public int TrainedDealCount { set; get; }
-        public int UntrainedDealCount { set; get; }
-        public double TrainedDataEarnRate { set; get; }
-        public double UnTrainedDataEarnRate { set; get; }
-        public List<DealLog> DealLogs { set; get; }
 
-        public long Step { set; get; }
-
-        // ================
-        // Network
-        public int HidenNodeCount { set; get; }
-
-        // ====================
-        // Functions
-        public EpisodeLog()
-        {
-            DealLogs = new List<DealLog>();
-        }
-    }
 
     public class RateMarketScore : ICalculateScore
     {
@@ -298,7 +272,7 @@ namespace MyProject01.Controller
         {
             RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
             TradeController tradeCtrl = new TradeController(agent, network);
-            EpisodeLog epsodeLog = new EpisodeLog();
+            RateMarketTestEpisodeDAO epsodeLog = new RateMarketTestEpisodeDAO();
             int trainDealCount = 0;
             DealLog dealLog;
             int trainedDataIndex = _trainDataLength;
