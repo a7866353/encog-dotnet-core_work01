@@ -53,5 +53,15 @@ namespace MyProject01.DAO
 
             connector.Close();
         }
+
+        static public void RemoveFromFS(TestCaseDatabaseConnector connector, string fileName)
+        {
+            MongoDatabase db = connector.Connect();
+
+            MongoGridFS fs = new MongoGridFS(db);
+            fs.Delete(fileName);
+
+            connector.Close();
+        }
     }
 }

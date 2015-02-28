@@ -272,7 +272,7 @@ namespace MyProject01.Controller
         {
             RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
             TradeController tradeCtrl = new TradeController(agent, network);
-            RateMarketTestEpisodeDAO epsodeLog = new RateMarketTestEpisodeDAO();
+            RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
             int trainDealCount = 0;
             DealLog dealLog;
             int trainedDataIndex = _trainDataLength;
@@ -314,7 +314,7 @@ namespace MyProject01.Controller
             epsodeLog.HidenNodeCount = network.Links.Length;
             epsodeLog.ResultMoney = endMoney;
             epsodeLog.Step = _epoch;
-            dao.AddEpisode(epsodeLog);
+            epsodeLog.Save();
 
             // update dao
             dao.LastTestDataEarnRate = epsodeLog.UnTrainedDataEarnRate;

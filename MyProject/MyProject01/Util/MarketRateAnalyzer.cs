@@ -57,8 +57,8 @@ namespace MyProject01.Util
             dealFuncs.Add(FindAroundMaximin);
             dealFuncs.Add(ThredHoldFilter);
             // Debug
-            _graphLineArr[0] = GraphViewer.Instance.AddRateSet(_sourceDataArr);
-            _graphLineArr[1] = GraphViewer.Instance.AddRateSet(aveDataArr);
+            _graphLineArr[0] = GraphViewer.Instance.AddLineData(_sourceDataArr);
+            _graphLineArr[1] = GraphViewer.Instance.AddLineData(aveDataArr);
 
 
 

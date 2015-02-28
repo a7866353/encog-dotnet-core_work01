@@ -13,37 +13,6 @@ namespace MyProject01.DAO
 {
     class BasicTestEpisodeDAO
     {
-        static public BasicTestEpisodeDAO GetNewDAO()
-        {
-            /*
-            if (string.IsNullOrWhiteSpace(name) == true)
-            {
-                return null;
-            }
-            TestCaseDAO retDao = null;
-            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
-            MongoDatabase db = connector.Connect();
-
-            MongoCollection<TestCaseDAO> collection = db.GetCollection<TestCaseDAO>(CollectionName);
-            var query = new QueryDocument { { "TestCaseName", name } };
-            var curst = collection.Find(query);
-            if (curst.Count() == 0)
-            {
-                // not existed.
-                retDao = new TestEpisodeDAO();
-                retDao.TestCaseName = name;
-                collection.Save(retDao);
-            }
-            else
-            {
-                retDao = curst.FirstOrDefault();
-            }
-            connector.Close();
-            return retDao;
-            */
-            return new BasicTestEpisodeDAO();
-        }
-
         static public void SaveDao(BasicTestCaseDAO dao)
         {
             if (dao == null)
@@ -55,19 +24,65 @@ namespace MyProject01.DAO
             connector.Close();
 
         }
+        static protected TestCaseDatabaseConnector _connector;
+        protected BasicTestCaseDAO _testCaseDAO;
 
+        static BasicTestEpisodeDAO()
+        {
+            _connector = new TestCaseDatabaseConnector();
+        }
       
+        /*****************
+         * Database values
+         *****************/
         public ObjectId _id;
 
         public ObjectId TestCaseID { set; get; }
 
+
+        
+
+        public BasicTestEpisodeDAO(BasicTestCaseDAO testCaseDao)
+        {
+            _testCaseDAO = testCaseDao;
+            TestCaseID = testCaseDao._id;
+            _connector = new TestCaseDatabaseConnector();
+        }
+
+        public void Save()
+        {
+            MongoDatabase db = _connector.Connect();
+            MongoCollection<BasicTestEpisodeDAO> collection = db.GetCollection<BasicTestEpisodeDAO>(BasicTestCaseDAO.EpisodeCollectionName);
+            collection.Save(this);
+            _connector.Close();
+        }
+
+        virtual public void Remove()
+        {
+            MongoDatabase db = _connector.Connect();
+
+            // delete deal logs
+
+            // delete episode
+            MongoCollection<BasicTestCaseDAO> epCollect = db.GetCollection<BasicTestCaseDAO>(BasicTestCaseDAO.EpisodeCollectionName);
+            var epQuery = new QueryDocument { { "_id", _id } };
+            epCollect.Remove(epQuery);
+
+            _connector.Close();
+        }
     }
     abstract class BasicTestCaseDAO
     {
         #region Static Region
 
-        static public string CollectionName = "TestCases";
-        static public string EpisodeCollectionName = "TestEpisode";
+        static public readonly string CollectionName = "TestCases";
+        static public readonly string EpisodeCollectionName = "TestEpisode";
+        static protected TestCaseDatabaseConnector _connector;
+        static BasicTestCaseDAO()
+        {
+            _connector = new TestCaseDatabaseConnector();
+        }
+
         static public T GetDAO<T>(string testCaseName, bool isNew = false) 
             where T : BasicTestCaseDAO, new()
         {
@@ -101,6 +116,29 @@ namespace MyProject01.DAO
             connector.Close();
             return retDao;
         }
+        static public T GetDAO<T>(ObjectId id)
+            where T : BasicTestCaseDAO, new()
+        {
+            T retDao;
+            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
+            MongoDatabase db = connector.Connect();
+
+            MongoCollection<T> collection = db.GetCollection<T>(CollectionName);
+            var query = new QueryDocument { { "_id", id } };
+            var curst = collection.Find(query);
+            if (curst.Count() == 0)
+            {
+                // not existed.
+                retDao = null;
+            }
+            else
+            {
+                retDao = curst.FirstOrDefault();
+            }
+            connector.Close();
+            return retDao;
+        }
+
         static public T[] GetAllDAOs<T>()
             where T : BasicTestCaseDAO, new()
         {
@@ -123,16 +161,6 @@ namespace MyProject01.DAO
             }
             connector.Close();
             return retDaoArr;
-        }
-        static public void SaveDao(BasicTestCaseDAO dao)
-        {
-            if (dao == null)
-                return;
-            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
-            MongoDatabase db = connector.Connect();
-            MongoCollection<BasicTestCaseDAO> collection = db.GetCollection<BasicTestCaseDAO>(CollectionName);
-            collection.Save(dao);
-            connector.Close();
         }
 
         static public bool IsExist(string testCaseName)
@@ -173,15 +201,17 @@ namespace MyProject01.DAO
 
 
 
-            MongoCollection<BsonDocument> collection = db.GetCollection<BsonDocument>(CollectionName);
+            MongoCollection<RateMarketTestDAO> collection = db.GetCollection<RateMarketTestDAO>(CollectionName);
             var query = new QueryDocument { { "TestCaseName", testCaseName } };
             var curst = collection.Find(query);
-            foreach (BsonDocument testCaseDAO in curst)
+            foreach (RateMarketTestDAO testCaseDAO in curst)
             {
                 // Remove referd episodes
-                MongoCollection<BasicTestCaseDAO> epCollect = db.GetCollection<BasicTestCaseDAO>(EpisodeCollectionName);
-                var epQuery = new QueryDocument { { "TestCaseID", testCaseDAO["_id"] } };
-                epCollect.Remove(epQuery);
+                RateMarketTestEpisodeDAO[] epDaoArr = testCaseDAO.GetAllEpisodes<RateMarketTestEpisodeDAO>();
+                foreach (BasicTestEpisodeDAO epDao in epDaoArr)
+                {
+                    epDao.Remove();
+                }
             }
             collection.Remove(query);
             connector.Close();
@@ -199,26 +229,20 @@ namespace MyProject01.DAO
         // ===========================
         // public region
         #region public region
-
         public void Save()
         {
-            SaveDao(this);
+            MongoDatabase db = _connector.Connect();
+            MongoCollection<BasicTestCaseDAO> collection = db.GetCollection<BasicTestCaseDAO>(CollectionName);
+            collection.Save(this);
+            _connector.Close();
         }
 
-        public void AddEpisode(BasicTestEpisodeDAO dao)
-        {
-            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
-            MongoDatabase db = connector.Connect();
-            MongoCollection<BasicTestEpisodeDAO> collection = db.GetCollection<BasicTestEpisodeDAO>(EpisodeCollectionName);
-            dao.TestCaseID = this._id;
-            collection.Insert(dao);
-            connector.Close();
-        }
+        abstract public BasicTestEpisodeDAO CreateEpisode();
+
         public T[] GetAllEpisodes<T>()
         {
             T[] daoArr = null;
-            TestCaseDatabaseConnector connector = new TestCaseDatabaseConnector();
-            MongoDatabase db = connector.Connect();
+            MongoDatabase db = _connector.Connect();
             MongoCollection<T> collection = db.GetCollection<T>(EpisodeCollectionName);
             var query = new QueryDocument { { "TestCaseID", _id } };
             var curst = collection.Find(query);
@@ -232,7 +256,7 @@ namespace MyProject01.DAO
                     daoArr[i++] = dao;
                 }
             }
-            connector.Close();
+            _connector.Close();
 
             return daoArr;
         }
@@ -242,9 +266,15 @@ namespace MyProject01.DAO
         }
 
         #endregion
+
+        #region Private Data section
+        
+
+        #endregion
+
         // =============================
         // Data for saving into database.
-        #region Data section
+        #region Pulbic Data section
 
         public ObjectId _id;
         public string TestCaseName { set; get; }

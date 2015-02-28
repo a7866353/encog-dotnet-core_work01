@@ -131,6 +131,9 @@ namespace MyProject01.Util.View
         private double transformPosStep = 10;
         private double transformScaleStep = 1.2;
 
+        //-------------------
+        private double targetHeight = 1000;
+
         //-------------------------
         private List<RateSetUtility> RateSetDataList;
 
@@ -345,7 +348,7 @@ namespace MyProject01.Util.View
             double[] dataArray = new double[rateSetArr.Length];
             for (int i = 0; i < dataArray.Length; i++)
                 dataArray[i] = rateSetArr[i].Value;
-            return AddRateSet(dataArray);
+            return AddLineData(dataArray);
 
 
             /*
@@ -368,7 +371,7 @@ namespace MyProject01.Util.View
             return RateSetDataList.Count - 1;
             */
         }
-        public GraphLine AddRateSet(double[] rateSetArr)
+        public GraphLine AddLineData(double[] rateSetArr)
         {
             /*
             RateSetUtility rateSetObj = new RateSetUtility(rateSetArr);
@@ -389,6 +392,13 @@ namespace MyProject01.Util.View
              // Return Index
             return RateSetDataList.Count - 1;
            */
+
+            // 输入数据规范化
+            DataNormallizer norm = new DataNormallizer();
+            norm.Set(rateSetArr, 0, rateSetArr.Length);
+            norm.DataValueAdjust(0, targetHeight);
+
+            // 创建Line
             GraphLine line = new GraphLine(target, rateSetArr, Brushes.Black, 1);
             _graphLineList.Add(line);
             this.Dispatcher.BeginInvoke(new func(delegate
@@ -397,6 +407,8 @@ namespace MyProject01.Util.View
             }));
             return line;
         }
+
+        /*
         public void AddMark(int index, DealPointInfomation[] markInfoArr)
         {
             int[] markArr = new int[markInfoArr.Length];
@@ -422,10 +434,8 @@ namespace MyProject01.Util.View
             {
                 geometrys.Children.Add(rateSetObj.GetMark());
             }));
-
-        
-
         }
+        */
 
         #endregion
     }

@@ -47,9 +47,9 @@ namespace MyProject01.DAO
     class TestCaseDatabaseConnector
     {
         public static string DatabaseName = "NetWorkTestDB";
-        // public static string ConnectionString = @"mongodb://127.0.0.1";
+        public static string ConnectionString = @"mongodb://127.0.0.1";
         // public static string ConnectionString = @"mongodb://192.168.1.15";
-        public static string ConnectionString = @"mongodb://192.168.1.11";
+        // public static string ConnectionString = @"mongodb://192.168.1.11";
 
         public static Semaphore Lock;
 
@@ -69,7 +69,7 @@ namespace MyProject01.DAO
 
         public MongoDatabase Connect()
         {
-            Lock.WaitOne();
+            // Lock.WaitOne();
 
             MongoClient client = new MongoClient(ConnectionString);
             server = client.GetServer();
@@ -91,7 +91,7 @@ namespace MyProject01.DAO
         {
             server.Disconnect();
             db = null;
-            Lock.Release();
+            // Lock.Release();
         }
     }
 }

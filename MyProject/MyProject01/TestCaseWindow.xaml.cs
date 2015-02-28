@@ -337,12 +337,27 @@ namespace MyProject01
             dao.Save();
 
             RateMarketTestEpisodeDAO episodeDAO;
-
+            Random rand = new Random();
+            double money;
+            double rate;
             for (int i = 0; i < 100; i++)
             {
-                episodeDAO = new RateMarketTestEpisodeDAO();
+                episodeDAO = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
                 episodeDAO.Step = i;
-                dao.AddEpisode(episodeDAO);
+                episodeDAO.Save();
+
+                DealLogList logList = new DealLogList();
+                money = 10000;
+                rate = 100;
+                for(int j=0;j<1000;j++)
+                {
+                    logList.Add((Agent.MarketActions)rand.Next(3), money, rate);
+                    money += rand.Next(-1000, 1000);
+                    rate += (rand.NextDouble() - 0.5) * 2 * 0.001;
+                }
+
+                episodeDAO.SaveDealLogs(logList);
+
             }
         // Class end
         //---------------------------------

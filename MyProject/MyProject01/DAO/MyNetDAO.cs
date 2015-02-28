@@ -14,11 +14,16 @@ namespace MyProject01.DAO
     {
         public MarketActions Action { set; get; }
         public double CurrentMoney { set; get; }
+        public double Rate;
     }
-    [Serializable]
 
+    [Serializable]
     class DealLogList : List<DealLog>
     {
+        public void Add(MarketActions action, double currentMoney, double rate)
+        {
+            Add(new DealLog { Action = action, CurrentMoney = currentMoney, Rate = rate });
+        }
 
     }
     class RateMarketTestEpisodeDAO : BasicTestEpisodeDAO
@@ -28,7 +33,6 @@ namespace MyProject01.DAO
         public int UntrainedDealCount { set; get; }
         public double TrainedDataEarnRate { set; get; }
         public double UnTrainedDataEarnRate { set; get; }
-        public DealLogList DealLogs { set; get; }
 
         public long Step { set; get; }
 
@@ -38,9 +42,35 @@ namespace MyProject01.DAO
 
         // ====================
         // Functions
-        public RateMarketTestEpisodeDAO()
+        public RateMarketTestEpisodeDAO(RateMarketTestDAO testCaseDAO)
+            : base(testCaseDAO)
         {
-            DealLogs = new DealLogList();
+
+        }
+
+        public override void Remove()
+        {
+            MongoDBUtility.RemoveFromFS(new TestCaseDatabaseConnector(), GetDealLogName());
+            base.Remove();
+        }
+
+        public void SaveDealLogs(DealLogList dealLogList)
+        {
+            MongoDBUtility.SaveToFS<DealLogList>(_connector, dealLogList, GetDealLogName());
+        }
+
+        public DealLogList GetDealLogs()
+        {
+            return MongoDBUtility.GetFromFS<DealLogList>(_connector, GetDealLogName());
+        }
+
+        private string GetDealLogName()
+        {
+            if (_testCaseDAO == null )
+            {
+                _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestCaseID);
+            }
+            return _testCaseDAO.TestCaseName + Step.ToString();
         }
     }
 
@@ -52,7 +82,14 @@ namespace MyProject01.DAO
         public long Step { set; get; }
         public double LastTrainedDataEarnRate { set; get; }
         public double LastTestDataEarnRate { set; get; }
-        // public double[] TestData { set; get; }
+
         public byte[] NetworkData { set; get; }
+
+        public override BasicTestEpisodeDAO CreateEpisode()
+        {
+            return new RateMarketTestEpisodeDAO(this);
+        }
+
+
     }
 }
