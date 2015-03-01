@@ -128,9 +128,10 @@ namespace MyProject01
 
         private void MainWorkFunction()
         {
+            LogFile.WriteLine(@"Test start...");
             if (_testObject.TestFunction != null)
                 _testObject.TestFunction();
-
+            LogFile.WriteLine(@"Test end...");
         }
     }
 

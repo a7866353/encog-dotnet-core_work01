@@ -88,7 +88,7 @@ namespace MyProject01.TestCases
 
             // init controller
             string controllerName = TestName;
-            NEATController controller = NEATController.Open(controllerName);
+            TradeDecisionController controller = TradeDecisionController.Open(controllerName);
             if (controller.InputVectorLength == -1)
             {
                 controller.InputVectorLength = dataBlockLength;
@@ -99,7 +99,7 @@ namespace MyProject01.TestCases
             {
                 if (controller.InputVectorLength != dataBlockLength || controller.OutputVectorLength != 3)
                 {
-                    controller = NEATController.Open(controllerName, true);
+                    controller = TradeDecisionController.Open(controllerName, true);
                     controller.InputVectorLength = dataBlockLength;
                     controller.OutputVectorLength = 3;
                     controller.PopulationNumeber = populationNum;

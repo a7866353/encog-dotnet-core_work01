@@ -208,6 +208,9 @@ namespace MyProject01.DAO
             {
                 // Remove referd episodes
                 RateMarketTestEpisodeDAO[] epDaoArr = testCaseDAO.GetAllEpisodes<RateMarketTestEpisodeDAO>();
+                if (epDaoArr == null)
+                    continue;
+
                 foreach (BasicTestEpisodeDAO epDao in epDaoArr)
                 {
                     epDao.Remove();

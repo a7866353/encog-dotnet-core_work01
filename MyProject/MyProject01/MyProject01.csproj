@@ -78,6 +78,8 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="Controller\IInputDataFormater.cs" />
+    <Compile Include="Controller\IOutputDataConvertor.cs" />
     <Compile Include="Controller\NEATController.cs" />
     <Compile Include="Controller\NEATTrainer.cs" />
     <Compile Include="DAO\ControllerDAO.cs" />

@@ -15,7 +15,7 @@ namespace MyProject01.ExchangeRateTrade
     class TradeController
     {
         private RateMarketAgent _agent;
-        private IMLRegression _network;
+        private TradeDecisionController _tradeCtl;
         private RateMarketAgentData stateData;
         private MarketActions _currentAction;
 
@@ -31,7 +31,7 @@ namespace MyProject01.ExchangeRateTrade
         public TradeController(RateMarketAgent agent, IMLRegression network)
         {
             _agent = agent;
-            _network = network;
+            _tradeCtl = TradeDecisionController.Open(network);
             stateData = _agent.Reset();
         }
         public void DoAction()
@@ -51,33 +51,7 @@ namespace MyProject01.ExchangeRateTrade
 
         private MarketActions ChoseAction(double[] rateDataArray)
         {
-            MarketActions currentAction;
-            IMLData output = _network.Compute(new BasicMLData(rateDataArray, false));
-
-            // Choose an action
-            int maxActionIndex = 0;
-            for (int i = 1; i < output.Count; i++)
-            {
-                if (output[maxActionIndex] < output[i])
-                    maxActionIndex = i;
-            }
-
-            // Do action
-            switch (maxActionIndex)
-            {
-                case 0:
-                    currentAction = MarketActions.Nothing;
-                    break;
-                case 1:
-                    currentAction = MarketActions.Buy;
-                    break;
-                case 2:
-                    currentAction = MarketActions.Sell;
-                    break;
-                default:
-                    currentAction = MarketActions.Nothing;
-                    break;
-            }
+            MarketActions currentAction = _tradeCtl.GetAction(rateDataArray);
             return currentAction;
         }
     }

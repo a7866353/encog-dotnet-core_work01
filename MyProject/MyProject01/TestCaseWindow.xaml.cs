@@ -349,7 +349,7 @@ namespace MyProject01
                 DealLogList logList = new DealLogList();
                 money = 10000;
                 rate = 100;
-                for(int j=0;j<1000;j++)
+                for(int j=0;j<5000;j++)
                 {
                     logList.Add((Agent.MarketActions)rand.Next(3), money, rate);
                     money += rand.Next(-1000, 1000);
@@ -359,10 +359,6 @@ namespace MyProject01
                 episodeDAO.SaveDealLogs(logList);
 
             }
-        // Class end
-        //---------------------------------
-
-
         }
 
         private void TestFWT()

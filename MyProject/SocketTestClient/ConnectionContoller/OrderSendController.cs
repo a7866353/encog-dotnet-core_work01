@@ -1,4 +1,5 @@
-﻿using MyProject01.Controller;
+﻿using MyProject01.Agent;
+using MyProject01.Controller;
 using MyProject01.DAO;
 using SocketTestClient.RateDataController;
 using SocketTestClient.RequestObject;
@@ -20,13 +21,13 @@ namespace SocketTestClient.ConnectionContoller
     class TradeOrder
     {
         private RateDataControlDAO _dataController;
-        private NEATController _networkController;
+        private TradeDecisionController _networkController;
         private DateTime _lastTradeTime;
 
         public TradeOrder(string rateDataControllerName, string networkControllerName)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
-            _networkController = NEATController.Open(networkControllerName, false, false);
+            _networkController = TradeDecisionController.Open(networkControllerName, false, false);
             _lastTradeTime = DateTime.Now;
         }
 
@@ -52,7 +53,7 @@ namespace SocketTestClient.ConnectionContoller
             double[] dataArr = new double[rateDataArr.Length];
             for (int i = 0; i < dataArr.Length; i++)
                 dataArr[i] = Normallize((rateDataArr[i].high + rateDataArr[i].low) / 2);
-            double[] res = _networkController.Compute(dataArr);
+            MarketActions res = _networkController.GetAction(dataArr);
 
             return ChoseAction(res);
         }
@@ -62,26 +63,19 @@ namespace SocketTestClient.ConnectionContoller
             return (value + _networkController.DataOffset) * _networkController.DataScale;
         }
 
-        private OrderCommand ChoseAction(double[] result)
+        private OrderCommand ChoseAction(MarketActions result)
         {
             OrderCommand cmd;
-            int maxActionIndex = 0;
-            for (int i = 1; i < result.Length; i++)
+             // Do action
+            switch (result)
             {
-                if (result[maxActionIndex] < result[i])
-                    maxActionIndex = i;
-            }
-
-            // Do action
-            switch (maxActionIndex)
-            {
-                case 0:
+                case MarketActions.Nothing:
                     cmd = OrderCommand.Nothing;
                     break;
-                case 1:
+                case MarketActions.Buy:
                     cmd = OrderCommand.Buy;
                     break;
-                case 2:
+                case MarketActions.Sell:
                     cmd = OrderCommand.Sell;
                     break;
                 default:

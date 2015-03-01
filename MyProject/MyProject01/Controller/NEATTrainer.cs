@@ -154,7 +154,7 @@ namespace MyProject01.Controller
 
         private RateMarketTestDAO _testCaseDAO;
 
-        public NEATController Controller;
+        public TradeDecisionController Controller;
         public long IterationCount = 10;
 
         public NEATTrainer()

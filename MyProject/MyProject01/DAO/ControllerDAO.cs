@@ -1,4 +1,5 @@
-﻿using Encog.Neural.NEAT;
+﻿using Encog.ML;
+using Encog.Neural.NEAT;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
@@ -175,7 +176,7 @@ namespace MyProject01.DAO
             return obj;
         }
 
-        public void SetBestNetwork(NEATNetwork net)
+        public void SetBestNetwork(IMLRegression net)
         {
             MemoryStream stream = new MemoryStream();
             BinaryFormatter formatter = new BinaryFormatter();

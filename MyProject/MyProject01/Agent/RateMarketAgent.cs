@@ -9,7 +9,7 @@ using MyProject01.Util.DataObject;
 
 namespace MyProject01.Agent
 {
-    enum MarketActions
+    public enum MarketActions
     {
         Nothing = 0,
         Buy,
