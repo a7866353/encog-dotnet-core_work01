@@ -39,7 +39,7 @@ namespace MyProject01.TestCases
         {
             // init controller
             string controllerName = TestName;
-            TradeDecisionController controller = TradeDecisionController.Open(controllerName);
+            NetworkController controller = NetworkController.Open(controllerName);
             if (controller.InputVectorLength == -1)
             {
                 controller.PopulationNumeber = PopulationNum;
@@ -50,7 +50,7 @@ namespace MyProject01.TestCases
             {
                 if (controller.InputVectorLength != DataBlockLength || controller.OutputVectorLength != 3)
                 {
-                    controller = TradeDecisionController.Open(controllerName, true);
+                    controller = NetworkController.Open(controllerName, true);
                     controller.PopulationNumeber = PopulationNum;
                     controller.InputVectorLength = DataBlockLength;
                     controller.OutputVectorLength = 3;

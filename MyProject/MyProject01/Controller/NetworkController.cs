@@ -89,7 +89,7 @@ namespace MyProject01.Controller
             return currentAction;
         }
     }
-    public class TradeDecisionController
+    public class NetworkController
     {
         private NEATPopulation _population;
         private IInputDataFormater _inputFormater;
@@ -142,20 +142,20 @@ namespace MyProject01.Controller
             set { _dao.DataScale = value; }
             get { return _dao.DataScale; }
         }
-        public static TradeDecisionController Open(string name, bool isNew = false, bool needPopulation = true)
+        public static NetworkController Open(string name, bool isNew = false, bool needPopulation = true)
         {
             ControllerDAO dao = ControllerDAO.GetDAO(name, isNew);
-            TradeDecisionController controller;
+            NetworkController controller;
 
             if (dao.BestNetwork == null)
             {
-                controller = new TradeDecisionController(dao);
+                controller = new NetworkController(dao);
                 controller.InputVectorLength = controller.OutputVectorLength = controller.PopulationNumeber = -1;
 
             }
             else
             {
-                controller = new TradeDecisionController(dao);
+                controller = new NetworkController(dao);
                 if (needPopulation == true)
                     controller._population = dao.GetPopulation();
                 controller.BestNetwork = dao.GetBestNetwork();
@@ -164,13 +164,13 @@ namespace MyProject01.Controller
 
             return controller;
         }
-        public static TradeDecisionController Open(IMLRegression network)
+        public static NetworkController Open(IMLRegression network)
         {
-            TradeDecisionController controller = new TradeDecisionController(null);
+            NetworkController controller = new NetworkController(null);
             controller.BestNetwork = network;
             return controller;
         }
-        private TradeDecisionController(ControllerDAO dao)
+        private NetworkController(ControllerDAO dao)
         {
             this._dao = dao;
         }

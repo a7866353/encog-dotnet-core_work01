@@ -15,7 +15,7 @@ namespace MyProject01.ExchangeRateTrade
     class TradeController
     {
         private RateMarketAgent _agent;
-        private TradeDecisionController _tradeCtl;
+        private NetworkController _tradeCtl;
         private RateMarketAgentData stateData;
         private MarketActions _currentAction;
 
@@ -31,7 +31,7 @@ namespace MyProject01.ExchangeRateTrade
         public TradeController(RateMarketAgent agent, IMLRegression network)
         {
             _agent = agent;
-            _tradeCtl = TradeDecisionController.Open(network);
+            _tradeCtl = NetworkController.Open(network);
             stateData = _agent.Reset();
         }
         public void DoAction()

@@ -21,13 +21,13 @@ namespace SocketTestClient.ConnectionContoller
     class TradeOrder
     {
         private RateDataControlDAO _dataController;
-        private TradeDecisionController _networkController;
+        private NetworkController _networkController;
         private DateTime _lastTradeTime;
 
         public TradeOrder(string rateDataControllerName, string networkControllerName)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
-            _networkController = TradeDecisionController.Open(networkControllerName, false, false);
+            _networkController = NetworkController.Open(networkControllerName, false, false);
             _lastTradeTime = DateTime.Now;
         }
 

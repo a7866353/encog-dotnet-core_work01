@@ -80,7 +80,7 @@
     <Compile Include="BasicTrainingMethod.cs" />
     <Compile Include="Controller\IInputDataFormater.cs" />
     <Compile Include="Controller\IOutputDataConvertor.cs" />
-    <Compile Include="Controller\NEATController.cs" />
+    <Compile Include="Controller\NetworkController.cs" />
     <Compile Include="Controller\NEATTrainer.cs" />
     <Compile Include="DAO\ControllerDAO.cs" />
     <Compile Include="DAO\DataBaseConnector.cs" />
