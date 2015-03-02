@@ -29,6 +29,7 @@ using Encog.Neural.Networks;
 using MyProject01.DAO;
 using MyProject01.Win;
 using MyProject01.Util.DllTools;
+using MyProject01.Controller;
 
 namespace MyProject01
 {
@@ -351,7 +352,7 @@ namespace MyProject01
                 rate = 100;
                 for(int j=0;j<5000;j++)
                 {
-                    logList.Add((Agent.MarketActions)rand.Next(3), money, rate);
+                    logList.Add((MarketActions)rand.Next(3), money, rate);
                     money += rand.Next(-1000, 1000);
                     rate += (rand.NextDouble() - 0.5) * 2 * 0.001;
                 }

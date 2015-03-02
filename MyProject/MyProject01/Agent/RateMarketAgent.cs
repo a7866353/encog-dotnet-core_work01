@@ -6,16 +6,10 @@ using System.Linq;
 using System.Text;
 using MyProject01.Reinforcement;
 using MyProject01.Util.DataObject;
+using MyProject01.Controller;
 
 namespace MyProject01.Agent
 {
-    public enum MarketActions
-    {
-        Nothing = 0,
-        Buy,
-        Sell,
-        Init,
-    };
     class DataNormallizer
     {
         private double _targDataMax;

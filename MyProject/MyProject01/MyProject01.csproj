@@ -82,6 +82,7 @@
     <Compile Include="Controller\IOutputDataConvertor.cs" />
     <Compile Include="Controller\NetworkController.cs" />
     <Compile Include="Controller\NEATTrainer.cs" />
+    <Compile Include="Controller\TradeDecisionController.cs" />
     <Compile Include="DAO\ControllerDAO.cs" />
     <Compile Include="DAO\DataBaseConnector.cs" />
     <Compile Include="DAO\BasicTestCaseDAO.cs" />
@@ -120,7 +121,6 @@
     <Compile Include="Util\DataObject\DataBlock.cs" />
     <Compile Include="Util\DataObject\DataLoader.cs" />
     <Compile Include="Util\DataObject\FenghuangDataLoader.cs" />
-    <Compile Include="Util\DataObject\FWTDataBlock.cs" />
     <Compile Include="Util\DataObject\IDataBlock.cs" />
     <Compile Include="Util\DllTools\DllTools.cs" />
     <Compile Include="Util\LogFile.cs" />
@@ -204,12 +204,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controller\NewFolder1\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\x64\Release\DllTools.dll">
-      <Link>DllTools.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

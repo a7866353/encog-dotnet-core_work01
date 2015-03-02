@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MyProject01.Agent;
 using MyProject01.Networks;
 using MyProject01.TrainingMethods;
 using MyProject01.TestParameters;
 using MyProject01.Test;
 using MyProject01.Util;
+using MyProject01.Controller;
+using MyProject01.Agent;
 
 
 namespace MyProject01.Reinforcement

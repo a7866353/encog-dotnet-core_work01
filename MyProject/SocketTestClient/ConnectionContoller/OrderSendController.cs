@@ -1,5 +1,4 @@
-﻿using MyProject01.Agent;
-using MyProject01.Controller;
+﻿using MyProject01.Controller;
 using MyProject01.DAO;
 using SocketTestClient.RateDataController;
 using SocketTestClient.RequestObject;
@@ -22,12 +21,14 @@ namespace SocketTestClient.ConnectionContoller
     {
         private RateDataControlDAO _dataController;
         private NetworkController _networkController;
+        private TradeDecisionController _decisionCtrl;
         private DateTime _lastTradeTime;
 
         public TradeOrder(string rateDataControllerName, string networkControllerName)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
             _networkController = NetworkController.Open(networkControllerName, false, false);
+            _decisionCtrl = _networkController.GetDecisionController();
             _lastTradeTime = DateTime.Now;
         }
 
@@ -53,7 +54,7 @@ namespace SocketTestClient.ConnectionContoller
             double[] dataArr = new double[rateDataArr.Length];
             for (int i = 0; i < dataArr.Length; i++)
                 dataArr[i] = Normallize((rateDataArr[i].high + rateDataArr[i].low) / 2);
-            MarketActions res = _networkController.GetAction(dataArr);
+            MarketActions res = _decisionCtrl.GetAction(dataArr);
 
             return ChoseAction(res);
         }

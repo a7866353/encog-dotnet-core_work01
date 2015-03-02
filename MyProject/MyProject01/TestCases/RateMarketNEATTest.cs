@@ -77,16 +77,11 @@ namespace MyProject01.TestCases
                 loader.Normallize(controller.DataOffset, controller.DataScale);
             }
             BasicDataBlock testBlock;
-            if( IsFWT == false )
-            {
-                // testBlock = loader.CreateDataBlock(0, loader.Count, DataBlockLength);
-                testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
-            }
-            else
-            {
-                testBlock = new FWTDataBlock(loader, 0, loader.Count, DataBlockLength);
 
-            }
+            // testBlock = loader.CreateDataBlock(0, loader.Count, DataBlockLength);
+            testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
+
+
             _train = new NEATTrainer();
             _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 

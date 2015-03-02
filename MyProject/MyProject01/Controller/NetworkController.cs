@@ -92,8 +92,6 @@ namespace MyProject01.Controller
     public class NetworkController
     {
         private NEATPopulation _population;
-        private IInputDataFormater _inputFormater;
-        private IOutputDataConvertor _outputConvertor;
         public IMLRegression BestNetwork;
 
         private ControllerDAO _dao;
@@ -164,26 +162,19 @@ namespace MyProject01.Controller
 
             return controller;
         }
+
         public static NetworkController Open(IMLRegression network)
         {
             NetworkController controller = new NetworkController(null);
             controller.BestNetwork = network;
             return controller;
         }
+
         private NetworkController(ControllerDAO dao)
         {
             this._dao = dao;
         }
-        public MarketActions GetAction(double[] input)
-        {
-            if (BestNetwork == null)
-                return MarketActions.Nothing;
-            BasicMLData inData = _inputFormater.Convert(input);
-
-            IMLData output = BestNetwork.Compute(inData);
-            MarketActions result = _outputConvertor.Convert(output);
-            return result;
-        }
+      
         public void Save()
         {
             _dao.SetBestNetwork(BestNetwork);
@@ -191,5 +182,10 @@ namespace MyProject01.Controller
             _dao.UpdatePopulation(_population);
         }
 
+        public TradeDecisionController GetDecisionController()
+        {
+            TradeDecisionController ctl = new TradeDecisionController();
+            return ctl;
+        }
     }
 }

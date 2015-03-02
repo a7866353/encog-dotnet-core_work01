@@ -86,9 +86,9 @@ namespace MyProject01.Win
             for(int i=0;i<logList.Count; i++)
             {
                 DealLog log = logList[i];
-                if(log.Action == Agent.MarketActions.Buy)
+                if(log.Action == MarketActions.Buy)
                     rateLine.AddMark(i, Brushes.Red);
-                else if(log.Action == Agent.MarketActions.Sell)
+                else if(log.Action == MarketActions.Sell)
                     rateLine.AddMark(i, Brushes.Green);
             }
             // 增加当前收益曲线
