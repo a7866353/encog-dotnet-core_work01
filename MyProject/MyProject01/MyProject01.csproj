@@ -206,10 +206,6 @@
     <Folder Include="Controller\NewFolder1\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\..\..\..\..\CUDA\Store\dwtHaar1D\Bin\win32\Debug\dwtHaar1D.dll">
-      <Link>dwtHaar1D.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\..\x64\Release\DllTools.dll">
       <Link>DllTools.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
