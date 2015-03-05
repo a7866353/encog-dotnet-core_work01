@@ -1,6 +1,7 @@
 ﻿using Encog.ML;
 using Encog.ML.Data;
 using Encog.ML.Data.Basic;
+using MyProject01.Util.DllTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +17,49 @@ namespace MyProject01.Controller
         Sell,
         Init,
     };
+    public enum InputDataFormaterType
+    {
+        None = 0,
+        FWT = 1,
+        Rate = 2,
+    }
+    class InputDataFormaterFactor
+    {
+        static public IInputDataFormater Create(InputDataFormaterType type, int inputDataLength)
+        {
+            IInputDataFormater result;
+            switch (type)
+            {
+                case InputDataFormaterType.FWT:
+                    result = new FWTFormater(inputDataLength);
+                    break;
+                case InputDataFormaterType.Rate:
+                    result = new RateDataFormater(inputDataLength);
+                    break;
+                default:
+                    throw (new Exception("Input parm error!"));
+            }
+
+            return result;
+        }
+    }
     class FWTFormater : IInputDataFormater
     {
+        private int _inputDataLength;
         private double[] _buffer;
         private double[] _tempBuffer;
 
+        public FWTFormater(int inputDataLength)
+        {
+            _inputDataLength = inputDataLength;
+            _buffer = new double[_inputDataLength];
+            _tempBuffer = new double[_inputDataLength];
+        }
         public BasicMLData Convert(double[] rateDataArray)
         {
-            if (_buffer == null || _buffer.Length != rateDataArray.Length)
+            if (_buffer.Length != rateDataArray.Length)
             {
-                _buffer = new double[rateDataArray.Length];
-                _tempBuffer = new double[rateDataArray.Length];
+                throw (new Exception("Input Param Error!"));
             }
 
             DllTools.FTW_2(rateDataArray, _buffer, _tempBuffer);
@@ -39,18 +72,55 @@ namespace MyProject01.Controller
 
             return new BasicMLData(_buffer, false);
         }
+
+
+        public int NetworkInputLength
+        {
+            get { return _inputDataLength; }
+        }
     }
 
     class RateDataFormater : IInputDataFormater
     {
-        private double[] _buffer;
-        private double[] _tempBuffer;
-
+        private int _inputDataLength;
+        public RateDataFormater(int inputDataLength)
+        {
+            _inputDataLength = inputDataLength;
+        }
         public BasicMLData Convert(double[] rateDataArray)
         {
             return new BasicMLData(rateDataArray, false);
         }
+        public int NetworkInputLength
+        {
+            get { return _inputDataLength; }
+        }
     }
+
+    public enum OutputDataConvertorType
+    {
+        None = 0,
+        StateKeep = 1,
+        Switch = 2,
+    }
+    class OutputDataConvertorFactory
+    {
+        static public IOutputDataConvertor Create(OutputDataConvertorType type)
+        {
+            IOutputDataConvertor result;
+            switch (type)
+            {
+                case OutputDataConvertorType.Switch:
+                    result = new TradeStateResultConvertor();
+                    break;
+                default:
+                    throw (new Exception("Input parm error!"));
+            }
+
+            return result;
+        }
+    }
+
 
     class TradeStateResultConvertor : IOutputDataConvertor
     {
@@ -83,18 +153,18 @@ namespace MyProject01.Controller
             }
             return currentAction;
         }
+
+
+        public int NetworkOutputLength
+        {
+            get { return 3; }
+        }
     }
     public class TradeDecisionController
     {
-        private IInputDataFormater _inputFormater;
-        private IOutputDataConvertor _outputConvertor;
+        public IInputDataFormater _inputFormater;
+        public IOutputDataConvertor _outputConvertor;
         public IMLRegression BestNetwork;
-
-        public TradeDecisionController()
-        {
-            _inputFormater = new FWTFormater();
-            _outputConvertor = new TradeStateResultConvertor();
-        }
 
         public MarketActions GetAction(double[] input)
         {

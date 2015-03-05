@@ -11,5 +11,7 @@ namespace MyProject01.Controller
     interface IOutputDataConvertor
     {
         MarketActions Convert(IMLData outData);
+        int NetworkOutputLength { get; }
+
     }
 }

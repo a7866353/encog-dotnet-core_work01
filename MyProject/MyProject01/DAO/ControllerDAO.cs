@@ -3,6 +3,7 @@ using Encog.Neural.NEAT;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using MyProject01.Controller;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -194,7 +195,8 @@ namespace MyProject01.DAO
         public string Name { set; get; }
         public DateTime UpdateTime { set; get; }
         public int InputVectorLength { set; get; }
-        public int OutputVectorLength { set; get; }
+        public InputDataFormaterType InputType { set; get; }
+        public OutputDataConvertorType OutType { set; get; }
         public int PopulationNumeber { set; get; }
         public double DataOffset { set; get; }
         public double DataScale { set; get; }

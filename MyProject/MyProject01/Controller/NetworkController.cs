@@ -50,10 +50,15 @@ namespace MyProject01.Controller
             set { _dao.InputVectorLength = value; }
             get { return _dao.InputVectorLength; }
         }
-        public int OutputVectorLength
+        public InputDataFormaterType InputType
         {
-            set { _dao.OutputVectorLength = value; }
-            get { return _dao.OutputVectorLength; }
+            set { _dao.InputType = value; }
+            get { return _dao.InputType; }
+        }
+        public OutputDataConvertorType OutType
+        {
+            set { _dao.OutType = value; }
+            get { return _dao.OutType; }
         }
         public int PopulationNumeber
         {
@@ -78,7 +83,9 @@ namespace MyProject01.Controller
             if (dao.BestNetwork == null)
             {
                 controller = new NetworkController(dao);
-                controller.InputVectorLength = controller.OutputVectorLength = controller.PopulationNumeber = -1;
+                controller.InputVectorLength = controller.PopulationNumeber = -1;
+                controller.InputType = InputDataFormaterType.None;
+                controller.OutType = OutputDataConvertorType.None;
 
             }
             else
@@ -90,13 +97,6 @@ namespace MyProject01.Controller
 
             }
 
-            return controller;
-        }
-
-        public static NetworkController Open(IMLRegression network)
-        {
-            NetworkController controller = new NetworkController(null);
-            controller.BestNetwork = network;
             return controller;
         }
 
@@ -115,6 +115,10 @@ namespace MyProject01.Controller
         public TradeDecisionController GetDecisionController()
         {
             TradeDecisionController ctl = new TradeDecisionController();
+            ctl.BestNetwork = BestNetwork;
+            ctl._inputFormater = InputDataFormaterFactor.Create(InputType, InputVectorLength);
+            ctl._outputConvertor = OutputDataConvertorFactory.Create(OutType);
+           
             return ctl;
         }
     }
