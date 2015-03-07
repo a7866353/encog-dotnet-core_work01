@@ -9,6 +9,9 @@ namespace MyProject01.Controller
 {
     interface IInputDataFormater
     {
+        int InputDataLength { get; }
+        int ResultDataLength { get; }
         BasicMLData Convert(double[] rateDataArray);
+        IInputDataFormater Clone();
     }
 }

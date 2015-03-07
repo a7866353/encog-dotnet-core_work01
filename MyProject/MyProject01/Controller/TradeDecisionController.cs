@@ -78,6 +78,23 @@ namespace MyProject01.Controller
         {
             get { return _inputDataLength; }
         }
+
+
+        public IInputDataFormater Clone()
+        {
+            FWTFormater ret = new FWTFormater(_inputDataLength);
+            return ret;
+        }
+
+        public int InputDataLength
+        {
+            get { return _inputDataLength; }
+        }
+
+        public int ResultDataLength
+        {
+            get { return _inputDataLength; }
+        }
     }
 
     class RateDataFormater : IInputDataFormater
@@ -92,6 +109,23 @@ namespace MyProject01.Controller
             return new BasicMLData(rateDataArray, false);
         }
         public int NetworkInputLength
+        {
+            get { return _inputDataLength; }
+        }
+
+
+        public IInputDataFormater Clone()
+        {
+            return (IInputDataFormater)MemberwiseClone();
+        }
+
+        public int InputDataLength
+        {
+            get { return _inputDataLength; }
+        }
+
+
+        public int ResultDataLength
         {
             get { return _inputDataLength; }
         }
@@ -159,8 +193,23 @@ namespace MyProject01.Controller
         {
             get { return 3; }
         }
+
+
+        public IOutputDataConvertor Clone()
+        {
+            return (IOutputDataConvertor)MemberwiseClone();
+        }
     }
-    public class TradeDecisionController
+    public interface ITradeDesisoin
+    {
+        MarketActions GetAction(double[] input);
+        ITradeDesisoin Clone();
+        void UpdateNetwork(IMLRegression network);
+        int InputDataLength { get; }
+        int NetworkInputVectorLength { get; }
+        int NetworkOutputVectorLenth { get; }
+    }
+    class TradeDecisionController : ITradeDesisoin
     {
         public IInputDataFormater _inputFormater;
         public IOutputDataConvertor _outputConvertor;
@@ -176,6 +225,37 @@ namespace MyProject01.Controller
             MarketActions result = _outputConvertor.Convert(output);
             return result;
         }
+        public ITradeDesisoin Clone()
+        {
+            TradeDecisionController newCtrl = new TradeDecisionController();
+            newCtrl.BestNetwork = BestNetwork;
+            newCtrl._inputFormater = _inputFormater.Clone();
+            newCtrl._outputConvertor = _outputConvertor.Clone();
 
+            return newCtrl;
+        }
+
+
+        public void UpdateNetwork(IMLRegression network)
+        {
+            BestNetwork = network;
+        }
+
+
+        public int InputDataLength
+        {
+            get { return _inputFormater.InputDataLength; }
+        }
+
+
+        public int NetworkInputVectorLength
+        {
+            get { return _inputFormater.ResultDataLength; }
+        }
+
+        public int NetworkOutputVectorLenth
+        {
+            get { return _outputConvertor.NetworkOutputLength; }
+        }
     }
 }

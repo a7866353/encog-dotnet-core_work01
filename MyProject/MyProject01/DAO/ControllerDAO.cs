@@ -186,6 +186,26 @@ namespace MyProject01.DAO
             stream.Close();
 
         }
+
+        public void SetTradeDecisionController(ITradeDesisoin ctrl)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, ctrl);
+            TradeDecisionController = stream.ToArray();
+            stream.Close();
+        }
+        public ITradeDesisoin GetTradeDecisionController()
+        {
+            if (BestNetwork == null)
+                return null;
+
+            MemoryStream stream = new MemoryStream(TradeDecisionController);
+            BinaryFormatter formatter = new BinaryFormatter();
+            ITradeDesisoin obj = (ITradeDesisoin)formatter.Deserialize(stream);
+
+            return obj;
+        }
         #endregion
         // =============================
         // Data for saving into database.
@@ -202,6 +222,7 @@ namespace MyProject01.DAO
         public double DataScale { set; get; }
         public byte[] BestNetwork { set; get; }
 
+        public byte[] TradeDecisionController { set; get; }
         
 
         #endregion

@@ -24,13 +24,12 @@ namespace MyProject01.Controller
     public class RateMarketScore : ICalculateScore
     {
         private BasicDataBlock _dataBlock;
-        private int _blockLength;
         public int StartIndex;
         public int Length;
-        public void SetData(BasicDataBlock dataBlock, int blockLength)
+        public ITradeDesisoin TradeDecisionCtrl;
+        public void SetData(BasicDataBlock dataBlock)
         {
             _dataBlock = dataBlock;
-            _blockLength = blockLength;
             StartIndex = 0;
             Length = _dataBlock.Length;
         }
@@ -47,7 +46,9 @@ namespace MyProject01.Controller
         public double CalculateScore(IMLMethod network)
         {
             RateMarketAgent agent = new RateMarketAgent(_dataBlock.GetNewBlock(StartIndex, Length));
-            TradeController tradeCtrl = new TradeController(agent, (IMLRegression)network);
+            ITradeDesisoin decisionCtrl = TradeDecisionCtrl.Clone();
+            decisionCtrl.UpdateNetwork((IMLRegression)network);
+            TradeController tradeCtrl = new TradeController(agent, decisionCtrl);
             while (true)
             {
                 if (agent.CurrentRateValue > 0)
@@ -148,9 +149,9 @@ namespace MyProject01.Controller
         private BasicDataBlock _testDataBlock;
         private BasicDataBlock _trainDataBlock;
         private int _trainDataLength;
-        private int _dataBlockLength;
         private long _epoch;
         private LogFormater _log = new LogFormater();
+        public ITradeDesisoin DecisionCtrl;
 
         private RateMarketTestDAO _testCaseDAO;
 
@@ -167,7 +168,6 @@ namespace MyProject01.Controller
             _trainDataLength = trainLength;
 
             // Update test data
-            _dataBlockLength = Controller.InputVectorLength;
             _trainDataBlock = _testDataBlock.GetNewBlock(0, _trainDataLength);
 
         }
@@ -176,7 +176,7 @@ namespace MyProject01.Controller
         {
             TrainingData trainData;
             // Check param
-            if (Controller.InputVectorLength == -1 && Controller.OutputVectorLength == -1)
+            if (Controller == null)
             {
                 throw (new Exception("Parm wrong!"));
             }
@@ -189,7 +189,6 @@ namespace MyProject01.Controller
             //Start
             _log = new LogFormater();
             _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
-            _testCaseDAO.DataBlockCount = _dataBlockLength;
             _testCaseDAO.TestDataStartIndex = _trainDataBlock.Length;
             _testCaseDAO.TotalDataCount = _testDataBlock.Length;
             // _testCaseDAO.TestData = _testDataArray;
@@ -198,7 +197,8 @@ namespace MyProject01.Controller
             byte[] LastNetData = null;
 
             RateMarketScore score = new RateMarketScore();
-            score.SetData(_trainDataBlock, _dataBlockLength);
+            score.TradeDecisionCtrl = DecisionCtrl;
+            score.SetData(_trainDataBlock);
 
             // train the neural network
             TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
@@ -216,7 +216,7 @@ namespace MyProject01.Controller
                      // set next test data
                      trainData = DataList.GetNext();
                      SetDataLength(trainData.DataBlock, trainData.TestLength);
-                     score.SetData(_trainDataBlock, _dataBlockLength);
+                     score.SetData(_trainDataBlock);
                      train.FinishTraining();
                      train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score); 
                      LogFile.WriteLine("Change data!");
@@ -271,7 +271,8 @@ namespace MyProject01.Controller
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
         {
             RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
-            TradeController tradeCtrl = new TradeController(agent, network);
+            DecisionCtrl.UpdateNetwork(network);
+            TradeController tradeCtrl = new TradeController(agent, DecisionCtrl);
             RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
             int trainDealCount = 0;
             DealLog dealLog;

@@ -40,22 +40,20 @@ namespace MyProject01.TestCases
             // init controller
             string controllerName = TestName;
             NetworkController controller = NetworkController.Open(controllerName);
-            if (controller.InputVectorLength == -1)
+            if (controller == null || controller.PopulationNumeber != PopulationNum)
             {
+                TradeDecisionController decisionCtrl = new TradeDecisionController();
+                if (IsFWT == true)
+                    decisionCtrl._inputFormater = new FWTFormater(DataBlockLength);
+                else
+                    decisionCtrl._inputFormater = new RateDataFormater(DataBlockLength);
+                decisionCtrl._outputConvertor = new TradeStateResultConvertor();
+                decisionCtrl.BestNetwork = null;
+
+                controller = NetworkController.Create(controllerName, decisionCtrl);
                 controller.PopulationNumeber = PopulationNum;
-                controller.InputVectorLength = DataBlockLength;
-                controller.OutputVectorLength = 3;
             }
-            else
-            {
-                if (controller.InputVectorLength != DataBlockLength || controller.OutputVectorLength != 3)
-                {
-                    controller = NetworkController.Open(controllerName, true);
-                    controller.PopulationNumeber = PopulationNum;
-                    controller.InputVectorLength = DataBlockLength;
-                    controller.OutputVectorLength = 3;
-                }
-            }
+            
             // init test data
             DataLoader loader;
             if (DataSoreceType == 0)
@@ -89,6 +87,7 @@ namespace MyProject01.TestCases
             _train.TestName = TestName;
             _train.Controller = controller;
             _train.IterationCount = 0;
+            _train.DecisionCtrl = controller.GetDecisionController();
             _train.RunTestCase();
         }
 

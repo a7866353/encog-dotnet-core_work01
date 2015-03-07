@@ -12,6 +12,7 @@ namespace MyProject01.Controller
     {
         MarketActions Convert(IMLData outData);
         int NetworkOutputLength { get; }
+        IOutputDataConvertor Clone();
 
     }
 }

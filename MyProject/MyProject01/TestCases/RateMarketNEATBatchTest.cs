@@ -89,21 +89,15 @@ namespace MyProject01.TestCases
             // init controller
             string controllerName = TestName;
             NetworkController controller = NetworkController.Open(controllerName);
-            if (controller.InputVectorLength == -1)
+            if (controller == null || controller.PopulationNumeber != populationNum)
             {
-                controller.InputVectorLength = dataBlockLength;
-                controller.OutputVectorLength = 3;
+                TradeDecisionController decisionCtrl = new TradeDecisionController();
+                decisionCtrl._inputFormater = new FWTFormater(dataBlockLength);
+                decisionCtrl._outputConvertor = new TradeStateResultConvertor();
+                decisionCtrl.BestNetwork = null;
+
+                controller = NetworkController.Create(controllerName, decisionCtrl);
                 controller.PopulationNumeber = populationNum;
-            }
-            else
-            {
-                if (controller.InputVectorLength != dataBlockLength || controller.OutputVectorLength != 3)
-                {
-                    controller = NetworkController.Open(controllerName, true);
-                    controller.InputVectorLength = dataBlockLength;
-                    controller.OutputVectorLength = 3;
-                    controller.PopulationNumeber = populationNum;
-                }
             }
 
             // init test data

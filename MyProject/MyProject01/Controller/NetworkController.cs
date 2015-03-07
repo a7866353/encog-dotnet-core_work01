@@ -22,33 +22,28 @@ namespace MyProject01.Controller
     public class NetworkController
     {
         private NEATPopulation _population;
+        private ITradeDesisoin _tradeDecisionController;
         public IMLRegression BestNetwork;
 
         private ControllerDAO _dao;
         public NEATPopulation GetPopulation()
         {
-           
-            if (_population == null)
+            if(_population == null)
             {
-                _population = new NEATPopulation(InputVectorLength, OutputVectorLength, PopulationNumeber);
+                _population = new NEATPopulation(_tradeDecisionController.NetworkInputVectorLength, _tradeDecisionController.NetworkOutputVectorLenth, PopulationNumeber);
                 _population.InitialConnectionDensity = 1.0;
                 _population.WeightRange = 0.1;
                 _population.Reset();
 
-                 // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
+                _dao.InputVectorLength = _tradeDecisionController.NetworkInputVectorLength;
+                // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
             }
             return _population;
-
         }
 
         public string Name
         {
             get { return _dao.Name; }
-        }
-        public int InputVectorLength
-        {
-            set { _dao.InputVectorLength = value; }
-            get { return _dao.InputVectorLength; }
         }
         public InputDataFormaterType InputType
         {
@@ -75,51 +70,61 @@ namespace MyProject01.Controller
             set { _dao.DataScale = value; }
             get { return _dao.DataScale; }
         }
-        public static NetworkController Open(string name, bool isNew = false, bool needPopulation = true)
+        public static NetworkController Open(string name)
         {
-            ControllerDAO dao = ControllerDAO.GetDAO(name, isNew);
+            ControllerDAO dao = ControllerDAO.GetDAO(name, false);
             NetworkController controller;
 
             if (dao.BestNetwork == null)
             {
-                controller = new NetworkController(dao);
-                controller.InputVectorLength = controller.PopulationNumeber = -1;
-                controller.InputType = InputDataFormaterType.None;
-                controller.OutType = OutputDataConvertorType.None;
+                return null;
 
             }
             else
             {
                 controller = new NetworkController(dao);
-                if (needPopulation == true)
-                    controller._population = dao.GetPopulation();
-                controller.BestNetwork = dao.GetBestNetwork();
 
             }
 
             return controller;
         }
 
+        public static NetworkController Create(string name, ITradeDesisoin ctrl)
+        {
+            ControllerDAO dao = ControllerDAO.GetDAO(name, true);
+            NetworkController controller = new NetworkController(dao, ctrl);
+
+            return controller;
+        }
+
+        // Get from saved data.
         private NetworkController(ControllerDAO dao)
         {
             this._dao = dao;
+            this._tradeDecisionController = _dao.GetTradeDecisionController();
+            this._population = dao.GetPopulation();
         }
-      
+        // Create a new one.
+        private NetworkController(ControllerDAO dao, ITradeDesisoin ctrl)
+        {
+            this._dao = dao;
+            this._tradeDecisionController = ctrl;
+            this._population = null;
+
+            
+        }
+          
         public void Save()
         {
+            _dao.SetTradeDecisionController(_tradeDecisionController);
             _dao.SetBestNetwork(BestNetwork);
             _dao.Save();
             _dao.UpdatePopulation(_population);
         }
 
-        public TradeDecisionController GetDecisionController()
+        public ITradeDesisoin GetDecisionController()
         {
-            TradeDecisionController ctl = new TradeDecisionController();
-            ctl.BestNetwork = BestNetwork;
-            ctl._inputFormater = InputDataFormaterFactor.Create(InputType, InputVectorLength);
-            ctl._outputConvertor = OutputDataConvertorFactory.Create(OutType);
-           
-            return ctl;
+            return _tradeDecisionController.Clone() ;
         }
     }
 }
