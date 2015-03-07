@@ -47,7 +47,8 @@ namespace MyProject01.TestCases
                     decisionCtrl._inputFormater = new FWTFormater(DataBlockLength);
                 else
                     decisionCtrl._inputFormater = new RateDataFormater(DataBlockLength);
-                decisionCtrl._outputConvertor = new TradeStateResultConvertor();
+                // decisionCtrl._outputConvertor = new TradeStateSwitchConvertor();
+                decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
                 decisionCtrl.BestNetwork = null;
 
                 controller = NetworkController.Create(controllerName, decisionCtrl);

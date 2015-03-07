@@ -93,7 +93,7 @@ namespace MyProject01.TestCases
             {
                 TradeDecisionController decisionCtrl = new TradeDecisionController();
                 decisionCtrl._inputFormater = new FWTFormater(dataBlockLength);
-                decisionCtrl._outputConvertor = new TradeStateResultConvertor();
+                decisionCtrl._outputConvertor = new TradeStateSwitchConvertor();
                 decisionCtrl.BestNetwork = null;
 
                 controller = NetworkController.Create(controllerName, decisionCtrl);
