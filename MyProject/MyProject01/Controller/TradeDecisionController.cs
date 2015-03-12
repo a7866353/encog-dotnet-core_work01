@@ -46,31 +46,31 @@ namespace MyProject01.Controller
     class FWTFormater : IInputDataFormater
     {
         private int _inputDataLength;
-        private double[] _buffer;
+        public double[] Buffer;
         private double[] _tempBuffer;
 
         public FWTFormater(int inputDataLength)
         {
             _inputDataLength = inputDataLength;
-            _buffer = new double[_inputDataLength];
+            Buffer = new double[_inputDataLength];
             _tempBuffer = new double[_inputDataLength];
         }
         public BasicMLData Convert(double[] rateDataArray)
         {
-            if (_buffer.Length != rateDataArray.Length)
+            if (Buffer.Length != rateDataArray.Length)
             {
                 throw (new Exception("Input Param Error!"));
             }
 
-            DllTools.FTW_2(rateDataArray, _buffer, _tempBuffer);
+            DllTools.FTW_2(rateDataArray, Buffer, _tempBuffer);
 
 
             MyProject01.Util.DataNormallizer adj = new MyProject01.Util.DataNormallizer();
-            _buffer[0] = _buffer[1];
-            adj.Set(_buffer, 0, _buffer.Length);
+            Buffer[0] = Buffer[1];
+            adj.Set(Buffer, 0, Buffer.Length);
             adj.DataValueAdjust(-0.01, 0.01);
 
-            return new BasicMLData(_buffer, false);
+            return new BasicMLData(Buffer, false);
         }
 
 

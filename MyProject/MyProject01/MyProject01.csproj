@@ -90,6 +90,7 @@
     <Compile Include="DAO\MyNetDAO.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="ExchangeRateTrade\TradeController.cs" />
+    <Compile Include="InputDataAnalyzerTool\InputDataAnalyzer.cs" />
     <Compile Include="MyNet.cs" />
     <Compile Include="MyNetFactory.cs" />
     <Compile Include="MyNetList.cs" />
