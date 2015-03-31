@@ -81,6 +81,7 @@ namespace MyProject01.Agent
 #endif
         private double _money;
         private OrderType _type;
+        private OrderType _lastAction;
         private double _startRate;
         private double _startRatePre;
         private double _currentRate;
@@ -91,12 +92,17 @@ namespace MyProject01.Agent
         {
             _money = initMoney;
             _type = OrderType.Nothing;
+            _lastAction = OrderType.Nothing;
             _startRate = 0;
             _dealCount = 0;
         }
         public int DealCount
         {
             get { return _dealCount; }
+        }
+        public OrderType LastAction
+        {
+            get { return _lastAction; }
         }
         public double GetCurrentMoney(double currentRate)
         {
@@ -107,7 +113,7 @@ namespace MyProject01.Agent
         public void StartOrder( OrderType type, double currentRate)
         {
             _currentRate = currentRate;
-
+            _lastAction = OrderType.Nothing;
             if (_type == type)
                 return;
             else if (_type != type && (_type != OrderType.Nothing))
@@ -118,11 +124,13 @@ namespace MyProject01.Agent
             {
                 _startRatePre = _startRate;
                 _startRate = Ask();
+                _lastAction = OrderType.Buy;
             }
             else
             {
                 _startRatePre = _startRate;
                 _startRate = Bid();
+                _lastAction = OrderType.Sell;
             }
         }
         public void CloseOrder(double currentRate)
@@ -187,6 +195,23 @@ namespace MyProject01.Agent
             get
             {
                 return _order.GetCurrentMoney(_currentRate);
+            }
+        }
+        public MarketActions LastAction
+        {
+            get
+            {
+                switch(_order.LastAction)
+                {
+                    case Order.OrderType.Nothing:
+                        return MarketActions.Nothing;
+                    case Order.OrderType.Sell:
+                        return MarketActions.Sell;
+                    case Order.OrderType.Buy:
+                        return MarketActions.Buy;
+                    default:
+                        return MarketActions.Nothing;
+                }
             }
         }
         public int DealCount

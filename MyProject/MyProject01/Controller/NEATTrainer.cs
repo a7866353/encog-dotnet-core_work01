@@ -274,6 +274,7 @@ namespace MyProject01.Controller
             DecisionCtrl.UpdateNetwork(network);
             TradeController tradeCtrl = new TradeController(agent, DecisionCtrl);
             RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
+            DealLogList logList = new DealLogList();
             int trainDealCount = 0;
             DealLog dealLog;
             int trainedDataIndex = _trainDataLength;
@@ -287,12 +288,9 @@ namespace MyProject01.Controller
                     // Get Action Value
                     tradeCtrl.DoAction();
 
-                    dealLog = new DealLog()
-                    {
-                        Action = tradeCtrl.LastAction,
-                        CurrentMoney = agent.CurrentValue,
+                    // Add log
+                    logList.Add(agent.LastAction, agent.CurrentValue, agent.CurrentRateValue);
 
-                    };
                     // To large for test
                     // epsodeLog.DealLogs.Add(dealLog);
                     if (agent.index == trainedDataIndex)
@@ -316,6 +314,7 @@ namespace MyProject01.Controller
             epsodeLog.ResultMoney = endMoney;
             epsodeLog.Step = _epoch;
             epsodeLog.Save();
+            epsodeLog.SaveDealLogs(logList);
 
             // update dao
             dao.LastTestDataEarnRate = epsodeLog.UnTrainedDataEarnRate;
