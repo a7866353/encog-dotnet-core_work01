@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MyProject01.DAO;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using MyProject01.Controller;
@@ -34,7 +33,7 @@ namespace MyProject01.TestCases
         public string RateDataControllerName = "test01";
         public bool IsFWT = false;
 
-        NEATTrainer _train;
+        NormalTrainer _train;
         public override void RunTest()
         {
             // init controller
@@ -81,13 +80,13 @@ namespace MyProject01.TestCases
             testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
 
 
-            _train = new NEATTrainer();
+            _train = new NormalTrainer();
             _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
             // start trainning
             _train.TestName = TestName;
             _train.Controller = controller;
-            _train.IterationCount = 0;
+            // _train.IterationCount = 0;
             _train.DecisionCtrl = controller.GetDecisionController();
             _train.RunTestCase();
         }

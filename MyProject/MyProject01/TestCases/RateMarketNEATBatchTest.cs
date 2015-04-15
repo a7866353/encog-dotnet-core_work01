@@ -101,8 +101,8 @@ namespace MyProject01.TestCases
             }
 
             // init test data
-            NEATTrainer _train;
-            _train = new NEATTrainer();
+            NormalTrainer _train;
+            _train = new NormalTrainer();
             _train.TestName = TestName;
             _train.Controller = controller;
             foreach(RateDataBlock block in _testDataBlockContainer.DataBlockArr)
@@ -110,7 +110,7 @@ namespace MyProject01.TestCases
                 _train.DataList.Add(new TrainingData(block, (int)(block.Length * testDataRate)));
             }
 
-            _train.IterationCount = IterationCountPerTest;
+            // _train.IterationCount = IterationCountPerTest;
             _train.RunTestCase();
            
 

@@ -19,54 +19,60 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-
-
-    public class RateMarketScore : ICalculateScore
+  
+    abstract class Trainer
     {
-        private BasicDataBlock _dataBlock;
-        public int StartIndex;
-        public int Length;
-        public ITradeDesisoin TradeDecisionCtrl;
-        public void SetData(BasicDataBlock dataBlock)
+        public string TestName = "DefaultTest000";
+        public TrainDataList DataList;
+        public NetworkController Controller;
+        public ITradeDesisoin DecisionCtrl;
+        public TrainResultCheckController CheckCtrl;
+
+        private long _epoch;
+
+
+        protected TrainEA train;
+        protected long Epoch
         {
-            _dataBlock = dataBlock;
-            StartIndex = 0;
-            Length = _dataBlock.Length;
+            get { return _epoch; }
         }
 
-        public bool ShouldMinimize
+        public Trainer()
         {
-            get { return false; }
+            DataList = new TrainDataList();
         }
-        public bool RequireSingleThreaded
+        public void RunTestCase()
         {
-            get { return false; }
-        }
+            LogFile.WriteLine(@"Beginning training...");
+            PrepareRunnTestCase();
+            _epoch = 1;
 
-        public double CalculateScore(IMLMethod network)
-        {
-            RateMarketAgent agent = new RateMarketAgent(_dataBlock.GetNewBlock(StartIndex, Length));
-            ITradeDesisoin decisionCtrl = TradeDecisionCtrl.Clone();
-            decisionCtrl.UpdateNetwork((IMLRegression)network);
-            TradeController tradeCtrl = new TradeController(agent, decisionCtrl);
-            while (true)
+            do
             {
-                if (agent.CurrentRateValue > 0)
-                {
-                    // Get Action Value
-                    tradeCtrl.DoAction();
-                }
-                if (agent.IsEnd == true)
-                    break;
-            }
-//            System.Console.WriteLine("S: " + agent.CurrentValue);
-            double score = agent.CurrentValue - agent.InitMoney;
-            // System.Console.WriteLine("S: " + score);
-            // return score;
-            return agent.CurrentValue;
+                 try
+                 {
+                     train.Iteration();
+
+                 }
+                catch(Exception)
+                 {
+                     LogFile.WriteLine("Train Iteration Error!");
+                 }
+                 PostItration();
+                 _epoch++;
+
+            } while (true);
+            train.FinishTraining();
+            
+            // test the neural network
+            LogFile.WriteLine(@"Training end");
         }
 
+        protected abstract void PrepareRunnTestCase();
+
+        protected abstract void PostItration();
     }
+
     class LogFormater
     {
         private double[] _valueArray;
@@ -105,6 +111,7 @@ namespace MyProject01.Controller
         }
 
     }
+
     class TrainingData
     {
         private BasicDataBlock _dataBlock;
@@ -127,7 +134,7 @@ namespace MyProject01.Controller
         }
 
     }
-    class TrainDataList : List<TrainingData> 
+    class TrainDataList : List<TrainingData>
     {
         private Random _rand;
 
@@ -138,218 +145,6 @@ namespace MyProject01.Controller
         public TrainingData GetNext()
         {
             return this[_rand.Next(Count)];
-        }
-    }
-
-    class NEATTrainer
-    {
-        public string TestName = "DefaultTest000";
-        public TrainDataList DataList;
-
-        private BasicDataBlock _testDataBlock;
-        private BasicDataBlock _trainDataBlock;
-        private int _trainDataLength;
-        private long _epoch;
-        private LogFormater _log = new LogFormater();
-        public ITradeDesisoin DecisionCtrl;
-
-        private RateMarketTestDAO _testCaseDAO;
-
-        public NetworkController Controller;
-        public long IterationCount = 10;
-
-        public NEATTrainer()
-        {
-            DataList = new TrainDataList();
-        }
-        private void SetDataLength(BasicDataBlock dataBlock, int trainLength)
-        {
-            _testDataBlock = dataBlock;
-            _trainDataLength = trainLength;
-
-            // Update test data
-            _trainDataBlock = _testDataBlock.GetNewBlock(0, _trainDataLength);
-
-        }
-
-        public void RunTestCase()
-        {
-            TrainingData trainData;
-            // Check param
-            if (Controller == null)
-            {
-                throw (new Exception("Parm wrong!"));
-            }
-
-
-            // Set test data
-            trainData = DataList.GetNext();
-            SetDataLength(trainData.DataBlock, trainData.TestLength);
-
-            //Start
-            _log = new LogFormater();
-            _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
-            _testCaseDAO.TestDataStartIndex = _trainDataBlock.Length;
-            _testCaseDAO.TotalDataCount = _testDataBlock.Length;
-            // _testCaseDAO.TestData = _testDataArray;
-
-
-            byte[] LastNetData = null;
-
-            RateMarketScore score = new RateMarketScore();
-            score.TradeDecisionCtrl = DecisionCtrl;
-            score.SetData(_trainDataBlock);
-
-            // train the neural network
-            TrainEA train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
-            
-            _epoch = 1;
-
-            LogFile.WriteLine(@"Beginning training...");
-            LogFile.WriteLine(_log.GetTitle());
-
-            
-            do
-            {
-                if ((IterationCount > 0) && (_epoch % IterationCount == 0))
-                 {
-                     // set next test data
-                     trainData = DataList.GetNext();
-                     SetDataLength(trainData.DataBlock, trainData.TestLength);
-                     score.SetData(_trainDataBlock);
-                     train.FinishTraining();
-                     train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score); 
-                     LogFile.WriteLine("Change data!");
-                 }
-
-                if( _epoch % 100 == 1)
-                {
-                    score.Length = 10;
-                    score.StartIndex++;
-                    if (score.StartIndex > _trainDataBlock.Length - 10)
-                        score.StartIndex = 0;
-                }
-                 try
-                 {
-                     train.Iteration();
-
-
-                     NEATNetwork episodeNet = (NEATNetwork)train.CODEC.Decode(train.BestGenome);
-                     Controller.BestNetwork = episodeNet;
-                     byte[] netData = NetworkToByte(episodeNet);
-                     if (ByteArrayCompare(netData, LastNetData) == false)
-                     {
-                         TestResult(episodeNet, _testCaseDAO);
-                         LastNetData = netData;
-                         Controller.Save();
-
-                     }
-                     _testCaseDAO.NetworkData = netData;
-                     _testCaseDAO.Step = _epoch;
-                     _testCaseDAO.Save();
-
-                     _log.Set(LogFormater.ValueName.Step, _epoch);
-
-                     LogFile.WriteLine(_log.GetLog());
-                 }
-                catch(Exception e)
-                 {
-                     LogFile.WriteLine("Error!");
-                 }
-                _epoch++;
-
-
-            } while (true);
-            train.FinishTraining();
-            
-            // test the neural network
-            LogFile.WriteLine(@"Training end");
-        }
-
-
-
-        private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
-        {
-            RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
-            DecisionCtrl.UpdateNetwork(network);
-            TradeController tradeCtrl = new TradeController(agent, DecisionCtrl);
-            RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
-            DealLogList logList = new DealLogList();
-            int trainDealCount = 0;
-            DealLog dealLog;
-            int trainedDataIndex = _trainDataLength;
-            double startMoney = agent.InitMoney;
-            double trainedMoney = 0;
-            double endMoney = 0;
-            while (true)
-            {
-                if (agent.CurrentRateValue > 0)
-                {
-                    // Get Action Value
-                    tradeCtrl.DoAction();
-
-                    // Add log
-                    logList.Add(agent.LastAction, agent.CurrentValue, agent.CurrentRateValue);
-
-                    // To large for test
-                    // epsodeLog.DealLogs.Add(dealLog);
-                    if (agent.index == trainedDataIndex)
-                    {
-                        trainedMoney = agent.CurrentValue;
-                        // trainDealCount = dealCount;
-                        trainDealCount = agent.DealCount;
-                    }
-
-                }
-                if (agent.IsEnd == true)
-                    break;
-            } // end while
-            endMoney = agent.CurrentValue;
-
-            epsodeLog.TrainedDataEarnRate = (trainedMoney / startMoney) * 100;
-            epsodeLog.UnTrainedDataEarnRate = (endMoney / trainedMoney) * 100;
-            epsodeLog.TrainedDealCount = trainDealCount;
-            epsodeLog.UntrainedDealCount = agent.DealCount - trainDealCount;
-            epsodeLog.HidenNodeCount = network.Links.Length;
-            epsodeLog.ResultMoney = endMoney;
-            epsodeLog.Step = _epoch;
-            epsodeLog.Save();
-            epsodeLog.SaveDealLogs(logList);
-
-            // update dao
-            dao.LastTestDataEarnRate = epsodeLog.UnTrainedDataEarnRate;
-            dao.LastTrainedDataEarnRate = epsodeLog.TrainedDataEarnRate;
-
-            // update log
-            _log.Set(LogFormater.ValueName.TrainScore, epsodeLog.TrainedDataEarnRate);
-            _log.Set(LogFormater.ValueName.UnTrainScore, epsodeLog.UnTrainedDataEarnRate);
-
-        }
-
-        private byte[] NetworkToByte(NEATNetwork network)
-        {
-            MemoryStream stream = new MemoryStream();
-            BinaryFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, network);
-
-            byte[] res = stream.ToArray();
-            stream.Close();
-            return res;
-        }
-
-        private bool ByteArrayCompare(byte[] arr1, byte[] arr2)
-        {
-            if (arr1 == null || arr2 == null)
-                return false;
-
-            if (arr1.Length != arr2.Length)
-                return false;
-            for (int i = 0; i < arr1.Length; i++)
-            {
-                if (arr1[i] != arr2[i])
-                    return false;
-            }
-            return true;
         }
     }
 }

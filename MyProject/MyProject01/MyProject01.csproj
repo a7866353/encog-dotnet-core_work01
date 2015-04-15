@@ -80,9 +80,17 @@
     <Compile Include="BasicTrainingMethod.cs" />
     <Compile Include="Controller\IInputDataFormater.cs" />
     <Compile Include="Controller\IOutputDataConvertor.cs" />
+    <Compile Include="Controller\Jobs\CheckNetworkChangeJob.cs" />
+    <Compile Include="Controller\Jobs\ICheckJob.cs" />
+    <Compile Include="Controller\Jobs\TrainerContex.cs" />
+    <Compile Include="Controller\Jobs\UpdataControllerJob.cs" />
+    <Compile Include="Controller\Jobs\UpdateTestCaseJob.cs" />
     <Compile Include="Controller\NetworkController.cs" />
     <Compile Include="Controller\NEATTrainer.cs" />
+    <Compile Include="Controller\NormalTrainer.cs" />
+    <Compile Include="Controller\SectionChangeTrainer.cs" />
     <Compile Include="Controller\TradeDecisionController.cs" />
+    <Compile Include="Controller\TrainResultCheckController.cs" />
     <Compile Include="DAO\ControllerDAO.cs" />
     <Compile Include="DAO\DataBaseConnector.cs" />
     <Compile Include="DAO\BasicTestCaseDAO.cs" />
@@ -203,9 +211,7 @@
       <Name>encog-core-cs</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controller\NewFolder1\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="DllTools.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

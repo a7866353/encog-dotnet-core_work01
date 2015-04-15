@@ -20,7 +20,7 @@ namespace MyProject01.InputDataAnalyzerTool
             {
                 stream = File.Open(path, FileMode.Open);
             }
-            catch(Exception e)
+            catch(Exception )
             {
                 return null;
             }
