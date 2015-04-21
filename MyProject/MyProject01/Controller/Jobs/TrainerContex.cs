@@ -41,5 +41,10 @@ namespace MyProject01.Controller.Jobs
         }
 
 
+
+        public TrainerContex Clone()
+        {
+            return (TrainerContex)MemberwiseClone();
+        }
     }
 }
