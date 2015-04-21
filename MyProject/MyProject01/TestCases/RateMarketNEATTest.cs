@@ -19,6 +19,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using MyProject01.Controller;
 using MyProject01.Util.DataObject;
+using MyProject01.Controller.TrainerFactorys;
 
 namespace MyProject01.TestCases
 {
@@ -33,7 +34,7 @@ namespace MyProject01.TestCases
         public string RateDataControllerName = "test01";
         public bool IsFWT = false;
 
-        NormalTrainer _train;
+        Trainer _train;
         public override void RunTest()
         {
             // init controller
@@ -54,6 +55,7 @@ namespace MyProject01.TestCases
                 controller.PopulationNumeber = PopulationNum;
             }
             
+
             // init test data
             DataLoader loader;
             if (DataSoreceType == 0)
@@ -80,7 +82,10 @@ namespace MyProject01.TestCases
             testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
 
 
-            _train = new NormalTrainer();
+
+            //
+            FirstTrainerFactory factory = new FirstTrainerFactory();
+            _train = factory.GetTrainer();
             _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
             // start trainning

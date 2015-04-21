@@ -90,6 +90,7 @@
     <Compile Include="Controller\NormalTrainer.cs" />
     <Compile Include="Controller\SectionChangeTrainer.cs" />
     <Compile Include="Controller\TradeDecisionController.cs" />
+    <Compile Include="Controller\TrainerFactorys\FirstTrainerFactory.cs" />
     <Compile Include="Controller\TrainResultCheckController.cs" />
     <Compile Include="DAO\ControllerDAO.cs" />
     <Compile Include="DAO\DataBaseConnector.cs" />

@@ -24,18 +24,23 @@ namespace MyProject01.Controller.Jobs
         private long _epoch;
         private LogFormater _log;
 
-        public UpdateTestCaseJob(TrainerContex context)
+        public UpdateTestCaseJob()
         {
-            _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
-            _testCaseDAO.TestDataStartIndex = context._trainDataBlock.Length;
-            _testCaseDAO.TotalDataCount = context._testDataBlock.Length;
-
             _log = new LogFormater();
             LogFile.WriteLine(_log.GetTitle());
-
+            _testCaseDAO = null;
         }
         public void Do(TrainerContex context)
         {
+            if (_testCaseDAO == null)
+            {
+                _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
+                _testCaseDAO.TestDataStartIndex = context._trainDataBlock.Length;
+                _testCaseDAO.TotalDataCount = context._testDataBlock.Length;
+
+            }
+
+
             _testDataBlock = context._testDataBlock;
             _epoch = context.Epoch;
             _trainDataLength = context._trainDataLength;
