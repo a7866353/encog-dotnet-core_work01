@@ -17,6 +17,7 @@ namespace MyProject01.Util.DataObject
 
         public BasicDataBlock(DataLoader loader, int startIndex, int length, int blockLength)
         {
+            _index = 0;
             _loader = loader;
             _startIndex = startIndex;
             _length = Math.Min(loader.Count-_startIndex, length);
@@ -58,6 +59,28 @@ namespace MyProject01.Util.DataObject
                 _data[i] = _loader[i + _startIndex].Value;
             }
 
+        }
+
+        protected int _index;
+        
+        public void Reset()
+        {
+            _index = 0;
+        }
+        public bool Next()
+        {
+            if ((_index + 1) >= _length)
+                return false;
+            else
+            {
+                _index++;
+                return true;
+            }
+        }
+
+        public int Copy(double[] array)
+        {
+            return Copy(array, _index);
         }
 
 

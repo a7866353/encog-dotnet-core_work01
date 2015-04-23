@@ -114,6 +114,8 @@
     <Compile Include="Factorys\PopulationFactorys\BasicPopulationFactory.cs" />
     <Compile Include="Factorys\PopulationFactorys\NormalPopulationFactory.cs" />
     <Compile Include="Reinforcement\QLearn.cs" />
+    <Compile Include="StateSpliter\StateSplitController.cs" />
+    <Compile Include="StateSpliter\ValueSortSpliter.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestCases\PredictTestCase.cs" />
     <Compile Include="TestCases\RateMarketNEATBatchTest.cs" />
