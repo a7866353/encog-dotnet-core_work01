@@ -32,6 +32,9 @@ namespace MyProject01.Controller.Jobs
         }
         public void Do(TrainerContex context)
         {
+            if (context.IsChanged == false)
+                return;
+
             if (_testCaseDAO == null)
             {
                 _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);

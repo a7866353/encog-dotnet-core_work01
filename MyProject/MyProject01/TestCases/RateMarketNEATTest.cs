@@ -85,6 +85,8 @@ namespace MyProject01.TestCases
 
             //
             FirstTrainerFactory factory = new FirstTrainerFactory();
+            factory.TestCaseName = TestName;
+            factory.TradeDesionin = controller.GetDecisionController();
             _train = factory.GetTrainer();
             _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
@@ -92,7 +94,7 @@ namespace MyProject01.TestCases
             _train.TestName = TestName;
             _train.Controller = controller;
             // _train.IterationCount = 0;
-            _train.DecisionCtrl = controller.GetDecisionController();
+            _train.DecisionCtrl = factory.TradeDesionin;
             _train.RunTestCase();
         }
 

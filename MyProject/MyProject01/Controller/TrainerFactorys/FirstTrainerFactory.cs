@@ -9,16 +9,22 @@ namespace MyProject01.Controller.TrainerFactorys
 {
     class FirstTrainerFactory
     {
+        public string TestCaseName;
+        public ITradeDesisoin TradeDesionin;
+
         public Trainer GetTrainer()
         {
             NormalTrainer trainer = new NormalTrainer();
 
+            TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
+            mainCheckCtrl.Add(new CheckNetworkChangeJob());
+            mainCheckCtrl.Add(new UpdataControllerJob());
 
-            TrainResultCheckController checkCtrl = new TrainResultCheckController();
-            checkCtrl.Add(new CheckNetworkChangeJob());
-            checkCtrl.Add(new UpdataControllerJob());
-            checkCtrl.Add(new UpdateTestCaseJob());
-            trainer.CheckCtrl = checkCtrl;
+            TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
+            subCheckCtrl.Add(new UpdateTestCaseJob() { TestName = TestCaseName, DecisionCtrl = TradeDesionin, });
+
+            mainCheckCtrl.Add(subCheckCtrl);
+            trainer.CheckCtrl = mainCheckCtrl;
 
             return trainer;
         }

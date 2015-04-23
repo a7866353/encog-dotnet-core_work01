@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MyProject01.Controller.Jobs;
 using System.Threading;
+using MyProject01.Controller.Jobs;
 
 namespace MyProject01.Controller
 {
-    class TrainResultCheckController : ICheckJob
+    class TrainResultCheckAsyncController : ICheckJob
     {
         private List<ICheckJob> _jobList;
         private List<TrainerContex> _contextTaskList;
         private Thread _workThread;
 
-        public TrainResultCheckController()
+        public TrainResultCheckAsyncController()
         {
             _jobList = new List<ICheckJob>();
             _contextTaskList = new List<TrainerContex>();
@@ -69,4 +69,28 @@ namespace MyProject01.Controller
 
 
     }
+
+    class TrainResultCheckSyncController : ICheckJob
+    {
+        private List<ICheckJob> _jobList;
+
+        public TrainResultCheckSyncController()
+        {
+            _jobList = new List<ICheckJob>();
+        }
+
+        public void Add(ICheckJob job)
+        {
+            _jobList.Add(job);
+        }
+
+        public void Do(TrainerContex context)
+        {
+            foreach (ICheckJob job in _jobList)
+            {
+                job.Do(context);
+            }
+        }
+    }
+
 }

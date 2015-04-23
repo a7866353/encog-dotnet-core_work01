@@ -15,7 +15,6 @@ namespace MyProject01.Controller.Jobs
         public void Do(TrainerContex context)
         {
             NEATNetwork episodeNet = (NEATNetwork)context.train.CODEC.Decode(context.train.BestGenome);
-
             byte[] netData = NetworkToByte(episodeNet);
             if (ByteArrayCompare(netData, LastNetData) == false)
             {
@@ -23,7 +22,10 @@ namespace MyProject01.Controller.Jobs
                 LastNetData = netData;
                 context.IsChanged = true;
             }
-            context.IsChanged = false;
+            else
+            {
+                context.IsChanged = false;
+            }
 
         }
 

@@ -5,6 +5,7 @@ using Encog.ML.EA.Train;
 using Encog.Neural.NEAT;
 using Encog.Neural.Networks.Training;
 using MyProject01.Agent;
+using MyProject01.Controller.Jobs;
 using MyProject01.DAO;
 using MyProject01.ExchangeRateTrade;
 using MyProject01.Util;
@@ -26,7 +27,7 @@ namespace MyProject01.Controller
         public TrainDataList DataList;
         public NetworkController Controller;
         public ITradeDesisoin DecisionCtrl;
-        public TrainResultCheckController CheckCtrl;
+        public ICheckJob CheckCtrl;
 
         private long _epoch;
 

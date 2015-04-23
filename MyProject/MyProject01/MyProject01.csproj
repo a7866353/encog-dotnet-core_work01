@@ -81,7 +81,7 @@
     <Compile Include="Controller\IInputDataFormater.cs" />
     <Compile Include="Controller\IOutputDataConvertor.cs" />
     <Compile Include="Controller\Jobs\CheckNetworkChangeJob.cs" />
-    <Compile Include="Controller\Jobs\ICheckJob.cs" />
+    <Compile Include="Controller\ICheckJob.cs" />
     <Compile Include="Controller\Jobs\TrainerContex.cs" />
     <Compile Include="Controller\Jobs\UpdataControllerJob.cs" />
     <Compile Include="Controller\Jobs\UpdateTestCaseJob.cs" />
