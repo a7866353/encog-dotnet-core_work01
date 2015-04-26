@@ -26,7 +26,6 @@ namespace MyProject01.TestCases
 
     class RateMarketNEATTest : BasicTestCase
     {
-        public string TestName = "DefaultTest000";
         public double TestDataRate = 0.75;
         public int DataBlockLength = 300;
         public  int PopulationNum = 50;

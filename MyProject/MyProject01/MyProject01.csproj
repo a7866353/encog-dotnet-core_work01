@@ -212,7 +212,9 @@
       <Name>encog-core-cs</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="TestCaseFactorys\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="DllTools.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
