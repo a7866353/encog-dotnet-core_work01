@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyProject01.ControllerFactorys;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,9 @@ namespace MyProject01.TestCases.RateMarketTestCases
     {
         public NormalRateMarketTestCase()
         {
-
+            NEATExchangeControllerFactory controllerFactory = new NEATExchangeControllerFactory();
+            controllerFactory.InputLength = 
+            controllerFactory.Get();
         }
     }
 }

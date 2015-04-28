@@ -78,6 +78,9 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="ControllerFactorys\BasicControllerFactory.cs" />
+    <Compile Include="ControllerFactorys\NEATExchangeControllerFactory.cs" />
+    <Compile Include="ControllerFactorys\NeatFwtExchangeControllerFactory.cs" />
     <Compile Include="Controller\IInputDataFormater.cs" />
     <Compile Include="Controller\IOutputDataConvertor.cs" />
     <Compile Include="Controller\Jobs\CheckNetworkChangeJob.cs" />
@@ -99,6 +102,7 @@
     <Compile Include="DAO\MyNetDAO.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="ExchangeRateTrade\TradeController.cs" />
+    <Compile Include="IControllerFactory.cs" />
     <Compile Include="InputDataAnalyzerTool\InputDataAnalyzer.cs" />
     <Compile Include="MyNet.cs" />
     <Compile Include="MyNetFactory.cs" />
@@ -113,6 +117,8 @@
     <Compile Include="TestCases\RateMarketNEATBatchTest.cs" />
     <Compile Include="TestCases\RateMarketNEATTest.cs" />
     <Compile Include="TestCases\RateMarketTest.cs" />
+    <Compile Include="TestCases\RateMarketTestCases\BasicRateMarketTestCase.cs" />
+    <Compile Include="TestCases\RateMarketTestCases\NormalRateMarketTestCase.cs" />
     <Compile Include="TestParameters\NormalParameterSet.cs" />
     <Compile Include="Test\DealTest.cs" />
     <Compile Include="Test\FeedForwardNetworkTest.cs" />
@@ -122,6 +128,10 @@
     <Compile Include="Test\RateDataCreator.cs" />
     <Compile Include="Test\ElmanNetworkTest.cs" />
     <Compile Include="Test\TestData.cs" />
+    <Compile Include="TrainerFactorys\BasicTrainerFactory.cs" />
+    <Compile Include="TrainerFactorys\NormalTrainerFactory.cs" />
+    <Compile Include="TrainingDataFactorys\BasicTrainingDataFactory.cs" />
+    <Compile Include="TrainingDataFactorys\OldRateTrainingDataFactory.cs" />
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
     <Compile Include="TrainingMethods\ResilientPropagationTraining.cs" />
