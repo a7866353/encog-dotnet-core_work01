@@ -35,7 +35,7 @@ namespace MyProject01.Controller
                 _population.WeightRange = 0.1;
                 _population.Reset();
 
-                _dao.InputVectorLength = _tradeDecisionController.NetworkInputVectorLength;
+                _dao.InputDataLength = _tradeDecisionController.NetworkInputVectorLength;
                 // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
             }
             return _population;
@@ -54,11 +54,6 @@ namespace MyProject01.Controller
         {
             set { _dao.OutType = value; }
             get { return _dao.OutType; }
-        }
-        public int PopulationNumeber
-        {
-            set { _dao.PopulationNumeber = value; }
-            get { return _dao.PopulationNumeber; }
         }
         public double DataOffset
         {

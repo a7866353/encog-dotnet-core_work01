@@ -214,10 +214,9 @@ namespace MyProject01.DAO
         public ObjectId _id;
         public string Name { set; get; }
         public DateTime UpdateTime { set; get; }
-        public int InputVectorLength { set; get; }
+        public int InputDataLength { set; get; }
         public InputDataFormaterType InputType { set; get; }
         public OutputDataConvertorType OutType { set; get; }
-        public int PopulationNumeber { set; get; }
         public double DataOffset { set; get; }
         public double DataScale { set; get; }
         public byte[] BestNetwork { set; get; }
