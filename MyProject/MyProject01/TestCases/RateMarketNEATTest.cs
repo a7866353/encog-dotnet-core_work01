@@ -51,7 +51,6 @@ namespace MyProject01.TestCases
                 decisionCtrl.BestNetwork = null;
 
                 controller = NetworkController.Create(controllerName, decisionCtrl);
-                controller.PopulationNumeber = PopulationNum;
             }
             
 
@@ -92,8 +91,6 @@ namespace MyProject01.TestCases
             // start trainning
             _train.TestName = TestName;
             _train.Controller = controller;
-            // _train.IterationCount = 0;
-            _train.DecisionCtrl = factory.TradeDesionin;
             _train.RunTestCase();
         }
 

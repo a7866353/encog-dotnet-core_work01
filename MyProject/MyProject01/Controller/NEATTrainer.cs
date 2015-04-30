@@ -26,11 +26,10 @@ namespace MyProject01.Controller
         public string TestName = "DefaultTest000";
         public TrainDataList DataList;
         public NetworkController Controller;
-        public ITradeDesisoin DecisionCtrl;
         public ICheckJob CheckCtrl;
 
         private long _epoch;
-
+        private ITradeDesisoin _decisionCtrl;
 
         protected TrainEA train;
         protected long Epoch
@@ -45,6 +44,9 @@ namespace MyProject01.Controller
         public void RunTestCase()
         {
             LogFile.WriteLine(@"Beginning training...");
+
+            _decisionCtrl = Controller.GetDecisionController();
+
             PrepareRunnTestCase();
             _epoch = 1;
 

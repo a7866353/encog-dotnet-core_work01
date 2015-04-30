@@ -42,7 +42,7 @@ namespace MyProject01.Controller
             _context.SetDataLength(trainData.DataBlock, trainData.TestLength);
 
             RateMarketScore score = new RateMarketScore();
-            score.TradeDecisionCtrl = DecisionCtrl;
+            score.TradeDecisionCtrl = _decisionCtrl;
             score.SetData(_trainDataBlock);
             _context.TestScore = score;
 
