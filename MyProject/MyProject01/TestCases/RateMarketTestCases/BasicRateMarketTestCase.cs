@@ -8,33 +8,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyProject01.Controller;
 
 namespace MyProject01.TestCases.RateMarketTestCases
 {
     abstract class BasicRateMarketTestCase : BasicTestCase
     {
-        /*
-        protected NetworkController controller;
-        protected TrainingData trainData;
-        protected Trainer _train;
-        */
+        public int DataBlockLength;
 
-        protected BasicControllerFactory _controllerFactory;
-        protected BasicTrainerFactory _trainerFactory;
-        protected BasicTrainingDataFactory _dataFactory;
+        protected Trainer _train;
+        abstract protected void Init();
+
 
         public override void RunTest()
         {
-            _train = _trainerFactory.Get();
-            _train.DataList.Add(trainData);
-
-            // start trainning
-            _train.TestName = TestName;
-            _train.Controller = controller;
-            // _train.IterationCount = 0
-            _train._decisionCtrl = controller.GetDecisionController();
+            Init();
             _train.RunTestCase();
-
         }
     }
 }

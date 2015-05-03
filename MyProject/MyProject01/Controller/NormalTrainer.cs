@@ -12,43 +12,33 @@ using MyProject01.Controller.Jobs;
 using MyProject01.Util;
 using Encog.Neural.Networks.Training;
 using Encog.ML;
+using MyProject01.PopulationFactorys;
 
 namespace MyProject01.Controller
 {
     class NormalTrainer : Trainer
     {
         private TrainerContex _context;
+        private RateMarketTestDAO _testDAO;
 
-        private BasicDataBlock _testDataBlock
-        { get { return _context._testDataBlock; } }
-        private BasicDataBlock _trainDataBlock
-        { get { return _context._trainDataBlock; } }
-        private int _trainDataLength
-        { get { return _context._trainDataLength; } }
-
+        public ITradeDesisoin DecisionCtrl;
+        public BasicDataBlock TrainDataBlock;
+        public BasicPopulationFactory PopulationFacotry;
 
         protected override void PrepareRunnTestCase()
         {
-            if (Controller == null)
-            {
-                throw (new Exception("Parm wrong!"));
-            }
-
             // Init context
             _context = new TrainerContex();
 
-            // Set test data ( Only one )
-            TrainingData trainData = DataList.GetNext();
-            _context.SetDataLength(trainData.DataBlock, trainData.TestLength);
-
             RateMarketScore score = new RateMarketScore();
-            score.TradeDecisionCtrl = _decisionCtrl;
-            score.SetData(_trainDataBlock);
+            score.TradeDecisionCtrl = DecisionCtrl;
+            score.SetData(TrainDataBlock);
             _context.TestScore = score;
 
-
             // train the neural network
-            train = NEATUtil.ConstructNEATTrainer(Controller.GetPopulation(), score);
+            PopulationFacotry.InputVectoryNumber = DecisionCtrl.NetworkInputVectorLength;
+            PopulationFacotry.OutputVectoryNumber = DecisionCtrl.NetworkOutputVectorLenth;
+            train = NEATUtil.ConstructNEATTrainer(PopulationFacotry.Get(), score);
             _context.train = train;
 
         }

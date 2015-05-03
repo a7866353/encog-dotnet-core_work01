@@ -153,36 +153,24 @@ namespace MyProject01.DAO
             ControllerDAO.Remove(this.Name);
         }
 
-        public NEATPopulation GetPopulation()
+        public NEATNetwork GetNetwork()
         {
-            NEATPopulation pop = MongoDBUtility.GetFromFS<NEATPopulation>(new TestCaseDatabaseConnector(), Name);
-            return pop;
-
-        }
-
-        public void UpdatePopulation(NEATPopulation pop)
-        {
-            MongoDBUtility.SaveToFS<NEATPopulation>(new TestCaseDatabaseConnector(), pop, Name);
-        }
-
-        public NEATNetwork GetBestNetwork()
-        {
-            if (BestNetwork == null)
+            if (NetworkData == null)
                 return null;
 
-            MemoryStream stream = new MemoryStream(BestNetwork);
+            MemoryStream stream = new MemoryStream(NetworkData);
             BinaryFormatter formatter = new BinaryFormatter();
             NEATNetwork obj = (NEATNetwork)formatter.Deserialize(stream);
 
             return obj;
         }
 
-        public void SetBestNetwork(IMLRegression net)
+        public void SetNetwork(IMLRegression net)
         {
             MemoryStream stream = new MemoryStream();
             BinaryFormatter formatter = new BinaryFormatter();
             formatter.Serialize(stream, net);
-            BestNetwork = stream.ToArray();
+            NetworkData = stream.ToArray();
             stream.Close();
 
         }
@@ -195,9 +183,10 @@ namespace MyProject01.DAO
             TradeDecisionController = stream.ToArray();
             stream.Close();
         }
+
         public ITradeDesisoin GetTradeDecisionController()
         {
-            if (BestNetwork == null)
+            if (NetworkData == null)
                 return null;
 
             MemoryStream stream = new MemoryStream(TradeDecisionController);
@@ -206,6 +195,7 @@ namespace MyProject01.DAO
 
             return obj;
         }
+
         #endregion
         // =============================
         // Data for saving into database.
@@ -219,7 +209,7 @@ namespace MyProject01.DAO
         public OutputDataConvertorType OutType { set; get; }
         public double DataOffset { set; get; }
         public double DataScale { set; get; }
-        public byte[] BestNetwork { set; get; }
+        public byte[] NetworkData { set; get; }
 
         public byte[] TradeDecisionController { set; get; }
         

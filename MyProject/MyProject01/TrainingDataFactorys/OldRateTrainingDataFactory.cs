@@ -19,7 +19,10 @@ namespace MyProject01.TrainingDataFactorys
             // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
            
             RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
-            TrainingData td = new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate));
+            TrainingData td = new TrainingData(
+                new RateDataBlock(loader, 0, loader.Count, DataBlockLength),
+                new RateDataBlock(loader, 0, (int)(loader.Count * TestDataRate), DataBlockLength)
+                );
 
             return td;
         }

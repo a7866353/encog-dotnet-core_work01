@@ -8,6 +8,7 @@ using MyProject01.Agent;
 using MyProject01.Controller.Jobs;
 using MyProject01.DAO;
 using MyProject01.ExchangeRateTrade;
+using MyProject01.PopulationFactorys;
 using MyProject01.Util;
 using MyProject01.Util.DataObject;
 using System;
@@ -24,28 +25,18 @@ namespace MyProject01.Controller
     abstract class Trainer
     {
         public string TestName = "DefaultTest000";
-        public TrainDataList DataList;
-        public NetworkController Controller;
         public ICheckJob CheckCtrl;
 
         private long _epoch;
-        private ITradeDesisoin _decisionCtrl;
 
         protected TrainEA train;
         protected long Epoch
         {
             get { return _epoch; }
         }
-
-        public Trainer()
-        {
-            DataList = new TrainDataList();
-        }
         public void RunTestCase()
         {
             LogFile.WriteLine(@"Beginning training...");
-
-            _decisionCtrl = Controller.GetDecisionController();
 
             PrepareRunnTestCase();
             _epoch = 1;
@@ -117,23 +108,21 @@ namespace MyProject01.Controller
 
     class TrainingData
     {
-        private BasicDataBlock _dataBlock;
-        private int _testLength;
-
-        public BasicDataBlock DataBlock
+        private BasicDataBlock _testDataBlock;
+        private BasicDataBlock _trainDataBlock;
+        public BasicDataBlock TestDataBlock
         {
-            get { return _dataBlock; }
+            get { return _testDataBlock; }
         }
-        public int TestLength
+        public BasicDataBlock TrainDataBlock
         {
-            get { return _testLength; }
+            get { return _trainDataBlock; }
         }
 
-
-        public TrainingData(BasicDataBlock block, int testLength)
+        public TrainingData(BasicDataBlock testBlock, BasicDataBlock trainBlock)
         {
-            _dataBlock = block;
-            _testLength = testLength;
+            _testDataBlock = testBlock;
+            _trainDataBlock = trainBlock;
         }
 
     }

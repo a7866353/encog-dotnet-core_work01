@@ -111,6 +111,8 @@
     <Compile Include="Networks\FeedForwardNet.cs" />
     <Compile Include="Networks\NEATNet.cs" />
     <Compile Include="Networks\SimpleFeedForwardNet.cs" />
+    <Compile Include="PopulationFactorys\BasicPopulationFactory.cs" />
+    <Compile Include="PopulationFactorys\NormalPopulationFactory.cs" />
     <Compile Include="Reinforcement\QLearn.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestCases\PredictTestCase.cs" />

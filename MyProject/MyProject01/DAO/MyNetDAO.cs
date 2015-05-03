@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Encog.Neural.NEAT;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MyProject01.Agent;
 using MyProject01.Controller;
@@ -84,12 +85,25 @@ namespace MyProject01.DAO
         public double LastTrainedDataEarnRate { set; get; }
         public double LastTestDataEarnRate { set; get; }
 
+        public int PopulationNumber { set; get; }
+
         public byte[] NetworkData { set; get; }
 
         public override BasicTestEpisodeDAO CreateEpisode()
         {
             return new RateMarketTestEpisodeDAO(this);
         }
+        public NEATPopulation GetPopulation()
+        {
+            NEATPopulation pop = MongoDBUtility.GetFromFS<NEATPopulation>(new TestCaseDatabaseConnector(), Name);
+            return pop;
+
+        }
+        public void UpdatePopulation(NEATPopulation pop)
+        {
+            MongoDBUtility.SaveToFS<NEATPopulation>(new TestCaseDatabaseConnector(), pop, Name);
+        }
+
 
 
     }

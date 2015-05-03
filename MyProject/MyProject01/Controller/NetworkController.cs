@@ -21,25 +21,10 @@ namespace MyProject01.Controller
 {
     public class NetworkController
     {
-        private NEATPopulation _population;
         private ITradeDesisoin _tradeDecisionController;
         public IMLRegression BestNetwork;
 
         private ControllerDAO _dao;
-        public NEATPopulation GetPopulation()
-        {
-            if(_population == null)
-            {
-                _population = new NEATPopulation(_tradeDecisionController.NetworkInputVectorLength, _tradeDecisionController.NetworkOutputVectorLenth, PopulationNumeber);
-                _population.InitialConnectionDensity = 1.0;
-                _population.WeightRange = 0.1;
-                _population.Reset();
-
-                _dao.InputDataLength = _tradeDecisionController.NetworkInputVectorLength;
-                // _population.InitialConnectionDensity = 1.0; // not required, but speeds processing.
-            }
-            return _population;
-        }
 
         public string Name
         {
@@ -70,7 +55,7 @@ namespace MyProject01.Controller
             ControllerDAO dao = ControllerDAO.GetDAO(name, false);
             NetworkController controller;
 
-            if (dao.BestNetwork == null)
+            if (dao.NetworkData == null)
             {
                 return null;
 
@@ -97,24 +82,19 @@ namespace MyProject01.Controller
         {
             this._dao = dao;
             this._tradeDecisionController = _dao.GetTradeDecisionController();
-            this._population = dao.GetPopulation();
         }
         // Create a new one.
         private NetworkController(ControllerDAO dao, ITradeDesisoin ctrl)
         {
             this._dao = dao;
             this._tradeDecisionController = ctrl;
-            this._population = null;
-
-            
         }
           
         public void Save()
         {
             _dao.SetTradeDecisionController(_tradeDecisionController);
-            _dao.SetBestNetwork(BestNetwork);
+            _dao.SetNetwork(BestNetwork);
             _dao.Save();
-            _dao.UpdatePopulation(_population);
         }
 
         public ITradeDesisoin GetDecisionController()

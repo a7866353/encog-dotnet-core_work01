@@ -16,10 +16,10 @@ namespace MyProject01.Controller.Jobs
     {
         public string TestName;
         public ITradeDesisoin DecisionCtrl;
+        public BasicDataBlock TestDataBlock;
 
         private RateMarketTestDAO _testCaseDAO;
 
-        private BasicDataBlock _testDataBlock;
         private int _trainDataLength;
         private long _epoch;
         private LogFormater _log;
@@ -43,8 +43,6 @@ namespace MyProject01.Controller.Jobs
 
             }
 
-
-            _testDataBlock = context._testDataBlock;
             _epoch = context.Epoch;
             _trainDataLength = context._trainDataLength;
             TestResult(context.BestNetwork, _testCaseDAO);
@@ -56,7 +54,7 @@ namespace MyProject01.Controller.Jobs
         }
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)
         {
-            RateMarketAgent agent = new RateMarketAgent(_testDataBlock);
+            RateMarketAgent agent = new RateMarketAgent(TestDataBlock);
             DecisionCtrl.UpdateNetwork(network);
 
             TradeController tradeCtrl = new TradeController(agent, DecisionCtrl);

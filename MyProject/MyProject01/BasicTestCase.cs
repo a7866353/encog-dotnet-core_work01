@@ -10,7 +10,6 @@ namespace MyProject01
     abstract class BasicTestCase
     {
         public string TestName = "DefaultTest000";
-        protected MyNet _network;
         protected TestData _testData;
         protected LogWriter _logger;
         protected bool isParameterSet = false;
