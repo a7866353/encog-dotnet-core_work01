@@ -27,7 +27,7 @@ namespace MyProject01.Controller
         public string TestName = "DefaultTest000";
         public ICheckJob CheckCtrl;
 
-        private long _epoch;
+        protected long _epoch;
 
         protected TrainEA train;
         protected long Epoch

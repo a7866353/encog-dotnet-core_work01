@@ -34,6 +34,7 @@ namespace MyProject01.Controller
             score.TradeDecisionCtrl = DecisionCtrl;
             score.SetData(TrainDataBlock);
             _context.TestScore = score;
+            _context._trainDataBlock = TrainDataBlock;
 
             // train the neural network
             train = NEATUtil.ConstructNEATTrainer(
@@ -45,6 +46,7 @@ namespace MyProject01.Controller
 
         protected override void PostItration()
         {
+            _context.Epoch = _epoch;
             CheckCtrl.Do(_context);
 
             // Update Test Data

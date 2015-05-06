@@ -21,7 +21,6 @@ namespace MyProject01.Controller.Jobs
         // Test Data
         public BasicDataBlock _testDataBlock;
         public BasicDataBlock _trainDataBlock;
-        public int _trainDataLength;
 
         // TestCase
         public RateMarketScore TestScore;
@@ -33,10 +32,9 @@ namespace MyProject01.Controller.Jobs
         public void SetDataLength(BasicDataBlock dataBlock, int trainLength)
         {
             _testDataBlock = dataBlock;
-            _trainDataLength = trainLength;
 
             // Update test data
-            _trainDataBlock = _testDataBlock.GetNewBlock(0, _trainDataLength);
+            _trainDataBlock = _testDataBlock.GetNewBlock(0, trainLength);
 
         }
 

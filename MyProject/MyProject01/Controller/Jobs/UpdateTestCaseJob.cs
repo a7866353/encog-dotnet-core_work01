@@ -39,12 +39,12 @@ namespace MyProject01.Controller.Jobs
             {
                 _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
                 _testCaseDAO.TestDataStartIndex = context._trainDataBlock.Length;
-                _testCaseDAO.TotalDataCount = context._testDataBlock.Length;
+                _testCaseDAO.TotalDataCount = TestDataBlock.Length;
 
             }
 
             _epoch = context.Epoch;
-            _trainDataLength = context._trainDataLength;
+            _trainDataLength = _testCaseDAO.TestDataStartIndex;
             TestResult(context.BestNetwork, _testCaseDAO);
 
             _testCaseDAO.NetworkData = null;

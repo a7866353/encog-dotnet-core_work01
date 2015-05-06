@@ -55,7 +55,14 @@ namespace MyProject01.Controller
 
                 if( context == null )
                 {
-                    Thread.Sleep(0);
+                    try
+                    {
+                        Thread.Sleep(0);
+                    }catch(Exception  e)
+                    {
+                        System.Console.WriteLine(e.ToString());
+
+                    }
                     continue;
                 }
 

@@ -52,7 +52,8 @@ namespace MyProject01.Controller
             }
             else
             {
-                controller = new NetworkController(dao);
+                return null;
+                // controller = new NetworkController(dao);
 
             }
 
@@ -82,7 +83,8 @@ namespace MyProject01.Controller
           
         public void Save()
         {
-            _dao.SetTradeDecisionController(_tradeDecisionController);
+           // TODO
+           //  _dao.SetTradeDecisionController(_tradeDecisionController);
             _dao.SetNetwork(BestNetwork);
 
             _dao.UpdateTime = DateTime.Now;
