@@ -19,6 +19,7 @@ namespace MyProject01.TestCases
 
         public override void RunTest()
         {
+            /*
             if (isParameterSet == false)
                 return;
 
@@ -77,6 +78,7 @@ namespace MyProject01.TestCases
             // ResultPrintf(_testData.ToStringResults());
             // LogPrintf("Test end!");
             LogPrintf("");
+            */
         }
 
     }

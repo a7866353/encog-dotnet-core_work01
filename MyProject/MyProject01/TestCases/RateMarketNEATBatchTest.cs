@@ -89,7 +89,7 @@ namespace MyProject01.TestCases
             // init controller
             string controllerName = TestName;
             NetworkController controller = NetworkController.Open(controllerName);
-            if (controller == null || controller.PopulationNumeber != populationNum)
+            if (controller == null )
             {
                 TradeDecisionController decisionCtrl = new TradeDecisionController();
                 decisionCtrl._inputFormater = new FWTFormater(dataBlockLength);
@@ -97,17 +97,15 @@ namespace MyProject01.TestCases
                 decisionCtrl.BestNetwork = null;
 
                 controller = NetworkController.Create(controllerName, decisionCtrl);
-                controller.PopulationNumeber = populationNum;
             }
 
             // init test data
             NormalTrainer _train;
             _train = new NormalTrainer();
             _train.TestName = TestName;
-            _train.Controller = controller;
             foreach(RateDataBlock block in _testDataBlockContainer.DataBlockArr)
             {
-                _train.DataList.Add(new TrainingData(block, (int)(block.Length * testDataRate)));
+                // _train.DataList.Add(new TrainingData(block, (int)(block.Length * testDataRate)));
             }
 
             // _train.IterationCount = IterationCountPerTest;

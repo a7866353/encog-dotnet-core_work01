@@ -108,7 +108,7 @@ namespace MyProject01.Util
                 */
                 QueryDocument query = new QueryDocument();
                 BsonDocument b = new BsonDocument();
-                b.Add("$gt", DateTime.Now.AddMonths(-6));
+                b.Add("$gt", DateTime.Now.AddMonths(-24));
                 b.Add("$lt", DateTime.Now);
                 query.Add("Date", b);
 

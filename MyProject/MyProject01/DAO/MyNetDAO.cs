@@ -95,13 +95,13 @@ namespace MyProject01.DAO
         }
         public NEATPopulation GetPopulation()
         {
-            NEATPopulation pop = MongoDBUtility.GetFromFS<NEATPopulation>(new TestCaseDatabaseConnector(), Name);
+            NEATPopulation pop = MongoDBUtility.GetFromFS<NEATPopulation>(new TestCaseDatabaseConnector(), TestCaseName);
             return pop;
 
         }
         public void UpdatePopulation(NEATPopulation pop)
         {
-            MongoDBUtility.SaveToFS<NEATPopulation>(new TestCaseDatabaseConnector(), pop, Name);
+            MongoDBUtility.SaveToFS<NEATPopulation>(new TestCaseDatabaseConnector(), pop, TestCaseName);
         }
 
 

@@ -21,13 +21,13 @@ namespace SocketTestClient.ConnectionContoller
     {
         private RateDataControlDAO _dataController;
         private NetworkController _networkController;
-        private TradeDecisionController _decisionCtrl;
+        private ITradeDesisoin _decisionCtrl;
         private DateTime _lastTradeTime;
 
         public TradeOrder(string rateDataControllerName, string networkControllerName)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
-            _networkController = NetworkController.Open(networkControllerName, false, false);
+            _networkController = NetworkController.Open(networkControllerName);
             _decisionCtrl = _networkController.GetDecisionController();
             _lastTradeTime = DateTime.Now;
         }
@@ -44,7 +44,7 @@ namespace SocketTestClient.ConnectionContoller
             if (_dataController.LastItemTime > _lastTradeTime)
             {
                 _lastTradeTime = _dataController.LastItemTime;
-                RateData[] rateDataArr = _dataController.Get(_lastTradeTime, _networkController.InputVectorLength);
+                RateData[] rateDataArr = _dataController.Get(_lastTradeTime, _decisionCtrl.InputDataLength);
                 return Calculte(rateDataArr);
             }
             return OrderCommand.Nothing;

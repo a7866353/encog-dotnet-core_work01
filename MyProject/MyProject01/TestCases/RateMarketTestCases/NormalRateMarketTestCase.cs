@@ -12,13 +12,20 @@ namespace MyProject01.TestCases.RateMarketTestCases
 {
     class NormalRateMarketTestCase : BasicRateMarketTestCase
     {
+
+        public NormalRateMarketTestCase()
+        {
+            TestName = "5Min_512_100_Test";
+        }
+        
         protected override void Init()
         {
+
             FirstTrainerFactory trainerFactory = new FirstTrainerFactory();
-            trainerFactory.TestCaseName = "NEAT_D512_5Min";
+            trainerFactory.TestCaseName = TestName;
 
             NEATExchangeControllerFactory controllerFactory = new NEATExchangeControllerFactory();
-            controllerFactory.InputLength = 512;
+            controllerFactory.InputLength = 32;
             trainerFactory.Controller = controllerFactory.Get();
 
             OldRateTrainingDataFactory dataFactory = new OldRateTrainingDataFactory();
@@ -29,7 +36,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
             popFactory.PopulationNumber = 100;
             trainerFactory.PopulationFacotry = popFactory;
 
-
+            _train = trainerFactory.GetTrainer();
         }
     }
 }

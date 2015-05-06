@@ -30,16 +30,6 @@ namespace MyProject01.Controller
         {
             get { return _dao.Name; }
         }
-        public InputDataFormaterType InputType
-        {
-            set { _dao.InputType = value; }
-            get { return _dao.InputType; }
-        }
-        public OutputDataConvertorType OutType
-        {
-            set { _dao.OutType = value; }
-            get { return _dao.OutType; }
-        }
         public double DataOffset
         {
             set { _dao.DataOffset = value; }
@@ -94,6 +84,8 @@ namespace MyProject01.Controller
         {
             _dao.SetTradeDecisionController(_tradeDecisionController);
             _dao.SetNetwork(BestNetwork);
+
+            _dao.UpdateTime = DateTime.Now;
             _dao.Save();
         }
 

@@ -10,14 +10,13 @@ namespace MyProject01.PopulationFactorys
     abstract class BasicPopulationFactory
     {
         public int PopulationNumber = 100;
-        public int InputVectoryNumber;
-        public int OutputVectoryNumber;
-        public NEATPopulation Get()
+
+        public NEATPopulation Get(int inputVectoryNumber, int outputVectoryNumber)
         {
-            return Create();
+            return Create(inputVectoryNumber, outputVectoryNumber);
         }
 
-        abstract protected NEATPopulation Create();
+        abstract protected NEATPopulation Create(int inputVectoryNumber, int outputVectoryNumber);
 
     }
 }

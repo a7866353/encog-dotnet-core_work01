@@ -13,14 +13,14 @@ namespace MyProject01.Controller.TrainerFactorys
         public string TestCaseName;
         public NetworkController Controller;
         public TrainingData TrainingData;
-        public BasicPopulationFactory PopulationFacotry = new NormalPopulationFactory();
+        public BasicPopulationFactory PopulationFacotry;
         public Trainer GetTrainer()
         {
             NormalTrainer trainer = new NormalTrainer();
 
             TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
             mainCheckCtrl.Add(new CheckNetworkChangeJob());
-            mainCheckCtrl.Add(new UpdataControllerJob());
+            mainCheckCtrl.Add(new UpdataControllerJob(Controller));
 
             TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             subCheckCtrl.Add(new UpdateTestCaseJob() 

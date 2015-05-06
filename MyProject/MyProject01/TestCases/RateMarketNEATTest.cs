@@ -39,7 +39,7 @@ namespace MyProject01.TestCases
             // init controller
             string controllerName = TestName;
             NetworkController controller = NetworkController.Open(controllerName);
-            if (controller == null || controller.PopulationNumeber != PopulationNum)
+            if (controller == null)
             {
                 TradeDecisionController decisionCtrl = new TradeDecisionController();
                 if (IsFWT == true)
@@ -84,13 +84,13 @@ namespace MyProject01.TestCases
             //
             FirstTrainerFactory factory = new FirstTrainerFactory();
             factory.TestCaseName = TestName;
-            factory.TradeDesionin = controller.GetDecisionController();
+            // factory.TradeDesionin = controller.GetDecisionController();
             _train = factory.GetTrainer();
-            _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
+            // _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
             // start trainning
             _train.TestName = TestName;
-            _train.Controller = controller;
+            // _train.Controller = controller;
             _train.RunTestCase();
         }
 

@@ -15,7 +15,7 @@ namespace MyProject01.TrainerFactorys
         public ITradeDesisoin TradeDesionin;
         protected override Controller.Trainer Create()
         {
-
+            /*
             NormalTrainer trainer = new NormalTrainer();
 
             TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
@@ -27,9 +27,11 @@ namespace MyProject01.TrainerFactorys
 
             mainCheckCtrl.Add(subCheckCtrl);
             trainer.CheckCtrl = mainCheckCtrl;
-
+            
             return trainer;
-        
+            */
+
+            return null;
 
         }
     }

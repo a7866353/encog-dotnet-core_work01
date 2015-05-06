@@ -9,6 +9,10 @@ namespace MyProject01.ControllerFactorys
 {
     class NEATExchangeControllerFactory : BasicControllerFactory
     {
+        public NEATExchangeControllerFactory()
+        {
+            Name = "XXXX";
+        }
         protected override NetworkController Create()
         {
             NetworkController controller;

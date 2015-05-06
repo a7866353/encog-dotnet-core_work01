@@ -30,15 +30,46 @@ using MyProject01.DAO;
 using MyProject01.Win;
 using MyProject01.Util.DllTools;
 using MyProject01.Controller;
+using MyProject01.TestCases.RateMarketTestCases;
 
 namespace MyProject01
 {
+    public class TestCaseObject
+    {
+        public delegate void TestFucntion();
+        public string Name;
+        public String Description;
+        public TestFucntion TestFunction;
+
+        public TestCaseObject(string name, string description, TestFucntion function)
+        {
+            this.Name = name;
+            this.Description = description;
+            this.TestFunction = function;
+        }
+    }
+
+    class TestCaseGroup : List<TestCaseObject>
+    {
+        public void Add(TestCaseGroup group)
+        {
+            foreach (TestCaseObject obj in group)
+                Add(obj);
+        }
+
+        public void Add(BasicTestCase testCase)
+        {
+            TestCaseObject obj = new TestCaseObject(testCase.TestName, "", new TestCaseObject.TestFucntion(testCase.RunTest));
+            Add(obj);
+        }
+
+    }
     /// <summary>
     /// Window1.xaml 的交互逻辑
     /// </summary>
     public partial class TestCaseWindow : Window
     {
-        private TestCaseObject[] TestCaseArray;
+        private TestCaseGroup TestCaseList;
         private delegate void Func();
 
         public TestCaseWindow()
@@ -46,33 +77,11 @@ namespace MyProject01
             InitializeComponent();
 
             this.Closing += TestCaseWindow_Closing;
+            TestCaseList = new TestCaseGroup();
 
-            TestCaseArray = new TestCaseObject[]
-            {
-                new TestCaseObject("FWT_Cuda_Test", "", new TestCaseObject.TestFucntion(FWT_Cuda_Test)),
-                new TestCaseObject("FWT_5min_Long", "", new TestCaseObject.TestFucntion(FWT_5min_Long)),
-                new TestCaseObject("FWT_5min_Simple", "", new TestCaseObject.TestFucntion(FWT_5min_Simple)),
-                new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)),
-                new TestCaseObject("Long5Min_Simple", "", new TestCaseObject.TestFucntion(Long5Min_Simple)),
-                new TestCaseObject("Test_5Min_Short", "", new TestCaseObject.TestFucntion(Test_5Min_Short)),
-                new TestCaseObject("Test_1Min_Short", "", new TestCaseObject.TestFucntion(Test_1Min_Short)),
-                new TestCaseObject("Test_1Min_Long", "", new TestCaseObject.TestFucntion(Test_1Min_Long)),
-                new TestCaseObject("TestRateMarketNEAT_Long", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Long)),
-                new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
-                new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
-                new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)),
-                new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
-                new TestCaseObject("TestRateMarketNEATBatch", "", new TestCaseObject.TestFucntion(TestRateMarketNEATBatch)),
-                new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
-                new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
-                new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
-                new TestCaseObject("RateAnalyzeTest", "", new TestCaseObject.TestFucntion(RateAnalyzeTest)),
-                new TestCaseObject("TestNEATNet", "", new TestCaseObject.TestFucntion(TestNEATNet)),
-                new TestCaseObject("TestBPTrain", "", new TestCaseObject.TestFucntion(TestBPTrain)),
-            };
+            AddTestCase();
 
-            ;
-            foreach( TestCaseObject obj in TestCaseArray)
+            foreach( TestCaseObject obj in TestCaseList)
             {
                 Border border = new Border();
                 border.BorderThickness = new Thickness(2, 5, 2, 5);
@@ -434,22 +443,39 @@ namespace MyProject01
             }));
         }
 
-    }
-
-    public class TestCaseObject
-    {
-        public delegate void TestFucntion();
-        public string Name;
-        public String Description;
-        public TestFucntion TestFunction;
-
-        public TestCaseObject(string name, string description, TestFucntion function)
+        private void AddTestCase()
         {
-            this.Name = name;
-            this.Description = description;
-            this.TestFunction = function;
+            TestCaseGroup oldTestList = new TestCaseGroup()
+            {
+                new TestCaseObject("FWT_Cuda_Test", "", new TestCaseObject.TestFucntion(FWT_Cuda_Test)),
+                new TestCaseObject("FWT_5min_Long", "", new TestCaseObject.TestFucntion(FWT_5min_Long)),
+                new TestCaseObject("FWT_5min_Simple", "", new TestCaseObject.TestFucntion(FWT_5min_Simple)),
+                new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)),
+                new TestCaseObject("Long5Min_Simple", "", new TestCaseObject.TestFucntion(Long5Min_Simple)),
+                new TestCaseObject("Test_5Min_Short", "", new TestCaseObject.TestFucntion(Test_5Min_Short)),
+                new TestCaseObject("Test_1Min_Short", "", new TestCaseObject.TestFucntion(Test_1Min_Short)),
+                new TestCaseObject("Test_1Min_Long", "", new TestCaseObject.TestFucntion(Test_1Min_Long)),
+                new TestCaseObject("TestRateMarketNEAT_Long", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Long)),
+                new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
+                new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
+                new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)),
+                new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
+                new TestCaseObject("TestRateMarketNEATBatch", "", new TestCaseObject.TestFucntion(TestRateMarketNEATBatch)),
+                new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
+                new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
+                new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
+                new TestCaseObject("RateAnalyzeTest", "", new TestCaseObject.TestFucntion(RateAnalyzeTest)),
+                new TestCaseObject("TestNEATNet", "", new TestCaseObject.TestFucntion(TestNEATNet)),
+                new TestCaseObject("TestBPTrain", "", new TestCaseObject.TestFucntion(TestBPTrain)),
+            };
+
+            TestCaseGroup newTestList = new TestCaseGroup();
+            newTestList.Add(new NormalRateMarketTestCase());
+
+
+
+            TestCaseList.Add(newTestList);
+            TestCaseList.Add(oldTestList);
         }
     }
-
-
 }

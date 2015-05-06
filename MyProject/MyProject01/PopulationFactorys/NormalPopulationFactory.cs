@@ -9,9 +9,9 @@ namespace MyProject01.PopulationFactorys
 {
     class NormalPopulationFactory : BasicPopulationFactory
     {
-        protected override NEATPopulation Create()
+        protected override NEATPopulation Create(int inputVectoryNumber, int outputVectoryNumber)
         {
-            NEATPopulation population = new NEATPopulation(InputVectoryNumber, OutputVectoryNumber, PopulationNumber);
+            NEATPopulation population = new NEATPopulation(inputVectoryNumber, outputVectoryNumber, PopulationNumber);
             population.InitialConnectionDensity = 1.0;
             population.WeightRange = 0.1;
             population.Reset();

@@ -36,9 +36,9 @@ namespace MyProject01.Controller
             _context.TestScore = score;
 
             // train the neural network
-            PopulationFacotry.InputVectoryNumber = DecisionCtrl.NetworkInputVectorLength;
-            PopulationFacotry.OutputVectoryNumber = DecisionCtrl.NetworkOutputVectorLenth;
-            train = NEATUtil.ConstructNEATTrainer(PopulationFacotry.Get(), score);
+            train = NEATUtil.ConstructNEATTrainer(
+                PopulationFacotry.Get(DecisionCtrl.NetworkInputVectorLength, DecisionCtrl.NetworkOutputVectorLenth), 
+                score );
             _context.train = train;
 
         }
