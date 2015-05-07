@@ -17,6 +17,11 @@ namespace MyProject01.DAO
         public MarketActions Action { set; get; }
         public double CurrentMoney { set; get; }
         public double Rate;
+
+        public override string ToString()
+        {
+            return Action + "@" + Rate + ", " + CurrentMoney;
+        }
     }
 
     [Serializable]

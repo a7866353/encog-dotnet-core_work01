@@ -15,7 +15,7 @@ namespace MyProject01.TrainingDataFactorys
         protected override TrainingData Create()
         {
             DataLoader loader;
-            loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            loader = new MTDataLoader("USDJPY", DataTimeType.Timer1Day);
             // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
            
             RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);

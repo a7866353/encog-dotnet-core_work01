@@ -25,7 +25,7 @@ namespace MyProject01.Util.View
 
         public GraphMark( Panel parentPanel, Point point, Brush color, int thickness = 1 )
         {
-            point.X -= 0.5;
+            // point.X -= 0.5;
             // point.X -= _width * 0.5;
             // point.Y -= _height * 0.5;
             this._partenPanel = parentPanel;
@@ -47,7 +47,9 @@ namespace MyProject01.Util.View
             _referedShape.Stroke = this._color;
             _referedShape.Width = (int)(_width);
             _referedShape.Height = (int)(_height);
-            _referedShape.Margin = new Thickness(_point.X*ScaleX, _point.Y*ScaleY, 0, 0);
+            _referedShape.VerticalAlignment = VerticalAlignment.Top;
+            _referedShape.Margin = new Thickness(_point.X * ScaleX -_width*0.5, _point.Y * ScaleY -_height * 0.5, 0, 0);
+            // _referedShape.Margin = new Thickness(_point.X * ScaleX, _point.Y * ScaleY, 0, 0);
 
             if( isNew == true)
                 _partenPanel.Children.Add(_referedShape);

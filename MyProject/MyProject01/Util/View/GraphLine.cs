@@ -33,8 +33,8 @@ namespace MyProject01.Util.View
         private List<GraphMark> _graphMarkList;
         private double[] _dataArray;
 
-        public double ScaleX = 1;
-        public double ScaleY = 1000;
+        public double ScaleX = 100;
+        public double ScaleY = -100;
 
         public GraphLine(Panel parentPanel, double[] dataArray, Brush color, int thickness = 1)
         {

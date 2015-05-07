@@ -99,7 +99,6 @@ namespace MyProject01.Util.View
         private TransformGroup transGroup;
         private ScaleTransform scale;
         private TranslateTransform translate;
-        private GeometryGroup geometrys;
 
         private List<GraphLine> _graphLineList;
         //-------------
@@ -127,7 +126,7 @@ namespace MyProject01.Util.View
         private double transformPosX = 0;
         private double transformPosY = 0;
         private double transformScaleX = 1;
-        private double transformScaleY = 400;
+        private double transformScaleY = -1;
         private double transformPosStep = 10;
         private double transformScaleStep = 1.2;
 
@@ -172,14 +171,6 @@ namespace MyProject01.Util.View
                         target.MaxHeight = 5000;
               */
             // Create a path to draw a geometry with.
-            Path myPath = new Path();
-            myPath.Stroke = Brushes.Black;
-            myPath.StrokeThickness = 1;
-            myPath.RenderTransform = transGroup;
-
-            target.Children.Add(myPath);
-            geometrys = new GeometryGroup();
-            myPath.Data = geometrys;
 
             // DataLoader dataLoader = new DataLoader();
             // AddRateSet(dataLoader.ToArray());
@@ -401,11 +392,18 @@ namespace MyProject01.Util.View
             // 创建Line
             GraphLine line = new GraphLine(target, rateSetArr, Brushes.Black, 1);
             _graphLineList.Add(line);
-            this.Dispatcher.BeginInvoke(new func(delegate
+            this.Dispatcher.Invoke(new func(delegate
             {
+                line.ScaleX = transformScaleX;
+                line.ScaleY = transformScaleY;
                 line.Update();
             }));
             return line;
+        }
+
+        public void PositionReset()
+        {
+
         }
 
         /*

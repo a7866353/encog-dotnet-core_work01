@@ -91,8 +91,14 @@ namespace MyProject01.Win
                 else if(log.Action == MarketActions.Sell)
                     rateLine.AddMark(i, Brushes.Green);
             }
+            rateLine.Update();
             // 增加当前收益曲线
-            logView.AddLineData(currentMoneyArr);
+            GraphLine moneyLine = logView.AddLineData(currentMoneyArr);
+
+            // 增加训练标记
+            RateMarketTestDAO testDao = (RateMarketTestDAO)TestCaseDataGrid.Items.CurrentItem;
+            moneyLine.AddMark(testDao.TestDataStartIndex, Brushes.Black);
+            moneyLine.Update();
         }
 
         void DataBaseViewer_Loaded(object sender, RoutedEventArgs e)
