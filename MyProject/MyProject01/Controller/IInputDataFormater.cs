@@ -13,5 +13,6 @@ namespace MyProject01.Controller
         int ResultDataLength { get; }
         BasicMLData Convert(double[] rateDataArray);
         IInputDataFormater Clone();
+        string GetDecs();
     }
 }

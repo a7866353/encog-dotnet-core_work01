@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace MyProject01.ControllerFactorys
 {
-    class NEATExchangeControllerFactory : BasicControllerFactory
+    class NEATStateKeepControllerFactory : BasicControllerFactory
     {
-        public NEATExchangeControllerFactory()
+        public NEATStateKeepControllerFactory()
         {
-            Name = "XXXX";
+            Name = GetDesc();
         }
         protected override NetworkController Create()
         {
@@ -25,7 +25,35 @@ namespace MyProject01.ControllerFactorys
             controller = NetworkController.Create(Name, decisionCtrl);
             return controller;           
         }
+
+        public override string GetDesc()
+        {
+            return "FWT_StateKeep";
+        }
     }
 
+    class NEATStateSwitchControllerFactory : BasicControllerFactory
+    {
+        public NEATStateSwitchControllerFactory()
+        {
+            Name = GetDesc();
+        }
+        protected override NetworkController Create()
+        {
+            NetworkController controller;
 
+            TradeDecisionController decisionCtrl = new TradeDecisionController();
+            decisionCtrl._inputFormater = new FWTFormater(_inputLength);
+            decisionCtrl._outputConvertor = new TradeStateSwitchConvertor();
+            decisionCtrl.BestNetwork = null;
+
+            controller = NetworkController.Create(Name, decisionCtrl);
+            return controller;
+        }
+
+        public override string GetDesc()
+        {
+            return "FWT_StateSwitch";
+        }
+    }
 }

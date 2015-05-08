@@ -46,5 +46,6 @@ namespace MyProject01.ControllerFactorys
             return controller;
         }
         abstract protected NetworkController Create();
+        abstract public string GetDesc();
     }
 }

@@ -95,6 +95,12 @@ namespace MyProject01.Controller
         {
             get { return _inputDataLength; }
         }
+
+
+        public string GetDecs()
+        {
+            return "FWT";
+        }
     }
 
     class RateDataFormater : IInputDataFormater
@@ -128,6 +134,12 @@ namespace MyProject01.Controller
         public int ResultDataLength
         {
             get { return _inputDataLength; }
+        }
+
+
+        public string GetDecs()
+        {
+            return "RateAdjust";
         }
     }
 
@@ -199,6 +211,12 @@ namespace MyProject01.Controller
         {
             return (IOutputDataConvertor)MemberwiseClone();
         }
+
+
+        public string GetDesc()
+        {
+            return "StateSwitch";
+        }
     }
     class TradeStateKeepConvertor : IOutputDataConvertor
     {
@@ -250,6 +268,12 @@ namespace MyProject01.Controller
         public IOutputDataConvertor Clone()
         {
             return (IOutputDataConvertor)MemberwiseClone();
+        }
+
+
+        public string GetDesc()
+        {
+            return "StateKeep";
         }
     }
 

@@ -26,5 +26,10 @@ namespace MyProject01.TrainingDataFactorys
 
             return td;
         }
+
+        public override string GetDesc()
+        {
+            return "USDJPY_1DAY";
+        }
     }
 }

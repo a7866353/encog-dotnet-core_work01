@@ -16,5 +16,6 @@ namespace MyProject01.TrainingDataFactorys
         }
 
         abstract protected TrainingData Create();
+        abstract public string GetDesc();
     }
 }
