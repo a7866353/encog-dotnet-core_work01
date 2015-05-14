@@ -23,14 +23,16 @@ namespace MyProject01.Controller.TrainerFactorys
             mainCheckCtrl.Add(new UpdataControllerJob(Controller));
 
             TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
-            subCheckCtrl.Add(new UpdateTestCaseJob() 
+            // subCheckCtrl.Add(new UpdateTestCaseJob() 
+            mainCheckCtrl.Add(new UpdateTestCaseJob() 
             { 
                 TestName = TestCaseName, 
                 DecisionCtrl = Controller.GetDecisionController(), 
                 TestDataBlock = TrainingData.TestDataBlock,
             });
 
-            mainCheckCtrl.Add(subCheckCtrl);
+            // mainCheckCtrl.Add(subCheckCtrl);
+
             trainer.CheckCtrl = mainCheckCtrl;
             trainer.DecisionCtrl = Controller.GetDecisionController();
             trainer.TrainDataBlock = TrainingData.TrainDataBlock;

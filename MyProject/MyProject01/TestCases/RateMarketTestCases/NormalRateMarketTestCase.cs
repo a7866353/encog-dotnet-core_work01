@@ -23,9 +23,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
             dataFactory = new OldRateTrainingDataFactory();
             dataFactory.DataBlockLength = controllerFactory.InputLength;
 
-            TestName = controllerFactory.GetDesc();
-            TestName += "_" + dataFactory.GetDesc();
-            TestName += "_" + DateTime.Now.ToString();
+            TestName = DateTime.Now.ToString("yyyyMMdd__HHmmss__fff");
         }
         
         protected override void Init()
@@ -34,6 +32,40 @@ namespace MyProject01.TestCases.RateMarketTestCases
 
             NormalPopulationFactory popFactory = new NormalPopulationFactory();
             popFactory.PopulationNumber = 100;
+            trainerFactory.PopulationFacotry = popFactory;
+
+            controllerFactory.Name = TestName;
+            trainerFactory.Controller = controllerFactory.Get();
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            _train = trainerFactory.GetTrainer();
+        }
+    }
+
+    class NormalRateMarketTestCase_BigPop : BasicRateMarketTestCase
+    {
+        private NEATStateKeepControllerFactory controllerFactory = new NEATStateKeepControllerFactory();
+        private OldRateTrainingDataFactory dataFactory = new OldRateTrainingDataFactory();
+
+        public NormalRateMarketTestCase_BigPop()
+        {
+            controllerFactory = new NEATStateKeepControllerFactory();
+            controllerFactory.InputLength = 32;
+
+            dataFactory = new OldRateTrainingDataFactory();
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            TestName = DateTime.Now.ToString("yyyyMMdd__HHmmss__fff");
+        }
+
+        protected override void Init()
+        {
+            FirstTrainerFactory trainerFactory = new FirstTrainerFactory();
+
+            NormalPopulationFactory popFactory = new NormalPopulationFactory();
+            popFactory.PopulationNumber = 1000;
             trainerFactory.PopulationFacotry = popFactory;
 
             controllerFactory.Name = TestName;

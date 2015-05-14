@@ -471,6 +471,7 @@ namespace MyProject01
 
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new NormalRateMarketTestCase());
+            newTestList.Add(new NormalRateMarketTestCase_BigPop());
 
 
 
