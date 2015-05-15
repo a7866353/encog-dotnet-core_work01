@@ -281,6 +281,7 @@ namespace MyProject01.DAO
 
         public ObjectId _id;
         public string TestCaseName { set; get; }
+        public string TestDescription { set; get; }
 
         #endregion
 

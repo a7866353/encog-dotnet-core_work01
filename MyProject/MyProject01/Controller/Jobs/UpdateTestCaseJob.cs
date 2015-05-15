@@ -15,6 +15,7 @@ namespace MyProject01.Controller.Jobs
     class UpdateTestCaseJob : ICheckJob
     {
         public string TestName;
+        public string TestDescription;
         public ITradeDesisoin DecisionCtrl;
         public BasicDataBlock TestDataBlock;
 
@@ -38,6 +39,7 @@ namespace MyProject01.Controller.Jobs
             if (_testCaseDAO == null)
             {
                 _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
+                _testCaseDAO.TestDescription = TestDescription;
                 _testCaseDAO.TestDataStartIndex = context._trainDataBlock.Length;
                 _testCaseDAO.TotalDataCount = TestDataBlock.Length;
 

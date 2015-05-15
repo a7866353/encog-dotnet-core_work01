@@ -23,6 +23,7 @@ namespace MyProject01.Win
     public partial class DataBaseViewer : Window
     {
         private RateMarketTestDAO[] _rateMarketTestDaoArr;
+        private RateMarketTestDAO _currentTestDao;
         public DataBaseViewer()
         {
             InitializeComponent();
@@ -57,6 +58,8 @@ namespace MyProject01.Win
                 return;
             RateMarketTestDAO currentDao = (RateMarketTestDAO)e.AddedItems[0];
             EpisodeDataGrid.ItemsSource = currentDao.GetAllEpisodes<RateMarketTestEpisodeDAO>();
+
+            _currentTestDao = currentDao;
         }
 
         void EpisodeDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -96,8 +99,7 @@ namespace MyProject01.Win
             GraphLine moneyLine = logView.AddLineData(currentMoneyArr);
 
             // 增加训练标记
-            RateMarketTestDAO testDao = (RateMarketTestDAO)TestCaseDataGrid.Items.CurrentItem;
-            moneyLine.AddMark(testDao.TestDataStartIndex, Brushes.Black);
+            moneyLine.AddMark(_currentTestDao.TestDataStartIndex, Brushes.Black);
             moneyLine.Update();
         }
 

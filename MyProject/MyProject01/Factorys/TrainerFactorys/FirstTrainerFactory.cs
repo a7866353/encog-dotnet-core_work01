@@ -13,6 +13,7 @@ namespace MyProject01.Factorys.TrainerFactorys
     class FirstTrainerFactory : BasicTrainerFactory
     {
         public string TestCaseName;
+        public string TestDescription;
         public NetworkController Controller;
         public TrainingData TrainingData;
         public BasicPopulationFactory PopulationFacotry;
@@ -30,6 +31,7 @@ namespace MyProject01.Factorys.TrainerFactorys
             mainCheckCtrl.Add(new UpdateTestCaseJob()
             {
                 TestName = TestCaseName,
+                TestDescription = TestDescription,
                 DecisionCtrl = Controller.GetDecisionController(),
                 TestDataBlock = TrainingData.TestDataBlock,
             });

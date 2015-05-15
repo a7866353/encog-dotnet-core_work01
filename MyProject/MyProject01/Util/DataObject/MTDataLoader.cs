@@ -20,6 +20,7 @@ namespace MyProject01.Util
     class MTDataLoader : DataLoader
     {
         private string _tickerName;
+        private int _dataCountLimit = 10000;
         public string TickerName
         {
             get { return _tickerName; }
@@ -28,7 +29,7 @@ namespace MyProject01.Util
         {
             _tickerName = tickerName;
 
-            MTDataBuffer dataBuffer = MTDataBuffer.GetLoader(_tickerName);
+            MTDataBuffer dataBuffer = MTDataBuffer.GetLoader(_tickerName, _dataCountLimit);
             if( type == DataTimeType.None )
                 AddAll(dataBuffer);
             else

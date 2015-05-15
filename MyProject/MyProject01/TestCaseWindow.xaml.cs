@@ -472,10 +472,10 @@ namespace MyProject01
             };
 
             TestCaseGroup newTestList = new TestCaseGroup();
-            newTestList.Add(new NormalRateMarketTestCase());
-            newTestList.Add(new NormalRateMarketTestCase_BigPop());
-
-
+            newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 100 });
+            newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 1000 });
+            newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 100 });
+            newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 1000 });
 
             TestCaseList.Add(newTestList);
             TestCaseList.Add(oldTestList);

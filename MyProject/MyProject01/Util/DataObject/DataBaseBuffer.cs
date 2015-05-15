@@ -51,7 +51,7 @@ namespace MyProject01.Util
         {
             _loaderList = new List<MTDataBuffer>();
         }
-        static public MTDataBuffer GetLoader(string tickerName)
+        static public MTDataBuffer GetLoader(string tickerName, int countLimit = 100000)
         {
             // find saved loader
             MTDataBuffer loader = null;
@@ -68,7 +68,7 @@ namespace MyProject01.Util
                 return loader;
 
             // find in db
-            loader = new MTDataBuffer(tickerName);
+            loader = new MTDataBuffer(tickerName, countLimit);
             if (loader.Count == 0)
                 return null;
 
@@ -82,7 +82,7 @@ namespace MyProject01.Util
         {
             get { return _tickerName; }
         }
-        private MTDataBuffer(string tickerName)
+        private MTDataBuffer(string tickerName, int countLimit)
         {
             _tickerName = tickerName;
 
@@ -114,6 +114,7 @@ namespace MyProject01.Util
 
                 var curst = collection.FindAs<MtDataObject>(query);
                 curst.BatchSize = 1000;
+                curst.SetLimit(countLimit);
                 foreach (MtDataObject dataObj in curst)
                 {
                     Add(dataObj);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Factorys.TrainingDataFactorys
 {
-    class OldRateTrainingDataFactory : BasicTrainingDataFactory
+    class OldRate1DayTrainingDataFactory : BasicTrainingDataFactory
     {
         public double TestDataRate = 0.7;
         protected override TrainingData Create()
@@ -30,6 +30,30 @@ namespace MyProject01.Factorys.TrainingDataFactorys
         public override string Description
         {
             get { return "USDJPY_1DAY"; }
+        }
+    }
+
+    class OldRate5MinTrainingDataFactory : BasicTrainingDataFactory
+    {
+        public double TestDataRate = 0.7;
+        protected override TrainingData Create()
+        {
+            DataLoader loader;
+            loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
+
+            RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
+            TrainingData td = new TrainingData(
+                new RateDataBlock(loader, 0, loader.Count, DataBlockLength),
+                new RateDataBlock(loader, 0, (int)(loader.Count * TestDataRate), DataBlockLength)
+                );
+
+            return td;
+        }
+
+        public override string Description
+        {
+            get { return "USDJPY_5MIN"; }
         }
     }
 }
