@@ -212,6 +212,7 @@ namespace MyProject01.DAO
         public byte[] NetworkData { set; get; }
 
         public byte[] TradeDecisionController { set; get; }
+        public string Description { set; get; }
         
 
         #endregion

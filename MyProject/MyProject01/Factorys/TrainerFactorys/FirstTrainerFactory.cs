@@ -4,17 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MyProject01.Controller.Jobs;
-using MyProject01.PopulationFactorys;
+using MyProject01.Factorys.PopulationFactorys;
+using MyProject01.Controller;
+using MyProject01.TrainerFactorys;
 
-namespace MyProject01.Controller.TrainerFactorys
+namespace MyProject01.Factorys.TrainerFactorys
 {
-    class FirstTrainerFactory
+    class FirstTrainerFactory : BasicTrainerFactory
     {
         public string TestCaseName;
         public NetworkController Controller;
         public TrainingData TrainingData;
         public BasicPopulationFactory PopulationFacotry;
-        public Trainer GetTrainer()
+
+        protected override Trainer Create()
         {
             NormalTrainer trainer = new NormalTrainer();
 
@@ -24,10 +27,10 @@ namespace MyProject01.Controller.TrainerFactorys
 
             TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
-            mainCheckCtrl.Add(new UpdateTestCaseJob() 
-            { 
-                TestName = TestCaseName, 
-                DecisionCtrl = Controller.GetDecisionController(), 
+            mainCheckCtrl.Add(new UpdateTestCaseJob()
+            {
+                TestName = TestCaseName,
+                DecisionCtrl = Controller.GetDecisionController(),
                 TestDataBlock = TrainingData.TestDataBlock,
             });
 
@@ -39,6 +42,11 @@ namespace MyProject01.Controller.TrainerFactorys
             trainer.PopulationFacotry = PopulationFacotry;
 
             return trainer;
+        }
+
+        public override string Description
+        {
+            get { return "NormalTrainer"; }
         }
     }
 }

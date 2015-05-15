@@ -1,13 +1,14 @@
 ﻿using MyProject01.Controller;
+using MyProject01.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject01.ControllerFactorys
+namespace MyProject01.Factorys.ControllerFactorys
 {
-    abstract class BasicControllerFactory : IControllerFactory
+    abstract class BasicControllerFactory : IControllerFactory, IDescriptionProvider
     {
         protected string _name;
         protected int _inputLength;
@@ -46,6 +47,6 @@ namespace MyProject01.ControllerFactorys
             return controller;
         }
         abstract protected NetworkController Create();
-        abstract public string GetDesc();
+        abstract public string Description { get; }
     }
 }

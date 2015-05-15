@@ -78,9 +78,9 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
-    <Compile Include="ControllerFactorys\BasicControllerFactory.cs" />
-    <Compile Include="ControllerFactorys\NEATExchangeControllerFactory.cs" />
-    <Compile Include="ControllerFactorys\NeatFwtExchangeControllerFactory.cs" />
+    <Compile Include="Factorys\ControllerFactorys\BasicControllerFactory.cs" />
+    <Compile Include="Factorys\ControllerFactorys\NEATExchangeControllerFactory.cs" />
+    <Compile Include="Factorys\ControllerFactorys\NeatFwtExchangeControllerFactory.cs" />
     <Compile Include="Controller\IInputDataFormater.cs" />
     <Compile Include="Controller\IOutputDataConvertor.cs" />
     <Compile Include="Controller\Jobs\CheckNetworkChangeJob.cs" />
@@ -93,7 +93,7 @@
     <Compile Include="Controller\NormalTrainer.cs" />
     <Compile Include="Controller\SectionChangeTrainer.cs" />
     <Compile Include="Controller\TradeDecisionController.cs" />
-    <Compile Include="Controller\TrainerFactorys\FirstTrainerFactory.cs" />
+    <Compile Include="Factorys\TrainerFactorys\FirstTrainerFactory.cs" />
     <Compile Include="Controller\TrainResultCheckController.cs" />
     <Compile Include="DAO\ControllerDAO.cs" />
     <Compile Include="DAO\DataBaseConnector.cs" />
@@ -111,8 +111,8 @@
     <Compile Include="Networks\FeedForwardNet.cs" />
     <Compile Include="Networks\NEATNet.cs" />
     <Compile Include="Networks\SimpleFeedForwardNet.cs" />
-    <Compile Include="PopulationFactorys\BasicPopulationFactory.cs" />
-    <Compile Include="PopulationFactorys\NormalPopulationFactory.cs" />
+    <Compile Include="Factorys\PopulationFactorys\BasicPopulationFactory.cs" />
+    <Compile Include="Factorys\PopulationFactorys\NormalPopulationFactory.cs" />
     <Compile Include="Reinforcement\QLearn.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestCases\PredictTestCase.cs" />
@@ -130,10 +130,9 @@
     <Compile Include="Test\RateDataCreator.cs" />
     <Compile Include="Test\ElmanNetworkTest.cs" />
     <Compile Include="Test\TestData.cs" />
-    <Compile Include="TrainerFactorys\BasicTrainerFactory.cs" />
-    <Compile Include="TrainerFactorys\NormalTrainerFactory.cs" />
-    <Compile Include="TrainingDataFactorys\BasicTrainingDataFactory.cs" />
-    <Compile Include="TrainingDataFactorys\OldRateTrainingDataFactory.cs" />
+    <Compile Include="Factorys\TrainerFactorys\BasicTrainerFactory.cs" />
+    <Compile Include="Factorys\TrainingDataFactorys\BasicTrainingDataFactory.cs" />
+    <Compile Include="Factorys\TrainingDataFactorys\OldRateTrainingDataFactory.cs" />
     <Compile Include="TrainingMethods\BackpropagationTraining.cs" />
     <Compile Include="TrainingMethods\LevenTraining.cs" />
     <Compile Include="TrainingMethods\ResilientPropagationTraining.cs" />
@@ -145,6 +144,7 @@
     <Compile Include="Util\DataObject\FenghuangDataLoader.cs" />
     <Compile Include="Util\DataObject\IDataBlock.cs" />
     <Compile Include="Util\DllTools\DllTools.cs" />
+    <Compile Include="Util\IDescriptionProvider.cs" />
     <Compile Include="Util\LogFile.cs" />
     <Compile Include="Util\LogWriter.cs" />
     <Compile Include="Util\MarketRateAnalyzer.cs" />
@@ -225,7 +225,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TestCaseFactorys\" />
+    <Folder Include="Factorys\TestCaseFactorys\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="DllTools.dll">

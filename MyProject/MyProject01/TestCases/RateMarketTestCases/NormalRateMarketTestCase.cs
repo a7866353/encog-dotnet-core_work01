@@ -1,7 +1,7 @@
-﻿using MyProject01.Controller.TrainerFactorys;
-using MyProject01.ControllerFactorys;
-using MyProject01.PopulationFactorys;
-using MyProject01.TrainingDataFactorys;
+﻿using MyProject01.Factorys.ControllerFactorys;
+using MyProject01.Factorys.PopulationFactorys;
+using MyProject01.Factorys.TrainerFactorys;
+using MyProject01.Factorys.TrainingDataFactorys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,24 +14,30 @@ namespace MyProject01.TestCases.RateMarketTestCases
     {
         private NEATStateKeepControllerFactory controllerFactory = new NEATStateKeepControllerFactory();
         private OldRateTrainingDataFactory dataFactory = new OldRateTrainingDataFactory();
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
 
         public NormalRateMarketTestCase()
         {
             controllerFactory = new NEATStateKeepControllerFactory();
             controllerFactory.InputLength = 32;
+            _descList.Add(controllerFactory);
 
             dataFactory = new OldRateTrainingDataFactory();
             dataFactory.DataBlockLength = controllerFactory.InputLength;
+            _descList.Add(dataFactory);
 
-            TestName = DateTime.Now.ToString("yyyyMMdd__HHmmss__fff");
+            trainerFactory = new FirstTrainerFactory();
+            _descList.Add(trainerFactory);
+
+            popFactory = new NormalPopulationFactory();
+            popFactory.PopulationNumber = 100;
+            _descList.Add(popFactory);
         }
         
         protected override void Init()
         {
-            FirstTrainerFactory trainerFactory = new FirstTrainerFactory();
 
-            NormalPopulationFactory popFactory = new NormalPopulationFactory();
-            popFactory.PopulationNumber = 100;
             trainerFactory.PopulationFacotry = popFactory;
 
             controllerFactory.Name = TestName;
@@ -40,7 +46,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
             trainerFactory.TrainingData = dataFactory.Get();
             trainerFactory.TestCaseName = TestName;
 
-            _train = trainerFactory.GetTrainer();
+            _train = trainerFactory.Get();
         }
     }
 
@@ -48,24 +54,31 @@ namespace MyProject01.TestCases.RateMarketTestCases
     {
         private NEATStateKeepControllerFactory controllerFactory = new NEATStateKeepControllerFactory();
         private OldRateTrainingDataFactory dataFactory = new OldRateTrainingDataFactory();
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
 
         public NormalRateMarketTestCase_BigPop()
         {
             controllerFactory = new NEATStateKeepControllerFactory();
             controllerFactory.InputLength = 32;
+            _descList.Add(controllerFactory);
 
             dataFactory = new OldRateTrainingDataFactory();
             dataFactory.DataBlockLength = controllerFactory.InputLength;
+            _descList.Add(dataFactory);
 
-            TestName = DateTime.Now.ToString("yyyyMMdd__HHmmss__fff");
+            trainerFactory = new FirstTrainerFactory();
+            _descList.Add(trainerFactory);
+
+            popFactory = new NormalPopulationFactory();
+            popFactory.PopulationNumber = 1000;
+            _descList.Add(popFactory);
         }
 
         protected override void Init()
         {
-            FirstTrainerFactory trainerFactory = new FirstTrainerFactory();
 
-            NormalPopulationFactory popFactory = new NormalPopulationFactory();
-            popFactory.PopulationNumber = 1000;
             trainerFactory.PopulationFacotry = popFactory;
 
             controllerFactory.Name = TestName;
@@ -74,7 +87,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
             trainerFactory.TrainingData = dataFactory.Get();
             trainerFactory.TestCaseName = TestName;
 
-            _train = trainerFactory.GetTrainer();
+            _train = trainerFactory.Get();
         }
     }
 }

@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject01.ControllerFactorys
+namespace MyProject01.Factorys.ControllerFactorys
 {
     class NEATRateStateKeepControllerFactory : BasicControllerFactory
     {
         public NEATRateStateKeepControllerFactory()
         {
-            Name = GetDesc();
+            Name = Description;
         }
         protected override NetworkController Create()
         {
@@ -26,9 +26,9 @@ namespace MyProject01.ControllerFactorys
             return controller;
         }
 
-        public override string GetDesc()
+        public override string Description
         {
-            return "Rate_StateKeep";
+            get { return "Rate_StateKeep"; }
         }
     }
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject01.PopulationFactorys
+namespace MyProject01.Factorys.PopulationFactorys
 {
     class NormalPopulationFactory : BasicPopulationFactory
     {

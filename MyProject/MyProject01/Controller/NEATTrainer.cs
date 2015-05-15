@@ -8,7 +8,6 @@ using MyProject01.Agent;
 using MyProject01.Controller.Jobs;
 using MyProject01.DAO;
 using MyProject01.ExchangeRateTrade;
-using MyProject01.PopulationFactorys;
 using MyProject01.Util;
 using MyProject01.Util.DataObject;
 using System;

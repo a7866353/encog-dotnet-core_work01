@@ -19,7 +19,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using MyProject01.Controller;
 using MyProject01.Util.DataObject;
-using MyProject01.Controller.TrainerFactorys;
+using MyProject01.Factorys.TrainerFactorys;
 
 namespace MyProject01.TestCases
 {
@@ -85,7 +85,7 @@ namespace MyProject01.TestCases
             FirstTrainerFactory factory = new FirstTrainerFactory();
             factory.TestCaseName = TestName;
             // factory.TradeDesionin = controller.GetDecisionController();
-            _train = factory.GetTrainer();
+            _train = factory.Get();
             // _train.DataList.Add(new TrainingData(testBlock, (int)(testBlock.Length * TestDataRate) ));
 
             // start trainning

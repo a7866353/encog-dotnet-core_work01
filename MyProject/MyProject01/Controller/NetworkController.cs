@@ -30,6 +30,11 @@ namespace MyProject01.Controller
         {
             get { return _dao.Name; }
         }
+        public string Description
+        {
+            set { _dao.Description = value; }
+            get { return _dao.Description; }
+        }
         public double DataOffset
         {
             set { _dao.DataOffset = value; }

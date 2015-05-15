@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject01.TrainingDataFactorys
+namespace MyProject01.Factorys.TrainingDataFactorys
 {
     class OldRateTrainingDataFactory : BasicTrainingDataFactory
     {
@@ -27,9 +27,9 @@ namespace MyProject01.TrainingDataFactorys
             return td;
         }
 
-        public override string GetDesc()
+        public override string Description
         {
-            return "USDJPY_1DAY";
+            get { return "USDJPY_1DAY"; }
         }
     }
 }

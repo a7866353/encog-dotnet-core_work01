@@ -12,7 +12,7 @@ using MyProject01.Controller.Jobs;
 using MyProject01.Util;
 using Encog.Neural.Networks.Training;
 using Encog.ML;
-using MyProject01.PopulationFactorys;
+using MyProject01.Factorys.PopulationFactorys;
 
 namespace MyProject01.Controller
 {

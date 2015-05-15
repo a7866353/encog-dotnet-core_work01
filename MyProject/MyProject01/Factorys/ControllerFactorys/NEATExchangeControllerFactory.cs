@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject01.ControllerFactorys
+namespace MyProject01.Factorys.ControllerFactorys
 {
     class NEATStateKeepControllerFactory : BasicControllerFactory
     {
         public NEATStateKeepControllerFactory()
         {
-            Name = GetDesc();
+            Name = Description;
         }
         protected override NetworkController Create()
         {
@@ -26,9 +26,9 @@ namespace MyProject01.ControllerFactorys
             return controller;           
         }
 
-        public override string GetDesc()
+        public override string Description
         {
-            return "FWT_StateKeep";
+            get { return "FWT_StateKeep"; }
         }
     }
 
@@ -36,7 +36,7 @@ namespace MyProject01.ControllerFactorys
     {
         public NEATStateSwitchControllerFactory()
         {
-            Name = GetDesc();
+            Name = Description;
         }
         protected override NetworkController Create()
         {
@@ -51,9 +51,9 @@ namespace MyProject01.ControllerFactorys
             return controller;
         }
 
-        public override string GetDesc()
+        public override string Description
         {
-            return "FWT_StateSwitch";
+            get { return "FWT_StateSwitch"; }
         }
     }
 }

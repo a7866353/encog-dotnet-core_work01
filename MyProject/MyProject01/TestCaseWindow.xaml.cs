@@ -59,7 +59,7 @@ namespace MyProject01
 
         public void Add(BasicTestCase testCase)
         {
-            TestCaseObject obj = new TestCaseObject(testCase.TestName, "", new TestCaseObject.TestFucntion(testCase.RunTest));
+            TestCaseObject obj = new TestCaseObject(testCase.TestName, testCase.TestDescription, new TestCaseObject.TestFucntion(testCase.RunTest));
             Add(obj);
         }
 
@@ -84,12 +84,13 @@ namespace MyProject01
             foreach( TestCaseObject obj in TestCaseList)
             {
                 Border border = new Border();
-                border.BorderThickness = new Thickness(2, 5, 2, 5);
+                border.BorderThickness = new Thickness(4, 2, 4, 2);
                 border.BorderBrush = Brushes.Black;
 
                 Button testButton = new Button();
                 testButton.Height = 30;
-                testButton.Content = obj.Name;
+                testButton.Content = obj.Name + ": " + obj.Description;
+                testButton.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
                 testButton.Click += new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
                     {
                         MainWindow mainWin = new MainWindow(obj);
@@ -99,6 +100,7 @@ namespace MyProject01
                 border.Child = testButton;
                 MainStackPanel.Children.Add(border);
             }
+
 
         }
 

@@ -9,7 +9,11 @@ namespace MyProject01
 {
     abstract class BasicTestCase
     {
-        public string TestName = "DefaultTestCase000";
+        public string TestName = DateTime.Now.ToString("yyyyMMdd__HHmmss__fff");
+        virtual public string TestDescription
+        {
+            get { return "None"; }
+        }
         protected TestData _testData;
         protected LogWriter _logger;
         protected bool isParameterSet = false;

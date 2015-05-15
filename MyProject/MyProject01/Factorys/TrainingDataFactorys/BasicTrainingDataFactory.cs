@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyProject01.Util;
 
-namespace MyProject01.TrainingDataFactorys
+namespace MyProject01.Factorys.TrainingDataFactorys
 {
-    abstract class BasicTrainingDataFactory
+    abstract class BasicTrainingDataFactory : IDescriptionProvider
     {
         public int DataBlockLength;
         public TrainingData Get()
@@ -16,6 +17,10 @@ namespace MyProject01.TrainingDataFactorys
         }
 
         abstract protected TrainingData Create();
-        abstract public string GetDesc();
+
+        abstract public string Description
+        {
+            get;
+        }
     }
 }
