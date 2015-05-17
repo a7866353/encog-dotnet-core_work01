@@ -43,6 +43,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
         {
 
             trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
 
             controllerFactory.Name = TestName;
             trainerFactory.Controller = controllerFactory.Get();

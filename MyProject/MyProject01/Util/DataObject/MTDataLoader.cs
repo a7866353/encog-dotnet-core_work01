@@ -20,7 +20,7 @@ namespace MyProject01.Util
     class MTDataLoader : DataLoader
     {
         private string _tickerName;
-        private int _dataCountLimit = 10000;
+        private int _dataCountLimit = 500;
         public string TickerName
         {
             get { return _tickerName; }
@@ -28,8 +28,27 @@ namespace MyProject01.Util
         public MTDataLoader(string tickerName, DataTimeType type = DataTimeType.None)
         {
             _tickerName = tickerName;
-
-            MTDataBuffer dataBuffer = MTDataBuffer.GetLoader(_tickerName, _dataCountLimit);
+            int countLimit = _dataCountLimit;
+            switch(type)
+            {
+                case DataTimeType.None:
+                    break;
+                case DataTimeType.Time10Min:
+                    countLimit *= 10;
+                    break;
+                case DataTimeType.Time1Min:
+                    countLimit *= 1;
+                    break;
+                case DataTimeType.Time5Min:
+                    countLimit *= 5;
+                    break;
+                case DataTimeType.Timer1Day:
+                    countLimit *= 60 * 24;
+                    break;
+                default:
+                    break;
+            }
+            MTDataBuffer dataBuffer = MTDataBuffer.GetLoader(_tickerName, countLimit);
             if( type == DataTimeType.None )
                 AddAll(dataBuffer);
             else
@@ -47,6 +66,8 @@ namespace MyProject01.Util
                 RateSet currRateSet;
                 currRateSet = new RateSet(mtData.Date, (mtData.HighPrice + mtData.LowPrice) / 2);
                 Add(currRateSet);
+                if (Count >= _dataCountLimit)
+                    break;
 
             }
         }
@@ -66,11 +87,15 @@ namespace MyProject01.Util
                     Add(currRateSet);
 
                     checker.Set(mtData);
+
+                    if (Count >= _dataCountLimit-1)
+                        break;
                 }
                 else
                 {
                     checker.Add(mtData);
                 }
+
             }
 
             // add last

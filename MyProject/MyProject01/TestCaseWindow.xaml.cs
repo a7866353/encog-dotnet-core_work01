@@ -83,18 +83,19 @@ namespace MyProject01
 
             foreach( TestCaseObject obj in TestCaseList)
             {
+                string displayName = obj.Name + ": " + obj.Description;
                 Border border = new Border();
                 border.BorderThickness = new Thickness(4, 2, 4, 2);
                 border.BorderBrush = Brushes.Black;
 
                 Button testButton = new Button();
                 testButton.Height = 30;
-                testButton.Content = obj.Name + ": " + obj.Description;
+                testButton.Content = displayName;
                 testButton.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
                 testButton.Click += new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
                     {
                         MainWindow mainWin = new MainWindow(obj);
-                        mainWin.Title = GetTestName();
+                        mainWin.Title = displayName;
                         mainWin.Show();
                     });
                 border.Child = testButton;

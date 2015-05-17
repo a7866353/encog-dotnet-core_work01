@@ -106,15 +106,20 @@ namespace MyProject01.Util
                         break;
                 }
                 */
+
+                /*
+                // Add by date limit
                 QueryDocument query = new QueryDocument();
                 BsonDocument b = new BsonDocument();
                 b.Add("$gt", DateTime.Now.AddMonths(-24));
                 b.Add("$lt", DateTime.Now);
                 query.Add("Date", b);
-
                 var curst = collection.FindAs<MtDataObject>(query);
+                */
+
+                var curst = collection.FindAllAs<MtDataObject>();
                 curst.BatchSize = 1000;
-                curst.SetLimit(countLimit);
+                curst.SetLimit(countLimit);  // set limit
                 foreach (MtDataObject dataObj in curst)
                 {
                     Add(dataObj);
@@ -140,7 +145,8 @@ namespace MyProject01.Util
             connector.Close();
             SortByDate();
         }
-               
+
+              
         private void SortByDate()
         {
             Sort(new MtDateComparer());
