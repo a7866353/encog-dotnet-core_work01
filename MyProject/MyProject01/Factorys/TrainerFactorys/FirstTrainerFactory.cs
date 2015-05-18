@@ -26,7 +26,7 @@ namespace MyProject01.Factorys.TrainerFactorys
             mainCheckCtrl.Add(new CheckNetworkChangeJob());
             mainCheckCtrl.Add(new UpdataControllerJob(Controller));
 
-            TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
+            // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
             mainCheckCtrl.Add(new UpdateTestCaseJob()
             {

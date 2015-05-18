@@ -57,7 +57,7 @@ namespace MyProject01.Controller
                 {
                     try
                     {
-                        Thread.Sleep(0);
+                        Thread.Sleep(Timeout.Infinite);
                     }catch(Exception  e)
                     {
                         System.Console.WriteLine(e.ToString());
