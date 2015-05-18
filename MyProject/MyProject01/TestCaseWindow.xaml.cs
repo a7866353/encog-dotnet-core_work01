@@ -76,6 +76,7 @@ namespace MyProject01
         {
             InitializeComponent();
 
+            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.Closing += TestCaseWindow_Closing;
             TestCaseList = new TestCaseGroup();
 
@@ -107,7 +108,7 @@ namespace MyProject01
 
         void TestCaseWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            App.Current.Shutdown();
+            Application.Current.Shutdown(-1);
         }
 
         private string GetTestName()
