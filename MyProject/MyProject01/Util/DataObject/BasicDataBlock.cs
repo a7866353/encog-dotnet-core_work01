@@ -95,6 +95,7 @@ namespace MyProject01.Util.DataObject
         }
 
         abstract public double GetRate(int i);
+        abstract public DateTime GetDate(int i);
 
         abstract public int Copy(double[] array, int index);
 

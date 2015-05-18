@@ -29,7 +29,10 @@ namespace MyProject01.Util
         {
             return _loader[_startIndex + _blockLength - 1 + i].RealValue;
         }
-
+        public override DateTime GetDate(int i)
+        {
+            return _loader[_startIndex + _blockLength - 1 + i].Date;
+        }
         override public BasicDataBlock GetNewBlock(int startIndex, int length)
         {
             RateDataBlock res = new RateDataBlock(_loader, _startIndex + startIndex, _blockLength + length - 1, _blockLength);
@@ -78,5 +81,6 @@ namespace MyProject01.Util
         {
             return (BasicDataBlock)MemberwiseClone();
         }
+
     }
 }

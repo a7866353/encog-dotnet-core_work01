@@ -12,10 +12,14 @@ namespace MyProject01.Factorys.TrainingDataFactorys
     class OldRate1DayTrainingDataFactory : BasicTrainingDataFactory
     {
         public double TestDataRate = 0.7;
+        public DateTime StartDateTime = new DateTime(2013, 10, 31);
+        public DateTime EndDateTime = new DateTime(2014, 10, 31);
+        public int Count = 1000;
         protected override TrainingData Create()
         {
-            DataLoader loader;
-            loader = new MTDataLoader("USDJPY", DataTimeType.Timer1Day);
+            BasicTestDataLoader loader;
+            loader = new TestDataDateRangeLoader("USDJPY", DataTimeType.Timer1Day, StartDateTime, EndDateTime, DataBlockLength-1);
+            loader.Load();
             // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
            
             RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
@@ -36,12 +40,14 @@ namespace MyProject01.Factorys.TrainingDataFactorys
     class OldRate5MinTrainingDataFactory : BasicTrainingDataFactory
     {
         public double TestDataRate = 0.7;
+        public DateTime StartDateTime = new DateTime(2013, 10, 31);
+        public DateTime EndDateTime = new DateTime(2014, 10, 31);
+        public int Count = 1000;
         protected override TrainingData Create()
         {
-            DataLoader loader;
-            loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
-            // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
-
+            BasicTestDataLoader loader;
+            loader = new TestDataDateRangeLoader("USDJPY", DataTimeType.Time5Min, StartDateTime, EndDateTime, DataBlockLength - 1);
+            loader.Load();
             RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
             TrainingData td = new TrainingData(
                 new RateDataBlock(loader, 0, loader.Count, DataBlockLength),

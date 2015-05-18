@@ -54,7 +54,7 @@ namespace MyProject01.Util
         }
         public override string ToString()
         {
-            return Date.ToShortDateString() + ": " + Value.ToString();
+            return Date.ToShortDateString() + " " + Date.ToShortTimeString() + ": " + Value.ToString();
         }
         public RateSet Clone()
         {
