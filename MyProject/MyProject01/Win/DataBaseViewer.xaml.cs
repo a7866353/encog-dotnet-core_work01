@@ -33,8 +33,18 @@ namespace MyProject01.Win
             EpisodeDataGrid.SelectionChanged += EpisodeDataGrid_SelectionChanged;
             DeleteButton.Click += DeleteButton_Click;
             UpdateButton.Click += UpdateButton_Click;
+            SizeChanged += DataBaseViewer_SizeChanged;
 
 
+        }
+
+        void DataBaseViewer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            TestCaseDataGrid.Height = MainStackPanel.ActualHeight * 0.4;
+            EpisodeDataGrid.Height = MainStackPanel.ActualHeight - TestCaseDataGrid.Height;
+
+            // TestCaseDataGrid.Width = MainStackPanel.ActualWidth;
+            // EpisodeDataGrid.Width = MainStackPanel.ActualWidth;
         }
 
         void UpdateButton_Click(object sender, RoutedEventArgs e)

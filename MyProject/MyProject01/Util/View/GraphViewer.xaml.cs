@@ -126,7 +126,7 @@ namespace MyProject01.Util.View
         private double transformPosX = 0;
         private double transformPosY = 0;
         private double transformScaleX = 1;
-        private double transformScaleY = -1;
+        private double transformScaleY = 1;
         private double transformPosStep = 10;
         private double transformScaleStep = 1.2;
 
@@ -146,6 +146,7 @@ namespace MyProject01.Util.View
 
             this.MouseWheel += new MouseWheelEventHandler(MainWindow_MouseWheel);
             this.MouseMove += GraphViewer_MouseMove;
+            this.KeyDown += GraphViewer_KeyDown;
             this.Loaded += MainWindow_Loaded;
             GraphViewer._Instance = this;
 
@@ -154,13 +155,27 @@ namespace MyProject01.Util.View
 
         }
 
+        void GraphViewer_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Space)
+            {
+                translate.X = 0;
+                translate.Y = target.ActualHeight;
+
+                transformScaleY /= target.Children[0].DesiredSize.Height / target.ActualHeight;
+                transformScaleX /= target.Children[0].DesiredSize.Width / target.ActualWidth;
+
+                UpdateLine();
+            }
+        }
+
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Init Panel
             target = new Canvas();
             transGroup = new TransformGroup();
             // target.ClipToBounds = true;
-            scale = new ScaleTransform(1, 1);
+            scale = new ScaleTransform(1, -1);
             transGroup.Children.Add(scale);
             translate = new TranslateTransform(0, 0);
             transGroup.Children.Add(translate);
@@ -183,7 +198,8 @@ namespace MyProject01.Util.View
             System.Console.WriteLine("Trans:" + scale.CenterX.ToString() + "\t"
                 + scale.CenterY.ToString() + "\t"
                 + scale.ScaleX.ToString() + "\t"
-                + scale.ScaleY.ToString());
+                + scale.ScaleY.ToString() + "\t"
+                + Keyboard.GetKeyStates(Key.LeftShift));
         }
         void GraphViewer_MouseMove(object sender, MouseEventArgs e)
         {
@@ -262,7 +278,7 @@ namespace MyProject01.Util.View
             }
             else
             {
-                if (Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down)
+                if (Keyboard.IsKeyDown(Key.LeftShift))
                 {
                     if (e.Delta > 0)
                     {
@@ -273,7 +289,7 @@ namespace MyProject01.Util.View
                         transformScaleX /= transformScaleStep;
                     }
                 }
-                else if (Keyboard.GetKeyStates(Key.LeftCtrl) == KeyStates.Down)
+                else if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
                     if (e.Delta > 0)
                     {
@@ -297,12 +313,7 @@ namespace MyProject01.Util.View
                         transformScaleY /= transformScaleStep;
                     }
                 }
-                foreach( GraphLine line in _graphLineList)
-                {
-                    line.ScaleX = transformScaleX;
-                    line.ScaleY = transformScaleY;
-                    line.Update();
-                }
+                UpdateLine();
             }
             // scale.CenterX = mouseLastPoint.X;
             // scale.CenterY = mouseLastPoint.Y;
@@ -332,6 +343,16 @@ namespace MyProject01.Util.View
             scale.ScaleY = y;
             */
 
+        }
+
+        private void UpdateLine()
+        {
+            foreach (GraphLine line in _graphLineList)
+            {
+                line.ScaleX = transformScaleX;
+                line.ScaleY = transformScaleY;
+                line.Update();
+            }
         }
         #region Pulic_Function
         public GraphLine AddRateSet(RateSet[] rateSetArr)

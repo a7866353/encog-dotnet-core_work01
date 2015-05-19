@@ -15,10 +15,10 @@ namespace MyProject01.Util.View
         private Brush _color;
         private int _thickness;
         private Point _point;
-        private double _width = 10;
-        private double _height = 15;
-        
-        private Shape _referedShape;
+        private double _width = 4;
+        private double _height = 8;
+
+        private Ellipse _referedShape;
 
         public double ScaleX = 1.0;
         public double ScaleY = 1.0;
@@ -41,6 +41,7 @@ namespace MyProject01.Util.View
             if (_referedShape == null)
             {
                 _referedShape = new Ellipse();
+                _referedShape.Fill = this._color;
                 isNew = true;
             }
             _referedShape.StrokeThickness = _thickness;
