@@ -1,6 +1,7 @@
 ﻿using Encog.ML;
 using Encog.ML.Data;
 using Encog.ML.Data.Basic;
+using MyProject01.Util;
 using MyProject01.Util.DllTools;
 using System;
 using System.Collections.Generic;
@@ -103,16 +104,82 @@ namespace MyProject01.Controller
         }
     }
 
+    class FWTNormFormater : IInputDataFormater
+    {
+        private int _inputDataLength;
+        public double[] Buffer;
+        private Normalizer[] _normArr;
+        private double[] _tempBuffer;
+
+        public FWTNormFormater(int inputDataLength, Normalizer[] normArr)
+        {
+            _inputDataLength = inputDataLength;
+            Buffer = new double[_inputDataLength];
+            _tempBuffer = new double[_inputDataLength];
+            _normArr = normArr;
+        }
+        public BasicMLData Convert(double[] rateDataArray)
+        {
+            if (Buffer.Length != rateDataArray.Length)
+            {
+                throw (new Exception("Input Param Error!"));
+            }
+
+            DllTools.FTW_2(rateDataArray, Buffer, _tempBuffer);
+
+
+            for (int i = 0; i < Buffer.Length;i++ )
+            {
+                Buffer[i] = _normArr[i].Convert(Buffer[i]);
+            }
+
+            return new BasicMLData(Buffer, false);
+        }
+
+
+        public int NetworkInputLength
+        {
+            get { return _inputDataLength; }
+        }
+
+
+        public IInputDataFormater Clone()
+        {
+            FWTNormFormater ret = new FWTNormFormater(_inputDataLength, _normArr);
+            return ret;
+        }
+
+        public int InputDataLength
+        {
+            get { return _inputDataLength; }
+        }
+
+        public int ResultDataLength
+        {
+            get { return _inputDataLength; }
+        }
+
+
+        public string GetDecs()
+        {
+            return "FWT_Norm";
+        }
+    }
     class RateDataFormater : IInputDataFormater
     {
         private int _inputDataLength;
+        public Normalizer Normalizer = new Normalizer() { Offset = 0, Scale = 1 };
         public RateDataFormater(int inputDataLength)
         {
             _inputDataLength = inputDataLength;
         }
         public BasicMLData Convert(double[] rateDataArray)
         {
-            return new BasicMLData(rateDataArray, false);
+            for (int i = 0; i < rateDataArray.Length;i++ )
+            {
+                rateDataArray[i] = Normalizer.Convert(rateDataArray[i]);
+            }
+                return new BasicMLData(rateDataArray, false);
         }
         public int NetworkInputLength
         {

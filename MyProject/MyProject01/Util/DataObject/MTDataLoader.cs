@@ -170,7 +170,7 @@ namespace MyProject01.Util
             connector.Close();
 
             SortByDate();
-            DataValueAdjust();
+            // DataValueAdjust();
         }
 
 

@@ -474,6 +474,7 @@ namespace MyProject01
             };
 
             TestCaseGroup newTestList = new TestCaseGroup();
+            newTestList.Add(new RawRateTestCase() { PopulationNumber = 100 });
             newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 100 });
             newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 1000 });
             newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 100 });

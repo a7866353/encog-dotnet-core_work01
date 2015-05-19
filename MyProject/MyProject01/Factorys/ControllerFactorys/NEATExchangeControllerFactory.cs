@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Factorys.ControllerFactorys
 {
-    class NEATStateKeepControllerFactory : BasicControllerFactory
+    class NEATFWTStateKeepControllerFactory : BasicControllerFactory
     {
-        public NEATStateKeepControllerFactory()
+        public NEATFWTStateKeepControllerFactory()
         {
             Name = Description;
         }
@@ -32,9 +32,9 @@ namespace MyProject01.Factorys.ControllerFactorys
         }
     }
 
-    class NEATStateSwitchControllerFactory : BasicControllerFactory
+    class NEATFWTStateSwitchControllerFactory : BasicControllerFactory
     {
-        public NEATStateSwitchControllerFactory()
+        public NEATFWTStateSwitchControllerFactory()
         {
             Name = Description;
         }

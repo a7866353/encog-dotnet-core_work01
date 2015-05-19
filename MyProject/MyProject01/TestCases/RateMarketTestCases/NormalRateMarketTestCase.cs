@@ -2,6 +2,7 @@
 using MyProject01.Factorys.PopulationFactorys;
 using MyProject01.Factorys.TrainerFactorys;
 using MyProject01.Factorys.TrainingDataFactorys;
+using MyProject01.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +18,14 @@ namespace MyProject01.TestCases.RateMarketTestCases
             set { popFactory.PopulationNumber = value; }
         }
 
-        private NEATStateKeepControllerFactory controllerFactory = new NEATStateKeepControllerFactory();
+        private NEATFWTStateKeepControllerFactory controllerFactory = new NEATFWTStateKeepControllerFactory();
         private OldRate1DayTrainingDataFactory dataFactory = new OldRate1DayTrainingDataFactory();
         private FirstTrainerFactory trainerFactory;
         private NormalPopulationFactory popFactory;
 
         public NormalRateMarketTestCase()
         {
-            controllerFactory = new NEATStateKeepControllerFactory();
+            controllerFactory = new NEATFWTStateKeepControllerFactory();
             controllerFactory.InputLength = 32;
             _descList.Add(controllerFactory);
 
@@ -61,7 +62,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
             set { popFactory.PopulationNumber = value; }
         }
 
-        private NEATStateKeepControllerFactory controllerFactory = new NEATStateKeepControllerFactory();
+        private NEATFWTStateKeepControllerFactory controllerFactory = new NEATFWTStateKeepControllerFactory();
         private BasicTrainingDataFactory dataFactory = new OldRate1DayTrainingDataFactory();
         private FirstTrainerFactory trainerFactory;
         private NormalPopulationFactory popFactory;
@@ -69,7 +70,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
 
         public Normal5MinRateMarketTestCase()
         {
-            controllerFactory = new NEATStateKeepControllerFactory();
+            controllerFactory = new NEATFWTStateKeepControllerFactory();
             controllerFactory.InputLength = 32;
             _descList.Add(controllerFactory);
 
@@ -98,4 +99,105 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+
+    class RawRateTestCase : BasicRateMarketTestCase
+    {
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private NEATRateStateKeepControllerFactory controllerFactory;
+        private OldRate1DayTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public RawRateTestCase()
+        {
+            controllerFactory = new NEATRateStateKeepControllerFactory();
+            controllerFactory.InputLength = 32;
+
+            dataFactory = new OldRate1DayTrainingDataFactory();
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory = new FirstTrainerFactory();
+
+            popFactory = new NormalPopulationFactory();
+
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            BlockDataNormalizer norm = new BlockDataNormalizer();
+            norm.Normalize(trainerFactory.TrainingData.TrainDataBlock);
+            controllerFactory.Name = TestName;
+            controllerFactory.Offset = norm.Offset;
+            controllerFactory.Scale = norm.Scacle;
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
+
+    class FwtNormTestCase : BasicRateMarketTestCase
+    {
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private NEATFWTStateKeepControllerFactory controllerFactory;
+        private OldRate1DayTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public FwtNormTestCase()
+        {
+            controllerFactory = new NEATFWTStateKeepControllerFactory();
+            controllerFactory.InputLength = 32;
+
+            dataFactory = new OldRate1DayTrainingDataFactory();
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory = new FirstTrainerFactory();
+
+            popFactory = new NormalPopulationFactory();
+
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            BlockDataNormalizer norm = new BlockDataNormalizer();
+            norm.Normalize(trainerFactory.TrainingData.TrainDataBlock);
+            controllerFactory.Name = TestName;
+
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
+
+
 }
