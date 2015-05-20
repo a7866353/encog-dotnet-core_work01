@@ -1,4 +1,6 @@
 ﻿using MyProject01.Controller;
+using MyProject01.Util;
+using MyProject01.Util.DataObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,4 +58,37 @@ namespace MyProject01.Factorys.ControllerFactorys
             get { return "FWT_StateSwitch"; }
         }
     }
+
+    class NEATFWTNromStateKeepControllerFactory : BasicControllerFactory
+    {
+        public BasicDataBlock NormalyzeData;
+        public double MiddleValue = 0.5;
+        public double Scale = 0.1;
+        public NEATFWTNromStateKeepControllerFactory()
+        {
+            Name = Description;
+        }
+        protected override NetworkController Create()
+        {
+            NetworkController controller;
+
+            TradeDecisionController decisionCtrl = new TradeDecisionController();
+
+            FWTNormFormater form = new FWTNormFormater(_inputLength);
+            form.Normilize(NormalyzeData, MiddleValue, Scale);
+            decisionCtrl._inputFormater = form;
+            decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
+            decisionCtrl.BestNetwork = null;
+
+            controller = NetworkController.Create(Name, decisionCtrl);
+            return controller;
+        }
+
+
+        public override string Description
+        {
+            get { return "FWT_Norm" + MiddleValue.ToString("G") + "|" + Scale.ToString("G") + "_StateKeep"; }
+        }
+    }
+
 }

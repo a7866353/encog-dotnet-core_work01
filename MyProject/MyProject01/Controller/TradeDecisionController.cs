@@ -2,6 +2,7 @@
 using Encog.ML.Data;
 using Encog.ML.Data.Basic;
 using MyProject01.Util;
+using MyProject01.Util.DataObject;
 using MyProject01.Util.DllTools;
 using System;
 using System.Collections.Generic;
@@ -108,16 +109,46 @@ namespace MyProject01.Controller
     {
         private int _inputDataLength;
         public double[] Buffer;
-        private Normalizer[] _normArr;
+        public Normalizer[] NormalizerArray;
         private double[] _tempBuffer;
 
-        public FWTNormFormater(int inputDataLength, Normalizer[] normArr)
+        public FWTNormFormater(int inputDataLength)
         {
             _inputDataLength = inputDataLength;
             Buffer = new double[_inputDataLength];
             _tempBuffer = new double[_inputDataLength];
-            _normArr = normArr;
+
+
+            // Init normalizers
+            NormalizerArray = new Normalizer[NetworkInputLength];
+            for(int i=0;i<NormalizerArray.Length;i++)
+            {
+                NormalizerArray[i] = new Normalizer(0, 1);
+            }
+
         }
+
+        public void Normilize(BasicDataBlock dataBlock, double middleValue, double margin)
+        {
+            FwtDataNormalizer norm = new FwtDataNormalizer();
+            double[] buffer = new double[dataBlock.DataBlockLength];
+            dataBlock.Reset();
+            dataBlock.Copy(buffer);
+            Convert(buffer);
+            norm.Init(this.Buffer, 0.5, 0.1);
+
+            while (true)
+            {
+                if (dataBlock.Next() == false)
+                    break;
+                dataBlock.Copy(buffer);
+                Convert(buffer);
+                norm.Set(this.Buffer);
+            }
+
+            NormalizerArray = norm.NromalizerArray;
+        }
+
         public BasicMLData Convert(double[] rateDataArray)
         {
             if (Buffer.Length != rateDataArray.Length)
@@ -130,7 +161,7 @@ namespace MyProject01.Controller
 
             for (int i = 0; i < Buffer.Length;i++ )
             {
-                Buffer[i] = _normArr[i].Convert(Buffer[i]);
+                Buffer[i] = NormalizerArray[i].Convert(Buffer[i]);
             }
 
             return new BasicMLData(Buffer, false);
@@ -145,7 +176,8 @@ namespace MyProject01.Controller
 
         public IInputDataFormater Clone()
         {
-            FWTNormFormater ret = new FWTNormFormater(_inputDataLength, _normArr);
+            FWTNormFormater ret = new FWTNormFormater(_inputDataLength);
+            ret.NormalizerArray = NormalizerArray;
             return ret;
         }
 
@@ -168,7 +200,7 @@ namespace MyProject01.Controller
     class RateDataFormater : IInputDataFormater
     {
         private int _inputDataLength;
-        public Normalizer Normalizer = new Normalizer() { Offset = 0, Scale = 1 };
+        public Normalizer Normalizer = new Normalizer(0, 1);
         public RateDataFormater(int inputDataLength)
         {
             _inputDataLength = inputDataLength;

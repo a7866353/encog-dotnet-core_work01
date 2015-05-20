@@ -157,14 +157,14 @@ namespace MyProject01.TestCases.RateMarketTestCases
             set { popFactory.PopulationNumber = value; }
         }
 
-        private NEATFWTStateKeepControllerFactory controllerFactory;
+        private NEATFWTNromStateKeepControllerFactory controllerFactory;
         private OldRate1DayTrainingDataFactory dataFactory;
         private FirstTrainerFactory trainerFactory;
         private NormalPopulationFactory popFactory;
 
         public FwtNormTestCase()
         {
-            controllerFactory = new NEATFWTStateKeepControllerFactory();
+            controllerFactory = new NEATFWTNromStateKeepControllerFactory();
             controllerFactory.InputLength = 32;
 
             dataFactory = new OldRate1DayTrainingDataFactory();
@@ -189,8 +189,7 @@ namespace MyProject01.TestCases.RateMarketTestCases
             trainerFactory.TrainingData = dataFactory.Get();
             trainerFactory.TestCaseName = TestName;
 
-            BlockDataNormalizer norm = new BlockDataNormalizer();
-            norm.Normalize(trainerFactory.TrainingData.TrainDataBlock);
+            controllerFactory.NormalyzeData = trainerFactory.TrainingData.TrainDataBlock;
             controllerFactory.Name = TestName;
 
             trainerFactory.Controller = controllerFactory.Get();

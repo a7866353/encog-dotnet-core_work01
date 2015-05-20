@@ -20,7 +20,7 @@ namespace MyProject01.Factorys.ControllerFactorys
             NetworkController controller;
 
             TradeDecisionController decisionCtrl = new TradeDecisionController();
-            decisionCtrl._inputFormater = new RateDataFormater(_inputLength) { Normalizer = new Util.Normalizer(){ Offset = this.Offset, Scale = this.Scale } };
+            decisionCtrl._inputFormater = new RateDataFormater(_inputLength) { Normalizer = new Util.Normalizer(Offset, Scale) };
             decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
             decisionCtrl.BestNetwork = null;
 

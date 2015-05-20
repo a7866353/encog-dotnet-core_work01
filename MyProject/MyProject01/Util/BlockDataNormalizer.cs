@@ -7,6 +7,46 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Util
 {
+    class FwtDataNormalizer
+    {
+        private NormalizeAnalyzer[] _normAnlzArr;
+        private int _length;
+
+        public void Init(double[] firstDataArray, double middleValue, double margin)
+        {
+            _length = firstDataArray.Length;
+            _normAnlzArr = new NormalizeAnalyzer[_length];
+            for (int i = 0; i < _length; i++)
+            {
+                NormalizeAnalyzer na = new NormalizeAnalyzer();
+                na.SetTarget(middleValue, margin);
+                na.Init(firstDataArray[i]);
+                _normAnlzArr[i] = na;
+            }
+        }
+
+        public void Set(double[] dataArr)
+        {
+            for (int i = 0; i < _length; i++)
+            {
+                _normAnlzArr[i].Set(dataArr[i]);
+            }
+        }
+
+        public Normalizer[] NromalizerArray
+        {
+            get
+            {
+                Normalizer[] normArr = new Normalizer[_length];
+                for (int i = 0; i < _length; i++)
+                {
+                    normArr[i] = _normAnlzArr[i].Normalizer;
+                }
+                return normArr;
+            }
+        }
+    }
+
     class BlockDataNormalizer
     {
         private double _scale = 1;
@@ -52,9 +92,6 @@ namespace MyProject01.Util
 
     class NormalizeAnalyzer
     {
-        private double _scale = 1;
-        private double _offset = 0;
-
         private double _targetDataMargin = 0.01;
         private double _targetDataMid = 0.5;
 
@@ -95,6 +132,11 @@ namespace MyProject01.Util
         {
             get { return (_dataMaxValue - _dataMinValue) * _targDataMax / (_targDataMax - _targDataMin) - _dataMaxValue; }
         }
+
+        public Normalizer Normalizer
+        {
+            get { return new Normalizer(Scale, Offset); }
+        }
     }
 
     class Normalizer
@@ -102,9 +144,20 @@ namespace MyProject01.Util
         public double Offset = 0;
         public double Scale = 1;
 
+        public Normalizer(double offset, double scale)
+        {
+            this.Offset = offset;
+            this.Scale = scale;
+        }
+
         public double Convert(double value)
         {
             return (value + Offset) * Scale;
+        }
+
+        public override string ToString()
+        {
+            return "O"+Offset.ToString("G") + "|S" + Scale.ToString("G");
         }
     }
 
