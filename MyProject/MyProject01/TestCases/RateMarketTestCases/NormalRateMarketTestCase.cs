@@ -100,8 +100,12 @@ namespace MyProject01.TestCases.RateMarketTestCases
         }
     }
 
-    class RawRateTestCase : BasicRateMarketTestCase
+    class RawRate1DayTestCase : BasicRateMarketTestCase
     {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
         public int PopulationNumber
         {
             set { popFactory.PopulationNumber = value; }
@@ -112,18 +116,14 @@ namespace MyProject01.TestCases.RateMarketTestCases
         private FirstTrainerFactory trainerFactory;
         private NormalPopulationFactory popFactory;
 
-        public RawRateTestCase()
+        public RawRate1DayTestCase()
         {
             controllerFactory = new NEATRateStateKeepControllerFactory();
-            controllerFactory.InputLength = 32;
-
             dataFactory = new OldRate1DayTrainingDataFactory();
-            dataFactory.DataBlockLength = controllerFactory.InputLength;
-
             trainerFactory = new FirstTrainerFactory();
-
             popFactory = new NormalPopulationFactory();
 
+            controllerFactory.InputLength = 32;
 
             _descList.Add(controllerFactory);
             _descList.Add(dataFactory);
@@ -133,6 +133,59 @@ namespace MyProject01.TestCases.RateMarketTestCases
 
         protected override void Init()
         {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            BlockDataNormalizer norm = new BlockDataNormalizer();
+            norm.Normalize(trainerFactory.TrainingData.TrainDataBlock);
+            controllerFactory.Name = TestName;
+            controllerFactory.Offset = norm.Offset;
+            controllerFactory.Scale = norm.Scacle;
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
+    class RawRate5MinTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private NEATRateStateKeepControllerFactory controllerFactory;
+        private OldRate5MinTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public RawRate5MinTestCase()
+        {
+            controllerFactory = new NEATRateStateKeepControllerFactory();
+            dataFactory = new OldRate5MinTrainingDataFactory();
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+            controllerFactory.InputLength = 32;
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
             trainerFactory.PopulationFacotry = popFactory;
             trainerFactory.TestDescription = TestDescription;
 
@@ -150,8 +203,12 @@ namespace MyProject01.TestCases.RateMarketTestCases
         }
     }
 
-    class FwtNormTestCase : BasicRateMarketTestCase
+    class FwtNorm1DayTestCase : BasicRateMarketTestCase
     {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
         public int PopulationNumber
         {
             set { popFactory.PopulationNumber = value; }
@@ -162,13 +219,12 @@ namespace MyProject01.TestCases.RateMarketTestCases
         private FirstTrainerFactory trainerFactory;
         private NormalPopulationFactory popFactory;
 
-        public FwtNormTestCase()
+        public FwtNorm1DayTestCase()
         {
             controllerFactory = new NEATFWTNromStateKeepControllerFactory();
             controllerFactory.InputLength = 32;
 
             dataFactory = new OldRate1DayTrainingDataFactory();
-            dataFactory.DataBlockLength = controllerFactory.InputLength;
 
             trainerFactory = new FirstTrainerFactory();
 
@@ -183,6 +239,58 @@ namespace MyProject01.TestCases.RateMarketTestCases
 
         protected override void Init()
         {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+            
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            controllerFactory.NormalyzeData = trainerFactory.TrainingData.TrainDataBlock;
+            controllerFactory.Name = TestName;
+
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
+
+    class FwtNorm5MinTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set {controllerFactory.InputLength = value;}
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private NEATFWTNromStateKeepControllerFactory controllerFactory;
+        private OldRate5MinTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public FwtNorm5MinTestCase()
+        {
+            controllerFactory = new NEATFWTNromStateKeepControllerFactory();
+            dataFactory = new OldRate5MinTrainingDataFactory();
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
             trainerFactory.PopulationFacotry = popFactory;
             trainerFactory.TestDescription = TestDescription;
 

@@ -475,8 +475,12 @@ namespace MyProject01
 
             TestCaseGroup newTestList = new TestCaseGroup();
 
-            newTestList.Add(new FwtNormTestCase() { PopulationNumber = 100 });
-            newTestList.Add(new RawRateTestCase() { PopulationNumber = 100 });
+            newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
+            newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });
+            newTestList.Add(new FwtNorm1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
+            newTestList.Add(new RawRate1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
+            newTestList.Add(new RawRate5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
+            newTestList.Add(new RawRate5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });
             newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 100 });
             newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 1000 });
             newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 100 });

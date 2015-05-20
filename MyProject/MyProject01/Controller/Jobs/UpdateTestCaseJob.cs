@@ -40,8 +40,8 @@ namespace MyProject01.Controller.Jobs
             {
                 _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
                 _testCaseDAO.TestDescription = TestDescription;
-                _testCaseDAO.TestDataStartIndex = context._trainDataBlock.Length;
-                _testCaseDAO.TotalDataCount = TestDataBlock.Length;
+                _testCaseDAO.TestDataStartIndex = context._trainDataBlock.BlockCount;
+                _testCaseDAO.TotalDataCount = TestDataBlock.BlockCount;
 
             }
 

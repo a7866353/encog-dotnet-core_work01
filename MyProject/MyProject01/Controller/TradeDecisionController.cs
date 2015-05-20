@@ -131,7 +131,7 @@ namespace MyProject01.Controller
         public void Normilize(BasicDataBlock dataBlock, double middleValue, double margin)
         {
             FwtDataNormalizer norm = new FwtDataNormalizer();
-            double[] buffer = new double[dataBlock.DataBlockLength];
+            double[] buffer = new double[dataBlock.BlockLength];
             dataBlock.Reset();
             dataBlock.Copy(buffer);
             Convert(buffer);

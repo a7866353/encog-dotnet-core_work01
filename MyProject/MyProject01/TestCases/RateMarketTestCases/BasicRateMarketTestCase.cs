@@ -12,8 +12,6 @@ namespace MyProject01.TestCases.RateMarketTestCases
 {
     abstract class BasicRateMarketTestCase : BasicTestCase, IDescriptionProvider
     {
-        public int DataBlockLength;
-
         protected Trainer _train;
         abstract protected void Init();
         protected DescriptionProviderList _descList;

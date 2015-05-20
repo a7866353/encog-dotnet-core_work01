@@ -105,7 +105,7 @@ namespace MyProject01.InputDataAnalyzerTool
             RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
             
 
-            Parallel.For(0, testBlock.Length, index =>
+            Parallel.For(0, testBlock.BlockCount, index =>
                 {
                     double[] rateData = new double[DataBlockLength];
                     testBlock.Copy(rateData, index);

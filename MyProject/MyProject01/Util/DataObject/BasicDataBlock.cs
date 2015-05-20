@@ -10,46 +10,25 @@ namespace MyProject01.Util.DataObject
     {
         protected DataLoader _loader;
         protected int _startIndex;
-        protected int _length;
+        protected int _dataBufferLength;
         protected int _blockLen;
 
         protected double[] _data;
 
-        public BasicDataBlock(DataLoader loader, int startIndex, int length, int blockLength)
+        public BasicDataBlock(DataLoader loader, int startIndex, int blockCount, int blockLength)
         {
-            _index = 0;
+            _blockIndex = 0;
             _loader = loader;
             _startIndex = startIndex;
-            _length = Math.Min(loader.Count-_startIndex, length);
-            _data = new double[_length];
+            _dataBufferLength = Math.Min(loader.Count - _startIndex, blockCount);
+            _data = new double[_dataBufferLength];
             _blockLen = blockLength;
             UpdateData();
         }
 
-        protected int _blockCount
-        {
-            get { return _length - _blockLen + 1; }
-        }
         protected int _blockLength
         {
             get { return _blockLen; }
-        }
-        protected double GetRateData(int i)
-        {
-            return _loader[_startIndex + _blockLen - 1 + i].RealValue;
-        }
-
-        protected int RateDataCopy(double[] array, int index)
-        {
-            int remain = _data.Length - index;
-            int length = Math.Min(remain, _blockLen);
-
-            if (length <= 0)
-                return 0;
-
-            Array.Copy(_data, index, array, 0, length);
-
-            return length;
         }
 
         private void UpdateData()
@@ -61,35 +40,35 @@ namespace MyProject01.Util.DataObject
 
         }
 
-        protected int _index;
+        protected int _blockIndex;
         
         public void Reset()
         {
-            _index = 0;
+            _blockIndex = 0;
         }
         public bool Next()
         {
-            if ((_index + 1) >= _length)
+            if ((_blockIndex + 1) >= BlockCount)
                 return false;
             else
             {
-                _index++;
+                _blockIndex++;
                 return true;
             }
         }
 
         public int Copy(double[] array)
         {
-            return Copy(array, _index);
+            return Copy(array, _blockIndex);
         }
 
 
-        abstract public int Length
+        abstract public int BlockCount
         {
             get;
         }
 
-        abstract public int DataBlockLength
+        abstract public int BlockLength
         {
             get;
         }

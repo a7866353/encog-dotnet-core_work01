@@ -17,11 +17,11 @@ namespace MyProject01.Util
         {
         }
 
-        override public int Length
+        override public int BlockCount
         {
-            get { return _length - _blockLength + 1; }
+            get { return _dataBufferLength - _blockLength + 1; }
         }
-        override public int DataBlockLength
+        override public int BlockLength
         {
             get { return _blockLength; }
         }
@@ -70,7 +70,7 @@ namespace MyProject01.Util
 
         private void UpdateData()
         {
-            for (int i = 0; i < _length; i++)
+            for (int i = 0; i < _dataBufferLength; i++)
             {
                 _data[i] = _loader[i + _startIndex].Value * _scale + _offset;
             }

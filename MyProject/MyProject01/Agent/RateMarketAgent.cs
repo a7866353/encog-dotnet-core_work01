@@ -223,7 +223,7 @@ namespace MyProject01.Agent
             _stateData = new RateMarketAgentData();
             _dataBlock = dataBlock.Clone() ;
             _order = new Order(InitMoney);
-            _stateData.RateDataArray = new double[_dataBlock.DataBlockLength];
+            _stateData.RateDataArray = new double[_dataBlock.BlockLength];
 
             Reset();
         }
@@ -244,7 +244,7 @@ namespace MyProject01.Agent
         {
             if (IsEnd == true)
                 return false;
-            if((index+1) >=  _dataBlock.Length)
+            if((index+1) >=  _dataBlock.BlockCount)
             {
                 IsEnd = true;
                 return false;

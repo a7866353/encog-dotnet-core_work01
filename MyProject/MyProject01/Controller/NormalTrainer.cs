@@ -64,7 +64,7 @@ namespace MyProject01.Controller
         {
             _dataBlock = dataBlock;
             StartIndex = 0;
-            Length = _dataBlock.Length;
+            Length = _dataBlock.BlockCount;
         }
 
         public bool ShouldMinimize

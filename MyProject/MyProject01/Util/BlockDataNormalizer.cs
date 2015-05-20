@@ -66,7 +66,7 @@ namespace MyProject01.Util
 
         public void Normalize(BasicDataBlock dataBlock)
         {
-            double[] buffer = new double[dataBlock.DataBlockLength];
+            double[] buffer = new double[dataBlock.BlockLength];
 
             dataBlock.Copy(buffer);
             NormalizeAnalyzer norm = new NormalizeAnalyzer();
@@ -135,7 +135,7 @@ namespace MyProject01.Util
 
         public Normalizer Normalizer
         {
-            get { return new Normalizer(Scale, Offset); }
+            get { return new Normalizer(Offset, Scale); }
         }
     }
 

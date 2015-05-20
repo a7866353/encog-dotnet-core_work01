@@ -63,7 +63,7 @@ namespace MyProject01.Factorys.ControllerFactorys
     {
         public BasicDataBlock NormalyzeData;
         public double MiddleValue = 0.5;
-        public double Scale = 0.1;
+        public double Margin = 0.25;
         public NEATFWTNromStateKeepControllerFactory()
         {
             Name = Description;
@@ -75,7 +75,7 @@ namespace MyProject01.Factorys.ControllerFactorys
             TradeDecisionController decisionCtrl = new TradeDecisionController();
 
             FWTNormFormater form = new FWTNormFormater(_inputLength);
-            form.Normilize(NormalyzeData, MiddleValue, Scale);
+            form.Normilize(NormalyzeData, MiddleValue, Margin);
             decisionCtrl._inputFormater = form;
             decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
             decisionCtrl.BestNetwork = null;
@@ -87,7 +87,7 @@ namespace MyProject01.Factorys.ControllerFactorys
 
         public override string Description
         {
-            get { return "FWT_Norm" + MiddleValue.ToString("G") + "|" + Scale.ToString("G") + "_StateKeep"; }
+            get { return "FWT__"  + _inputLength.ToString() + "_Norm" + MiddleValue.ToString("G") + "|" + Margin.ToString("G") + "_StateKeep"; }
         }
     }
 

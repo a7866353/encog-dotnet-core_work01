@@ -30,7 +30,7 @@ namespace MyProject01.Factorys.ControllerFactorys
 
         public override string Description
         {
-            get { return "Rate_StateKeep"; }
+            get { return "Rate_StateKeep_" + _inputLength.ToString();}
         }
     }
 
