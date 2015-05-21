@@ -12,7 +12,12 @@ namespace MyProject01.Factorys.ControllerFactorys
     {
         protected string _name;
         protected int _inputLength;
- 
+        protected DescriptionProviderList _descList;
+
+        public BasicControllerFactory()
+        {
+            _descList = new DescriptionProviderList();
+        }
         public int InputLength
         {
             get

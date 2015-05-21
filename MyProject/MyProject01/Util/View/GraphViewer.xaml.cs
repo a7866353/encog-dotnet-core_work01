@@ -132,6 +132,17 @@ namespace MyProject01.Util.View
 
         //-------------------
         private double targetHeight = 1000;
+        private Brush[] _lineColorArray = new Brush[]
+            {
+                Brushes.Black,
+                Brushes.Blue,
+                Brushes.Red,
+                // Brushes.Yellow,
+                Brushes.Aqua,
+                Brushes.Coral,
+                Brushes.Peru,
+            };
+        private int _lineColorIndex = 0;
 
         //-------------------------
         private List<RateSetUtility> RateSetDataList;
@@ -354,6 +365,16 @@ namespace MyProject01.Util.View
                 line.Update();
             }
         }
+
+        private Brush GetNextColor()
+        {
+            Brush color = _lineColorArray[_lineColorIndex];
+            _lineColorIndex++;
+            if (_lineColorIndex >= _lineColorArray.Length)
+                _lineColorIndex = 0;
+            return color;
+        }
+
         #region Pulic_Function
         public GraphLine AddRateSet(RateSet[] rateSetArr)
         {
@@ -411,7 +432,7 @@ namespace MyProject01.Util.View
             norm.DataValueAdjust(0, targetHeight);
 
             // 创建Line
-            GraphLine line = new GraphLine(target, rateSetArr, Brushes.Black, 1);
+            GraphLine line = new GraphLine(target, rateSetArr, GetNextColor(), 1);
             _graphLineList.Add(line);
             this.Dispatcher.Invoke(new func(delegate
             {

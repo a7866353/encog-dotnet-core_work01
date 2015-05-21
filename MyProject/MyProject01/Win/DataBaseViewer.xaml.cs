@@ -99,10 +99,12 @@ namespace MyProject01.Win
             for(int i=0;i<logList.Count; i++)
             {
                 DealLog log = logList[i];
-                if(log.Action == MarketActions.Buy)
+                if (log.Action == MarketActions.Buy)
                     rateLine.AddMark(i, Brushes.Red);
-                else if(log.Action == MarketActions.Sell)
+                else if (log.Action == MarketActions.Sell)
                     rateLine.AddMark(i, Brushes.Green);
+                else if (log.Action == MarketActions.Close)
+                    rateLine.AddMark(i, Brushes.Orange);
             }
             rateLine.Update();
             // 增加当前收益曲线

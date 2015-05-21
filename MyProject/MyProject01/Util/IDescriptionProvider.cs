@@ -10,9 +10,25 @@ namespace MyProject01.Util
     {
         string Description { get; }
     }
+    class StringDescriptionProvider : IDescriptionProvider
+    {
+        private string _desc = "";
+        public StringDescriptionProvider(string desc)
+        {
+            _desc = desc;
+        }
 
+        public string Description
+        {
+            get { return _desc; }
+        }
+    }
     class DescriptionProviderList : List<IDescriptionProvider>, IDescriptionProvider
     {
+        public void Add(string desc)
+        {
+            Add(new StringDescriptionProvider(desc));
+        }
         public string Description
         {
             get 

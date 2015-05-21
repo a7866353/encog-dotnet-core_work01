@@ -63,7 +63,7 @@ namespace MyProject01.Factorys.ControllerFactorys
     {
         public BasicDataBlock NormalyzeData;
         public double MiddleValue = 0.5;
-        public double Margin = 0.25;
+        public double Margin = 0.1;
         public NEATFWTNromStateKeepControllerFactory()
         {
             Name = Description;
@@ -87,7 +87,52 @@ namespace MyProject01.Factorys.ControllerFactorys
 
         public override string Description
         {
-            get { return "FWT__"  + _inputLength.ToString() + "_Norm" + MiddleValue.ToString("G") + "|" + Margin.ToString("G") + "_StateKeep"; }
+            get 
+            {
+                _descList.Clear();
+                _descList.Add("FWT" + _inputLength.ToString());
+                _descList.Add("Norm" + MiddleValue.ToString("G") + "|" + Margin.ToString("G"));
+                _descList.Add("StateKeep");
+                return _descList.Description;
+            }
+        }
+    }
+    class NEATFWTNromStateKeepCloseControllerFactory : BasicControllerFactory
+    {
+        public BasicDataBlock NormalyzeData;
+        public double MiddleValue = 0.5;
+        public double Margin = 0.1;
+        public NEATFWTNromStateKeepCloseControllerFactory()
+        {
+            Name = Description;
+        }
+        protected override NetworkController Create()
+        {
+            NetworkController controller;
+
+            TradeDecisionController decisionCtrl = new TradeDecisionController();
+
+            FWTNormFormater form = new FWTNormFormater(_inputLength);
+            form.Normilize(NormalyzeData, MiddleValue, Margin);
+            decisionCtrl._inputFormater = form;
+            decisionCtrl._outputConvertor = new TradeStateKeepWithCloseOrderConvertor();
+            decisionCtrl.BestNetwork = null;
+
+            controller = NetworkController.Create(Name, decisionCtrl);
+            return controller;
+        }
+
+
+        public override string Description
+        {
+            get
+            {
+                _descList.Clear();
+                _descList.Add("FWT" + _inputLength.ToString());
+                _descList.Add("Norm" + MiddleValue.ToString("G") + "|" + Margin.ToString("G"));
+                _descList.Add("StateKeepWithClose");
+                return _descList.Description;
+            }
         }
     }
 

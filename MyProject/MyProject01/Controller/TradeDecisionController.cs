@@ -17,6 +17,7 @@ namespace MyProject01.Controller
         Nothing = 0,
         Buy,
         Sell,
+        Close,
         Init,
     };
     public enum InputDataFormaterType
@@ -373,6 +374,59 @@ namespace MyProject01.Controller
         public string GetDesc()
         {
             return "StateKeep";
+        }
+    }
+    class TradeStateKeepWithCloseOrderConvertor : IOutputDataConvertor
+    {
+        private MarketActions _lastAction = MarketActions.Nothing;
+        public MarketActions Convert(IMLData output)
+        {
+            MarketActions currentAction;
+            // Choose an action
+            int maxActionIndex = 0;
+            for (int i = 1; i < output.Count; i++)
+            {
+                if (output[maxActionIndex] < output[i])
+                    maxActionIndex = i;
+            }
+
+            // Do action
+            switch (maxActionIndex)
+            {
+                case 0:
+                    currentAction = MarketActions.Close;
+                    break;
+                case 1:
+                    currentAction = MarketActions.Buy;
+                    break;
+                case 2:
+                    currentAction = MarketActions.Sell;
+                    break;
+                default:
+                    currentAction = MarketActions.Close;
+                    break;
+            }
+
+            _lastAction = currentAction;
+            return currentAction;
+        }
+
+
+        public int NetworkOutputLength
+        {
+            get { return 3; }
+        }
+
+
+        public IOutputDataConvertor Clone()
+        {
+            return (IOutputDataConvertor)MemberwiseClone();
+        }
+
+
+        public string GetDesc()
+        {
+            return "StateKeepWithClose";
         }
     }
 

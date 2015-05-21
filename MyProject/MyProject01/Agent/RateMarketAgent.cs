@@ -81,7 +81,7 @@ namespace MyProject01.Agent
 #endif
         private double _money;
         private OrderType _type;
-        private OrderType _lastAction;
+        private MarketActions _lastAction;
         private double _startRate;
         private double _startRatePre;
         private double _currentRate;
@@ -92,7 +92,7 @@ namespace MyProject01.Agent
         {
             _money = initMoney;
             _type = OrderType.Nothing;
-            _lastAction = OrderType.Nothing;
+            _lastAction = MarketActions.Nothing;
             _startRate = 0;
             _dealCount = 0;
         }
@@ -100,7 +100,7 @@ namespace MyProject01.Agent
         {
             get { return _dealCount; }
         }
-        public OrderType LastAction
+        public MarketActions LastAction
         {
             get { return _lastAction; }
         }
@@ -113,40 +113,39 @@ namespace MyProject01.Agent
         public void StartOrder( OrderType type, double currentRate)
         {
             _currentRate = currentRate;
-            _lastAction = OrderType.Nothing;
+            _lastAction = MarketActions.Nothing;
             if (_type == type)
                 return;
             else if (_type != type && (_type != OrderType.Nothing))
                 CloseOrder(currentRate);
             _dealCount++;
             _type = type;
-            if (_type == OrderType.Buy)
+            _startRatePre = _startRate;
+            if (_type == OrderType.BuyOrder)
             {
-                _startRatePre = _startRate;
                 _startRate = Ask();
-                _lastAction = OrderType.Buy;
+                _lastAction = MarketActions.Buy;
             }
             else
             {
-                _startRatePre = _startRate;
                 _startRate = Bid();
-                _lastAction = OrderType.Sell;
+                _lastAction = MarketActions.Sell;
             }
         }
         public void CloseOrder(double currentRate)
         {
+            _currentRate = currentRate;
             double res = Benifit();
             _money += res;
             _type = OrderType.Nothing;
- //           System.Console.WriteLine("M: " + _money.ToString());
-
+            _lastAction = MarketActions.Close;
         }
 
         private double Benifit()
         {
             if (_type == OrderType.Nothing)
                 return 0;
-            else if (_type == OrderType.Buy)
+            else if (_type == OrderType.BuyOrder)
                 return (Bid() / _startRate - 1) * _money;
             else // for sell order
                 return (_startRate / Ask() - 1) * _money;
@@ -163,8 +162,8 @@ namespace MyProject01.Agent
         public enum OrderType
         {
             Nothing,
-            Buy,
-            Sell,
+            BuyOrder,
+            SellOrder,
         }
 
     }
@@ -201,17 +200,7 @@ namespace MyProject01.Agent
         {
             get
             {
-                switch(_order.LastAction)
-                {
-                    case Order.OrderType.Nothing:
-                        return MarketActions.Nothing;
-                    case Order.OrderType.Sell:
-                        return MarketActions.Sell;
-                    case Order.OrderType.Buy:
-                        return MarketActions.Buy;
-                    default:
-                        return MarketActions.Nothing;
-                }
+                return _order.LastAction;
             }
         }
         public int DealCount
@@ -259,10 +248,13 @@ namespace MyProject01.Agent
             switch (action)
             {
                 case MarketActions.Buy:
-                    _order.StartOrder(Order.OrderType.Buy, _currentRate);
+                    _order.StartOrder(Order.OrderType.BuyOrder, _currentRate);
                     break;
                 case MarketActions.Sell:
-                    _order.StartOrder(Order.OrderType.Sell, _currentRate);
+                    _order.StartOrder(Order.OrderType.SellOrder, _currentRate);
+                    break;
+                case MarketActions.Close:
+                    _order.CloseOrder(_currentRate);
                     break;
                 case MarketActions.Nothing:
                     break;

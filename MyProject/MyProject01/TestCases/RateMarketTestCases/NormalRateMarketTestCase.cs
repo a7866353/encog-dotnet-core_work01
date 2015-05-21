@@ -255,6 +255,58 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+    class FwtNorm1Day3StateTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private NEATFWTNromStateKeepCloseControllerFactory controllerFactory;
+        private OldRate1DayTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public FwtNorm1Day3StateTestCase()
+        {
+            controllerFactory = new NEATFWTNromStateKeepCloseControllerFactory();
+            controllerFactory.InputLength = 32;
+
+            dataFactory = new OldRate1DayTrainingDataFactory();
+
+            trainerFactory = new FirstTrainerFactory();
+
+            popFactory = new NormalPopulationFactory();
+
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            controllerFactory.NormalyzeData = trainerFactory.TrainingData.TrainDataBlock;
+            controllerFactory.Name = TestName;
+
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
 
     class FwtNorm5MinTestCase : BasicRateMarketTestCase
     {

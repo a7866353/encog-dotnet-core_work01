@@ -462,7 +462,6 @@ namespace MyProject01
                 new TestCaseObject("TestRateMarketNEAT_Long", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Long)),
                 new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
                 new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
-                new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)),
                 // new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
                 // new TestCaseObject("TestRateMarketNEATBatch", "", new TestCaseObject.TestFucntion(TestRateMarketNEATBatch)),
                 // new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
@@ -474,10 +473,14 @@ namespace MyProject01
             };
 
             TestCaseGroup newTestList = new TestCaseGroup();
+            newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
 
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });
             newTestList.Add(new FwtNorm1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
+            newTestList.Add(new FwtNorm1Day3StateTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
+            newTestList.Add(new FwtNorm1Day3StateTestCase() { PopulationNumber = 100, DataBlockLength = 64 });
+            newTestList.Add(new FwtNorm1Day3StateTestCase() { PopulationNumber = 100, DataBlockLength = 128 });
             newTestList.Add(new RawRate1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
             newTestList.Add(new RawRate5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
             newTestList.Add(new RawRate5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });

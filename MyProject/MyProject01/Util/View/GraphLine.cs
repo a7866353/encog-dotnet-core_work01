@@ -43,11 +43,12 @@ namespace MyProject01.Util.View
             this._color = color;
             this._thickness = thickness;
 
+            /*
             this._color = _lineColorArray[_lineColorIndex];
             _lineColorIndex++;
             if (_lineColorIndex >= _lineColorArray.Length)
                 _lineColorIndex = 0;
-
+            */
             _graphMarkList = new List<GraphMark>();
 
         }
