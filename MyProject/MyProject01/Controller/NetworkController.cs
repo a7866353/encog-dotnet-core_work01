@@ -89,7 +89,7 @@ namespace MyProject01.Controller
         public void Save()
         {
            // TODO
-           //  _dao.SetTradeDecisionController(_tradeDecisionController);
+            _dao.SetTradeDecisionController(_tradeDecisionController);
             _dao.SetNetwork(BestNetwork);
 
             _dao.UpdateTime = DateTime.Now;

@@ -106,6 +106,7 @@ namespace MyProject01.Controller
         }
     }
 
+    [Serializable]
     class FWTNormFormater : IInputDataFormater
     {
         private int _inputDataLength;
@@ -198,6 +199,7 @@ namespace MyProject01.Controller
             return "FWT_Norm";
         }
     }
+    [Serializable]
     class RateDataFormater : IInputDataFormater
     {
         private int _inputDataLength;
@@ -267,7 +269,7 @@ namespace MyProject01.Controller
         }
     }
 
-
+    [Serializable]
     class TradeStateSwitchConvertor : IOutputDataConvertor
     {
         public MarketActions Convert(IMLData output)
@@ -318,6 +320,7 @@ namespace MyProject01.Controller
             return "StateSwitch";
         }
     }
+    [Serializable]
     class TradeStateKeepConvertor : IOutputDataConvertor
     {
         private MarketActions _lastAction = MarketActions.Nothing;
@@ -376,6 +379,7 @@ namespace MyProject01.Controller
             return "StateKeep";
         }
     }
+    [Serializable]
     class TradeStateKeepWithCloseOrderConvertor : IOutputDataConvertor
     {
         private MarketActions _lastAction = MarketActions.Nothing;
@@ -439,6 +443,8 @@ namespace MyProject01.Controller
         int NetworkInputVectorLength { get; }
         int NetworkOutputVectorLenth { get; }
     }
+
+    [Serializable]
     class TradeDecisionController : ITradeDesisoin
     {
         public IInputDataFormater _inputFormater;

@@ -139,6 +139,7 @@ namespace MyProject01.Util
         }
     }
 
+    [Serializable]
     class Normalizer
     {
         public double Offset = 0;
