@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SocketTestClient.ConnectionContoller;
 
 namespace SocketTestClient.RequestObject
 {
@@ -28,9 +29,13 @@ namespace SocketTestClient.RequestObject
             return sb.GetBytes();
         }
 
+
+        public RateDataRequestController ReqCtrl;
         public void FromBytes(byte[] data, int length)
         {
-            throw new NotImplementedException();
+            RateDataIndicateRequest idc = new RateDataIndicateRequest();
+            idc.FromBytes(data, length);
+            ReqCtrl.SetResult(idc);
         }
     }
 }

@@ -163,12 +163,40 @@ namespace SocketTestClient.Sender
 
         private DeamonState StateSending()
         {
+            // Send Request
+            SendOnePacket(_sendRquest.GetBytes());
+
+            //Get Result
+            int rcvCount = GetOnePacket(_rcvBuffer);
+            // data received
+            _sendRquest.FromBytes(_rcvBuffer, rcvCount);
+
+            _sendFinishEvent.Release();
+
+            _deamonState = DeamonState.Connected;
+            return _deamonState;
+        }
+
+        private DeamonState StateReceiving()
+        {
+            int rcvCount = GetOnePacket(_rcvBuffer);
+            // data received
+            IRequest rcvReq = Request.FromBytes(_rcvBuffer, rcvCount);
+            if (rcvReq != null)
+                _receiveRequestList.Add(rcvReq);
+
+            _deamonState = DeamonState.Connected;
+            return _deamonState;
+        }
+
+        private void SendOnePacket(byte[] buffer)
+        {
             int rcvCount;
 
             // Send data
             try
             {
-                rcvCount = _clientSocket.Send(_sendRquest.GetBytes());
+                rcvCount = _clientSocket.Send(buffer);
             }
             catch (Exception e)
             {
@@ -184,33 +212,22 @@ namespace SocketTestClient.Sender
             {
                 // timeout
             }
-
-            _sendFinishEvent.Release();
-
-            _deamonState = DeamonState.Connected;
-            return _deamonState;
         }
-
-        private DeamonState StateReceiving()
+        
+        private int GetOnePacket(byte[] buffer)
         {
             int rcvCount = 0;
             // _clientSocket.ReceiveTimeout = 500;
             try
             {
-                rcvCount = _clientSocket.Receive(_rcvBuffer);
+                rcvCount = _clientSocket.Receive(buffer);
             }
             catch (Exception e)
             {
                 // timeout
             }
 
-            // data received
-            IRequest rcvReq = Request.FromBytes(_rcvBuffer, rcvCount);
-            if (rcvReq != null)
-                _receiveRequestList.Add(rcvReq);
-
             byte[] ackBuffer = new byte[] { 0x55 };
-
             try
             {
                 rcvCount = _clientSocket.Send(ackBuffer);
@@ -219,10 +236,7 @@ namespace SocketTestClient.Sender
             {
                 printf("[Srv]" + e.Message);
             }
-
-            _deamonState = DeamonState.Connected;
-            return _deamonState;
-
+            return rcvCount;
         }
 
         private DeamonState StateDisconnecting()

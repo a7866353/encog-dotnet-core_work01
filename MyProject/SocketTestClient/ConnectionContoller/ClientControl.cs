@@ -27,7 +27,7 @@ namespace SocketTestClient.ConnectionContoller
             List<IRequestController> ctrlList = new List<IRequestController>();
             OrderSendController orderCtrl = new OrderSendController();
             ctrlList.Add(orderCtrl);
-            RateDataController rateDataCtrl = new RateDataController();
+            RateDataRequestController rateDataCtrl = new RateDataRequestController();
             ctrlList.Add(rateDataCtrl);
 
             _sender = new SocketDeamonSender();

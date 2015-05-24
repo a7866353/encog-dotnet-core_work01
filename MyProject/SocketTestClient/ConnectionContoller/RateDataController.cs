@@ -16,7 +16,7 @@ namespace SocketTestClient.ConnectionContoller
         public string SymbolName;
         public int Timeframe;
     }
-    class RateDataController : IRequestController
+    class RateDataRequestController : IRequestController
     {
         private RateDataDAOList _rateDataList;
         private RateDataControlDAO _currentTargetDao;
@@ -43,7 +43,7 @@ namespace SocketTestClient.ConnectionContoller
             }
         }
 
-        public RateDataController()
+        public RateDataRequestController()
         {
             _rateDataList = new RateDataDAOList();
             _currentTargetDao = null;
@@ -130,6 +130,7 @@ namespace SocketTestClient.ConnectionContoller
             req.StopTime = dao.LastGetTime + nextDulation;
             if (req.StopTime > DateTime.Now)
                 req.StopTime = DateTime.Now;
+            req.ReqCtrl = this;
 
             return req;
         }
