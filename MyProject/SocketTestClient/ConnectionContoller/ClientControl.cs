@@ -17,12 +17,9 @@ namespace SocketTestClient.ConnectionContoller
         SocketDeamonSender _sender;
         public ClientControl()
         {
-            _ctrlList = new List<IRequestController>();
-            OrderSendController orderCtrl = new OrderSendController();
-            _ctrlList.Add(orderCtrl);
-            RateDataRequestController rateDataCtrl = new RateDataRequestController();
-            _ctrlList.Add(rateDataCtrl);
+
         }
+
 
         public void Add(IRequestController ctrl)
         {
@@ -33,6 +30,7 @@ namespace SocketTestClient.ConnectionContoller
         {
             IRequest rcvReq, sendReq;
             bool isDoSend;
+            bool isNeedInit = true;
 
 
             _sender = new SocketDeamonSender();
@@ -41,7 +39,14 @@ namespace SocketTestClient.ConnectionContoller
                 if (_sender.State != DeamonState.Connected)
                 {
                     Thread.Sleep(2000);
+                    isNeedInit = true;
                     continue;
+                }
+
+                if (isNeedInit == true)
+                {
+                    Init();
+                    isNeedInit = false;
                 }
 
                 rcvReq = _sender.Get();
@@ -70,6 +75,15 @@ namespace SocketTestClient.ConnectionContoller
                 }
 
             }
+        }
+
+        private void Init()
+        {
+            _ctrlList = new List<IRequestController>();
+            OrderSendController orderCtrl = new OrderSendController();
+            _ctrlList.Add(orderCtrl);
+            RateDataRequestController rateDataCtrl = new RateDataRequestController();
+            _ctrlList.Add(rateDataCtrl);
         }
 
 

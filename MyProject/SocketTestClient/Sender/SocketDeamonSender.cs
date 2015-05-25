@@ -207,7 +207,7 @@ namespace SocketTestClient.Sender
         {
             _clientSocket.Shutdown(SocketShutdown.Both);
             _clientSocket.Close();
-            _deamonState = DeamonState.Disconnected;
+            _deamonState = DeamonState.Disconnecting;
         }
 
         private int SendOnePacket(byte[] buffer)
