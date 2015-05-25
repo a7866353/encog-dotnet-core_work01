@@ -132,6 +132,8 @@ namespace SocketTestClient.Sender
         private DeamonState StateDisconnected()
         {
             _clientSocket = _socket.Accept();
+            _clientSocket.ReceiveTimeout = 1000;
+
             _deamonState = DeamonState.Connected;
             printf("[Srv] Client attatched!");
 
@@ -163,11 +165,23 @@ namespace SocketTestClient.Sender
 
         private DeamonState StateSending()
         {
+            int rcvCount;
             // Send Request
-            SendOnePacket(_sendRquest.GetBytes());
-
+            rcvCount = SendOnePacket(_sendRquest.GetBytes());
+            if( rcvCount < 0)
+            {
+                _sendFinishEvent.Release();
+                Disconnect();
+                return _deamonState;
+            }
             //Get Result
-            int rcvCount = GetOnePacket(_rcvBuffer);
+            rcvCount = GetOnePacket(_rcvBuffer);
+            if (rcvCount < 0)
+            {
+                _sendFinishEvent.Release();
+                Disconnect();
+                return _deamonState;
+            }
             // data received
             _sendRquest.FromBytes(_rcvBuffer, rcvCount);
 
@@ -189,7 +203,14 @@ namespace SocketTestClient.Sender
             return _deamonState;
         }
 
-        private void SendOnePacket(byte[] buffer)
+        private void Disconnect()
+        {
+            _clientSocket.Shutdown(SocketShutdown.Both);
+            _clientSocket.Close();
+            _deamonState = DeamonState.Disconnected;
+        }
+
+        private int SendOnePacket(byte[] buffer)
         {
             int rcvCount;
 
@@ -201,6 +222,7 @@ namespace SocketTestClient.Sender
             catch (Exception e)
             {
                 printf("[Srv]" + e.Message);
+                return -1;
             }
 
             // Get ACK
@@ -210,8 +232,10 @@ namespace SocketTestClient.Sender
             }
             catch (Exception e)
             {
-                // timeout
+                // Timeout
+                return -1;
             }
+            return 0;
         }
         
         private int GetOnePacket(byte[] buffer)
@@ -225,6 +249,7 @@ namespace SocketTestClient.Sender
             catch (Exception e)
             {
                 // timeout
+                rcvCount = -1;
             }
 
             byte[] ackBuffer = new byte[] { 0x55 };

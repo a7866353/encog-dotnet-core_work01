@@ -58,6 +58,7 @@ namespace SocketTestClient.RequestObject
             Nothing = 0,
             Buy = 1,
             Sell = 2,
+            Close = 3,
         }
     }
 }

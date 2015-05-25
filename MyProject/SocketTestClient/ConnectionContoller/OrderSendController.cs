@@ -11,23 +11,16 @@ using System.Threading.Tasks;
 
 namespace SocketTestClient.ConnectionContoller
 {
-    enum OrderCommand
-    {
-        Nothing = 0,
-        Buy,
-        Sell,
-    }
     class TradeOrder
     {
         private RateDataControlDAO _dataController;
-        private NetworkController _networkController;
         private ITradeDesisoin _decisionCtrl;
         private DateTime _lastTradeTime;
 
         public TradeOrder(string rateDataControllerName, string networkControllerName)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
-            _networkController = NetworkController.Open(networkControllerName);
+            NetworkController _networkController = NetworkController.Open(networkControllerName);
             _decisionCtrl = _networkController.GetDecisionController();
             _lastTradeTime = DateTime.Now;
         }
@@ -37,53 +30,25 @@ namespace SocketTestClient.ConnectionContoller
             get { return _dataController.SymbolName; }
         }
 
-        public OrderCommand GetNextCommand()
+        public MarketActions GetNextCommand()
         {
-
             _dataController.Update();
             if (_dataController.LastItemTime > _lastTradeTime)
             {
                 _lastTradeTime = _dataController.LastItemTime;
-                RateData[] rateDataArr = _dataController.Get(_lastTradeTime, _decisionCtrl.InputDataLength);
+                RateData[] rateDataArr = _dataController.GetByEndTime(_lastTradeTime, _decisionCtrl.InputDataLength);
                 return Calculte(rateDataArr);
             }
-            return OrderCommand.Nothing;
+            return MarketActions.Nothing;
         }
-        private OrderCommand Calculte(RateData[] rateDataArr)
+        private MarketActions Calculte(RateData[] rateDataArr)
         {
             double[] dataArr = new double[rateDataArr.Length];
             for (int i = 0; i < dataArr.Length; i++)
-                dataArr[i] = Normallize((rateDataArr[i].high + rateDataArr[i].low) / 2);
+                dataArr[i] = (rateDataArr[i].high + rateDataArr[i].low) / 2;
             MarketActions res = _decisionCtrl.GetAction(dataArr);
 
-            return ChoseAction(res);
-        }
-
-        private double Normallize(double value)
-        {
-            return (value + _networkController.DataOffset) * _networkController.DataScale;
-        }
-
-        private OrderCommand ChoseAction(MarketActions result)
-        {
-            OrderCommand cmd;
-             // Do action
-            switch (result)
-            {
-                case MarketActions.Nothing:
-                    cmd = OrderCommand.Nothing;
-                    break;
-                case MarketActions.Buy:
-                    cmd = OrderCommand.Buy;
-                    break;
-                case MarketActions.Sell:
-                    cmd = OrderCommand.Sell;
-                    break;
-                default:
-                    cmd = OrderCommand.Nothing;
-                    break;
-            }
-            return cmd;
+            return res;
         }
 
     }
@@ -104,20 +69,25 @@ namespace SocketTestClient.ConnectionContoller
         {
             foreach(TradeOrder order in _tradeOrderList)
             {
-                OrderCommand cmd = order.GetNextCommand();
-                if (cmd == OrderCommand.Nothing)
+                MarketActions cmd = order.GetNextCommand();
+                if (cmd == MarketActions.Nothing)
                     continue;
                 SendOrderRequest req = new SendOrderRequest();
                 req.SymbolName = order.SymbolName;
-                if (cmd == OrderCommand.Buy)
+                if (cmd == MarketActions.Buy)
                 {
                     req.OrderCmd = SendOrderRequest.Cmd.Buy;
                     Printf("Buy");
                 }
-                else if (cmd == OrderCommand.Sell)
+                else if (cmd == MarketActions.Sell)
                 {
                     req.OrderCmd = SendOrderRequest.Cmd.Sell;
                     Printf("Sell");
+                }
+                else if (cmd == MarketActions.Close)
+                {
+                    req.OrderCmd = SendOrderRequest.Cmd.Close;
+                    Printf("Close");
                 }
                 else
                     throw (new Exception("Parm error!"));

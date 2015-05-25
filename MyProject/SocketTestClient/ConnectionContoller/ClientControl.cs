@@ -12,23 +12,28 @@ namespace SocketTestClient.ConnectionContoller
 {
     class ClientControl
     {
+        private List<IRequestController> _ctrlList;
         
         SocketDeamonSender _sender;
         public ClientControl()
         {
+            _ctrlList = new List<IRequestController>();
+            OrderSendController orderCtrl = new OrderSendController();
+            _ctrlList.Add(orderCtrl);
+            RateDataRequestController rateDataCtrl = new RateDataRequestController();
+            _ctrlList.Add(rateDataCtrl);
+        }
 
-  
+        public void Add(IRequestController ctrl)
+        {
+            _ctrlList.Add(ctrl);
         }
 
         public void StartListen()
         {
             IRequest rcvReq, sendReq;
             bool isDoSend;
-            List<IRequestController> ctrlList = new List<IRequestController>();
-            OrderSendController orderCtrl = new OrderSendController();
-            ctrlList.Add(orderCtrl);
-            RateDataRequestController rateDataCtrl = new RateDataRequestController();
-            ctrlList.Add(rateDataCtrl);
+
 
             _sender = new SocketDeamonSender();
             while (true)
@@ -44,29 +49,24 @@ namespace SocketTestClient.ConnectionContoller
                 {
                     // DealWithSend
                     isDoSend = false;
-                    if (rateDataCtrl.IsFinish == true)
+                    foreach (IRequestController ctrl in _ctrlList)
                     {
-                        foreach (IRequestController ctrl in ctrlList)
+                        sendReq = ctrl.GetRequest();
+                        if (sendReq != null)
                         {
-                            sendReq = ctrl.GetRequest();
-                            if (sendReq != null)
-                            {
-                                isDoSend = true;
-                                _sender.Send(sendReq);
-                                break;
-                            }
+                            isDoSend = true;
+                            _sender.Send(sendReq);
+                            break;
                         }
                     }
+                    
                     
                     if (isDoSend == false)
                         Thread.Sleep(100);
                 }
                 else
                 {
-                    if (rcvReq.GetType() == typeof(RateDataIndicateRequest))
-                    {
-                        rateDataCtrl.SetResult(rcvReq);
-                    }
+                    // Todo Nothing
                 }
 
             }

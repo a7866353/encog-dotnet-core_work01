@@ -11,6 +11,37 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace SocketTestClient.RateDataController
 {
+    class RateDataDateComparer : IComparer<RateData>
+    {
+        private bool _isIncr = false;
+
+        public RateDataDateComparer(bool isIncr)
+        {
+            _isIncr = isIncr;
+        }
+        public int Compare(RateData x, RateData y)
+        {
+            if (_isIncr)
+            {
+                if (x.time > y.time)
+                    return 1;
+                else if (x.time == y.time)
+                    return 0;
+                else
+                    return -1;
+            }
+            else
+            {
+                if (x.time < y.time)
+                    return 1;
+                else if (x.time == y.time)
+                    return 0;
+                else
+                    return -1;
+            }
+
+        }
+    }
     class RateData
     {
         public ObjectId _id;
@@ -240,7 +271,28 @@ namespace SocketTestClient.RateDataController
 
             return dataArr;
         }
+        public RateData[] GetByEndTime(DateTime endTime, int count)
+        {
+            MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
 
+            MongoDatabase db = connector.Connect();
+            MongoCollection<RateData> collection = db.GetCollection<RateData>(CollectiongName);
+            QueryDocument query = new QueryDocument();
+            BsonDocument b = new BsonDocument();
+            b.Add("$lt", endTime);
+            query.Add("time", b);
+
+            SortByDocument sDown = new SortByDocument();
+            sDown.Add("time", -1);
+
+            SortByDocument sUp = new SortByDocument();
+            sDown.Add("time", 1);
+
+
+            var curst = collection.Find(query).SetSortOrder(sDown).SetLimit(count).SetSortOrder(sUp);
+            RateData[] dataArr = curst.ToArray<RateData>();
+            return dataArr;
+        }
         public RateData[] Get(int startIndex, int count)
         {
             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
