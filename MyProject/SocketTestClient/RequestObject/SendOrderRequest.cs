@@ -16,7 +16,7 @@ namespace SocketTestClient.RequestObject
 
     class SendOrderRequest : IRequest
     {
-        public RequestType OrderType = RequestType.SendOrderRequire;
+        public RequestType OrderType = RequestType.SendOrderRequest;
         public string SymbolName;
         public Cmd OrderCmd;
 

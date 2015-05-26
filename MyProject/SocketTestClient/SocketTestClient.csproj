@@ -64,6 +64,7 @@
     <Compile Include="RequestObject\SendOrderRequest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestObject\SymbolNameListRequest.cs" />
     <Compile Include="RequestObject\TestRequest.cs" />
     <Compile Include="Sender\ISender.cs" />
     <Compile Include="Sender\SocketDeamonSender.cs" />

@@ -10,7 +10,7 @@ namespace SocketTestClient.RequestObject
 {
     class RateRequest : IRequest
     {
-        public RequestType OrderType = RequestType.RateDataRequire;
+        public RequestType OrderType = RequestType.RateDataRequest;
 
         public string SymbolName;
         public int TimeFrame;

@@ -9,7 +9,7 @@ namespace SocketTestClient.RequestObject
 {
     class TestRequest : IRequest
     {
-        public RequestType OrderType = RequestType.TestRequire;
+        public RequestType OrderType = RequestType.TestRequest;
         public double doubleTest = 0.5;
         public int intTest = 1234567;
         public short shortTest = 1234;

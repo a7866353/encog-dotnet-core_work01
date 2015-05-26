@@ -10,12 +10,13 @@ namespace SocketTestClient.RequestObject
     enum RequestType
     {
         None = 0,
-        TestRequire,
-        SendOrderRequire,
-        RateDataRequire,
+        TestRequest,
+        SendOrderRequest,
+        SendOrderResult,
+        RateDataRequest,
         RateDataIndicate,
-
-
+        SymbolNameListRequest,
+        SymbolNameListResult,
     }
     class Request
     {
@@ -25,10 +26,10 @@ namespace SocketTestClient.RequestObject
             RequestType type = GetType(data);
             switch(type)
             {
-                case RequestType.RateDataRequire:
+                case RequestType.RateDataRequest:
                     res = new RateRequest();
                     break;
-                case RequestType.TestRequire:
+                case RequestType.TestRequest:
                     res = new TestRequest();
                     break;
                 case RequestType.RateDataIndicate:

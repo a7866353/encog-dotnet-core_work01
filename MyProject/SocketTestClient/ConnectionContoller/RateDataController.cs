@@ -23,6 +23,7 @@ namespace SocketTestClient.ConnectionContoller
         private RateRequest _lastRequest;
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
         private DateTimeFormatInfo _dtFormat;
+        private bool _isSymbolListUpdated;
 
         private RateDataNeed[] _need = new RateDataNeed[]
         {
@@ -58,18 +59,9 @@ namespace SocketTestClient.ConnectionContoller
 
         public RateDataRequestController()
         {
+            _isSymbolListUpdated = false;
             _rateDataList = new RateDataDAOList();
             _currentTargetDao = null;
-
-            foreach( RateDataNeed info in _need)
-            {
-                if (_rateDataList.Get(info.Name) == null)
-                {
-                    _rateDataList.Add(info.Name, info.SymbolName, info.Timeframe, new DateTime(1988, 1, 1, 0, 0, 0));
-                }
-            }
-            
-
             _dtFormat = new DateTimeFormatInfo();
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
         }
@@ -79,6 +71,13 @@ namespace SocketTestClient.ConnectionContoller
 
             if (_currentTargetDao != null)
                 return null;
+
+            if(_isSymbolListUpdated == false)
+            {
+                SymbolNameListRequest req = new SymbolNameListRequest();
+                req.ReqCtrl = this;
+                return req;
+            }
 
             foreach( RateDataControlDAO dao in _rateDataList)
             {
@@ -146,6 +145,19 @@ namespace SocketTestClient.ConnectionContoller
             req.ReqCtrl = this;
 
             return req;
+        }
+
+        public void UpdateSymbolList(string[] symbols)
+        {
+            foreach (RateDataNeed info in _need)
+            {
+                if (_rateDataList.Get(info.Name) == null)
+                {
+                    _rateDataList.Add(info.Name, info.SymbolName, info.Timeframe, new DateTime(1988, 1, 1, 0, 0, 0));
+                }
+            }
+
+            _isSymbolListUpdated = true;
         }
 
         private void Printf(string str)
