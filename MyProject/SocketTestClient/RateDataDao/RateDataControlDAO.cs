@@ -160,8 +160,22 @@ namespace SocketTestClient.RateDataController
 
             Remove();
             this.Save();
+            SetIndex();
+
         }
 
+        private void SetIndex()
+        {
+            MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
+            MongoDatabase db = connector.Connect();
+            MongoCollection<RateData> collection = db.GetCollection<RateData>(CollectiongName);
+            // collection.CreateIndex("time", IndexOptions.SetUnique);
+            collection.CreateIndex(IndexKeys.Ascending("time"), IndexOptions.SetUnique(true));
+            collection.CreateIndex(IndexKeys.Descending("time"), IndexOptions.SetUnique(true));
+            connector.Close();
+
+
+        }
         public void Save()
         {
             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();

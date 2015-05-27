@@ -23,7 +23,6 @@ namespace SocketTestClient.ConnectionContoller
         private RateRequest _lastRequest;
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
         private DateTimeFormatInfo _dtFormat;
-        private bool _isSymbolListUpdated;
 
         private RateDataNeed[] _need = new RateDataNeed[]
         {
@@ -59,7 +58,6 @@ namespace SocketTestClient.ConnectionContoller
 
         public RateDataRequestController()
         {
-            _isSymbolListUpdated = false;
             _rateDataList = new RateDataDAOList();
             _currentTargetDao = null;
             _dtFormat = new DateTimeFormatInfo();
@@ -72,7 +70,7 @@ namespace SocketTestClient.ConnectionContoller
             if (_currentTargetDao != null)
                 return null;
 
-            if(_isSymbolListUpdated == false)
+            if (_rateDataList.Count == 0 )
             {
                 SymbolNameListRequest req = new SymbolNameListRequest();
                 req.ReqCtrl = this;
@@ -149,6 +147,7 @@ namespace SocketTestClient.ConnectionContoller
 
         public void UpdateSymbolList(string[] symbols)
         {
+            // Add Test Symbol
             foreach (RateDataNeed info in _need)
             {
                 if (_rateDataList.Get(info.Name) == null)
@@ -157,7 +156,19 @@ namespace SocketTestClient.ConnectionContoller
                 }
             }
 
-            _isSymbolListUpdated = true;
+            // Add all Symbol
+            foreach( string symbol in symbols)
+            {
+                foreach( int timeFrame in _timeFrameArray)
+                {
+                    string name = symbol + timeFrame;
+                    if (_rateDataList.Get(name) == null)
+                    {
+                        _rateDataList.Add(name, symbol, timeFrame, new DateTime(1900, 1, 1, 0, 0, 0));
+                    }
+
+                }
+            }
         }
 
         private void Printf(string str)
