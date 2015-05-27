@@ -23,6 +23,7 @@ namespace SocketTestClient.ConnectionContoller
         private RateRequest _lastRequest;
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
         private DateTimeFormatInfo _dtFormat;
+        private bool _isSymbolListUpdated;
 
         private RateDataNeed[] _need = new RateDataNeed[]
         {
@@ -62,6 +63,7 @@ namespace SocketTestClient.ConnectionContoller
             _currentTargetDao = null;
             _dtFormat = new DateTimeFormatInfo();
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
+            _isSymbolListUpdated = false;
         }
 
         public IRequest GetRequest()
@@ -70,7 +72,7 @@ namespace SocketTestClient.ConnectionContoller
             if (_currentTargetDao != null)
                 return null;
 
-            if (_rateDataList.Count == 0 )
+            if (_isSymbolListUpdated == false)
             {
                 SymbolNameListRequest req = new SymbolNameListRequest();
                 req.ReqCtrl = this;
@@ -169,6 +171,7 @@ namespace SocketTestClient.ConnectionContoller
 
                 }
             }
+            _isSymbolListUpdated = true;
         }
 
         private void Printf(string str)

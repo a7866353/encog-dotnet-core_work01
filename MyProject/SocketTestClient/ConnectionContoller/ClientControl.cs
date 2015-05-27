@@ -38,7 +38,7 @@ namespace SocketTestClient.ConnectionContoller
             {
                 if (_sender.State != DeamonState.Connected)
                 {
-                    Thread.Sleep(2000);
+                    Thread.Sleep(500);
                     isNeedInit = true;
                     continue;
                 }
