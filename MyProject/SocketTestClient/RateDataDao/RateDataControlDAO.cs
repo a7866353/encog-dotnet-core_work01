@@ -170,7 +170,8 @@ namespace SocketTestClient.RateDataController
             MongoDatabase db = connector.Connect();
             MongoCollection<RateData> collection = db.GetCollection<RateData>(CollectiongName);
             // collection.CreateIndex("time", IndexOptions.SetUnique);
-            collection.CreateIndex(IndexKeys.Ascending("time"), IndexOptions.SetUnique(true));
+
+
             collection.CreateIndex(IndexKeys.Descending("time"), IndexOptions.SetUnique(true));
             connector.Close();
 
