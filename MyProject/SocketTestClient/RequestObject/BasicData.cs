@@ -104,7 +104,7 @@ namespace SocketTestClient.RequestObject
                 length = _buffer.Length - _index;
             else
                 length = pos+1;
-            string str = Encoding.ASCII.GetString(_buffer, _index, length);
+            string str = Encoding.ASCII.GetString(_buffer, _index, pos);
 
             _index += length;
             return str;

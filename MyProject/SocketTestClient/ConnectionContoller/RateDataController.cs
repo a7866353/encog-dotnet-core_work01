@@ -68,10 +68,10 @@ namespace SocketTestClient.ConnectionContoller
 
         public IRequest GetRequest()
         {
-
+            /*
             if (_currentTargetDao != null)
                 return null;
-
+            */
             if (_isSymbolListUpdated == false)
             {
                 SymbolNameListRequest req = new SymbolNameListRequest();
@@ -95,29 +95,36 @@ namespace SocketTestClient.ConnectionContoller
         {
             RateDataIndicateRequest indicate = (RateDataIndicateRequest)req;
             RateInfo[] infoArr = indicate.RateInfoArray;
-            List<RateData> dataList = new List<RateData>(infoArr.Length);
-            foreach(RateInfo info in infoArr)
+            List<RateData> dataList = new List<RateData>();
+
+            if (infoArr != null)
             {
-                DateTime time = Convert.ToDateTime(info.time, _dtFormat);
-                if (time <= _currentTargetDao.LastItemTime)
-                    continue;
+                foreach (RateInfo info in infoArr)
+                {
+                    DateTime time = Convert.ToDateTime(info.time, _dtFormat);
+                    if (time <= _currentTargetDao.LastItemTime)
+                        continue;
 
-                RateData data = new RateData();
-                data.time = time;
-                data.high = info.high;
-                data.low = info.low;
-                data.open = info.open;
-                data.close = info.close;
+                    RateData data = new RateData();
+                    data.time = time;
+                    data.high = info.high;
+                    data.low = info.low;
+                    data.open = info.open;
+                    data.close = info.close;
 
-                dataList.Add(data);
+                    dataList.Add(data);
+                }
+                if (dataList.Count != 0)
+                    _currentTargetDao.Add(dataList.ToArray());
             }
-            if(dataList.Count != 0)
-                _currentTargetDao.Add(dataList.ToArray());
-
+            else
+            {
+                infoArr = infoArr;
+            }
             _currentTargetDao.LastGetTime = _lastRequest.StopTime;
             _currentTargetDao.Save();
 
-            Printf("Get:From" + _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
+            Printf("Get:" + _currentTargetDao.SymbolName + " From" + _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
 
             if (indicate.EndFlag == true)
             {
@@ -166,7 +173,7 @@ namespace SocketTestClient.ConnectionContoller
                     string name = symbol + timeFrame;
                     if (_rateDataList.Get(name) == null)
                     {
-                        _rateDataList.Add(name, symbol, timeFrame, new DateTime(1900, 1, 1, 0, 0, 0));
+                        _rateDataList.Add(name, symbol, timeFrame, new DateTime(1988, 1, 1, 0, 0, 0));
                     }
 
                 }

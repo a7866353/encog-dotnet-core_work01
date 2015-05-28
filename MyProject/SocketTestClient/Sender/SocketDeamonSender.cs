@@ -132,7 +132,7 @@ namespace SocketTestClient.Sender
         private DeamonState StateDisconnected()
         {
             _clientSocket = _socket.Accept();
-            _clientSocket.ReceiveTimeout = 1000;
+            // _clientSocket.ReceiveTimeout = 1000;
 
             _deamonState = DeamonState.Connected;
             printf("[Srv] Client attatched!");

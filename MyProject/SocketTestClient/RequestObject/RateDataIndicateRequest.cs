@@ -33,6 +33,8 @@ namespace SocketTestClient.RequestObject
             DataRcvBuffer rb = new DataRcvBuffer(data, length);
             rb.GetInt();
             int count = rb.GetInt();
+            if (count <= 0)
+                return;
             EndFlag = rb.GetBool();
             RateInfoArray = new RateInfo[count];
             for (int i = 0; i < count;i++ )
