@@ -225,16 +225,6 @@ namespace SocketTestClient.Sender
                 return -1;
             }
 
-            // Get ACK
-            try
-            {
-                rcvCount = _clientSocket.Receive(_rcvBuffer);
-            }
-            catch (Exception e)
-            {
-                // Timeout
-                return -1;
-            }
             return 0;
         }
         
@@ -250,16 +240,6 @@ namespace SocketTestClient.Sender
             {
                 // timeout
                 rcvCount = -1;
-            }
-
-            byte[] ackBuffer = new byte[] { 0x55 };
-            try
-            {
-                rcvCount = _clientSocket.Send(ackBuffer);
-            }
-            catch (Exception e)
-            {
-                printf("[Srv]" + e.Message);
             }
             return rcvCount;
         }
