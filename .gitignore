@@ -46,6 +46,7 @@ encog-core-cs.5.1.ReSharper.user.orig
 /MyProject/DllTools/DllTools/Release
 /MyProject/DllTools/DllTools/x64/Release
 /MyProject/SocketTestClient/obj
+/MyProject/SocketPipeClient/obj
 /MyProject/common
 /x64/Release
 /*.sdf
