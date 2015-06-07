@@ -67,6 +67,7 @@
     <Compile Include="RequestObject\SymbolNameListRequest.cs" />
     <Compile Include="RequestObject\TestRequest.cs" />
     <Compile Include="Sender\ISender.cs" />
+    <Compile Include="Sender\PacketAnalyzer.cs" />
     <Compile Include="Sender\SocketDeamonSender.cs" />
     <Compile Include="Sender\SocketSender.cs" />
   </ItemGroup>

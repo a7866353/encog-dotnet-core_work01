@@ -17,8 +17,8 @@ namespace SocketTestClient
         {
             System.Console.WriteLine("Test Started!");
 
-            TestClientDeamon();
-            // TestOrderSendRequest();
+            // TestClientDeamon();
+            TestSocketDeamon();
          
         }
 

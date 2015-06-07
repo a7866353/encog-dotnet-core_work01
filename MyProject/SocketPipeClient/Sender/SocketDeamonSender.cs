@@ -39,7 +39,7 @@ namespace SocketTestClient.Sender
         }
 
         private byte[] _rcvBuffer = new byte[1024*1024];
-
+        private PacketAnalyzer _packetAnalyzer;
         public SocketDeamonSender()
         {
             _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
@@ -51,6 +51,8 @@ namespace SocketTestClient.Sender
             _deamonState = DeamonState.Disconnected;
 
             _receiveRequestList = new List<IRequest>();
+
+            _packetAnalyzer = new PacketAnalyzer();
 
             _listenThread = new Thread(new ThreadStart(ListenClientTask));
             _listenThread.Start();
@@ -166,6 +168,7 @@ namespace SocketTestClient.Sender
         private DeamonState StateSending()
         {
             int rcvCount;
+            byte[] buffer;
             // Send Request
             rcvCount = SendOnePacket(_sendRquest.GetBytes());
             if( rcvCount < 0)
@@ -175,7 +178,7 @@ namespace SocketTestClient.Sender
                 return _deamonState;
             }
             //Get Result
-            rcvCount = GetOnePacket(_rcvBuffer);
+            buffer = GetOnePacket();
             if (rcvCount < 0)
             {
                 _sendFinishEvent.Release();
@@ -183,7 +186,7 @@ namespace SocketTestClient.Sender
                 return _deamonState;
             }
             // data received
-            _sendRquest.FromBytes(_rcvBuffer, rcvCount);
+            _sendRquest.FromBytes(buffer, buffer.Length);
 
             _sendFinishEvent.Release();
 
@@ -193,9 +196,9 @@ namespace SocketTestClient.Sender
 
         private DeamonState StateReceiving()
         {
-            int rcvCount = GetOnePacket(_rcvBuffer);
+            byte[] buffer = GetOnePacket();
             // data received
-            IRequest rcvReq = Request.FromBytes(_rcvBuffer, rcvCount);
+            IRequest rcvReq = Request.FromBytes(buffer, buffer.Length);
             if (rcvReq != null)
                 _receiveRequestList.Add(rcvReq);
 
@@ -213,10 +216,11 @@ namespace SocketTestClient.Sender
         private int SendOnePacket(byte[] buffer)
         {
             int rcvCount;
-
+            _packetAnalyzer.SetBufferLength(buffer.Length);
             // Send data
             try
             {
+                rcvCount = _clientSocket.Send(_packetAnalyzer.GetHeader());
                 rcvCount = _clientSocket.Send(buffer);
             }
             catch (Exception e)
@@ -228,20 +232,27 @@ namespace SocketTestClient.Sender
             return 0;
         }
         
-        private int GetOnePacket(byte[] buffer)
+        private byte[] GetOnePacket()
         {
             int rcvCount = 0;
+            byte[] buffer = null;
             // _clientSocket.ReceiveTimeout = 500;
-            try
+            while (true)
             {
-                rcvCount = _clientSocket.Receive(buffer);
+                try
+                {
+                    rcvCount = _clientSocket.Receive(_rcvBuffer);
+                }
+                catch (Exception e)
+                {
+                    // timeout
+                    rcvCount = -1;
+                }
+                buffer = _packetAnalyzer.SetBuffer(_rcvBuffer, rcvCount);
+                if (buffer != null)
+                    break;
             }
-            catch (Exception e)
-            {
-                // timeout
-                rcvCount = -1;
-            }
-            return rcvCount;
+            return buffer;
         }
 
         private DeamonState StateDisconnecting()
