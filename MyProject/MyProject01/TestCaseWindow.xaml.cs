@@ -81,16 +81,18 @@ namespace MyProject01
             TestCaseList = new TestCaseGroup();
 
             AddTestCase();
+            int i = 0;
 
             foreach( TestCaseObject obj in TestCaseList)
             {
-                string displayName = obj.Name + ": " + obj.Description;
+                string displayName = "[" + i.ToString("D2") + "]" + obj.Name + ": " + obj.Description;
+                i++;
                 Border border = new Border();
-                border.BorderThickness = new Thickness(4, 2, 4, 2);
+                border.BorderThickness = new Thickness(4, 1, 4, 1);
                 border.BorderBrush = Brushes.Black;
 
                 Button testButton = new Button();
-                testButton.Height = 30;
+                testButton.Height = 20;
                 testButton.Content = displayName;
                 testButton.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
                 testButton.Click += new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
@@ -447,6 +449,26 @@ namespace MyProject01
             }));
         }
 
+
+        private void AddCrossTestCase(TestCaseGroup group)
+        {
+            int populatim = 512;
+            int[] dataBlockLength = new int[]{32 ,1024};
+            DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.D1 };
+            foreach (int blockLength in dataBlockLength)
+            {
+                foreach(DataTimeType timeFrame in timeFrameArr)
+                {
+                    RawRateTestCase rawCase = new RawRateTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength, TimeFrame = timeFrame,};
+                    FwtNormTestCase fwtCase = new FwtNormTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength, TimeFrame = timeFrame, };
+                    group.Add(rawCase);
+                    group.Add(fwtCase);
+                }
+            }
+            
+
+                
+        }
         private void AddTestCase()
         {
             TestCaseGroup oldTestList = new TestCaseGroup()
@@ -475,6 +497,8 @@ namespace MyProject01
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
 
+            AddCrossTestCase(newTestList);
+            /*
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });
             newTestList.Add(new FwtNorm1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
@@ -488,9 +512,11 @@ namespace MyProject01
             newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 1000 });
             newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 100 });
             newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 1000 });
-
+            */
             TestCaseList.Add(newTestList);
-            TestCaseList.Add(oldTestList);
+
+            // TestCaseList.Add(oldTestList);
+             
         }
     }
 }

@@ -101,7 +101,7 @@ namespace MyProject01.InputDataAnalyzerTool
 
         public void Run()
         {
-            DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.M5);
             RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
             
 

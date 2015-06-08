@@ -24,7 +24,7 @@ namespace MyProject01.TestCases
 
         public void Init()
         {
-            _loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            _loader = new MTDataLoader("USDJPY", DataTimeType.M5);
 
             int count = _loader.Count / DataLength;
             if (count == 0)

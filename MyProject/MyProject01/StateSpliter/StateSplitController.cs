@@ -24,7 +24,7 @@ namespace MyProject01.StateSpliter
         {
             // init test data
             // _loader = new MTData2Loader(RateDataControllerName);
-            _loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+            _loader = new MTDataLoader("USDJPY", DataTimeType.M5);
             ResultArr = null;
         }
 

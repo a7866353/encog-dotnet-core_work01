@@ -12,10 +12,16 @@ namespace MyProject01.Util
     enum DataTimeType
     {
         None = 0,
-        Time1Min = 1,
-        Time5Min = 5,
-        Time10Min = 10,
-        Timer1Day = 24*60,
+        // M1 = 1,
+        M5 = 5,
+        M10 = 10,
+        M30 = 30,
+        H1 = 60,
+        // H2 = 120,
+        // H3 = 180, 
+        // H4 = 240,
+        D1 = 1440,
+        // W1 = 10080,
     }
     class MTDataLoader : DataLoader
     {
@@ -33,16 +39,18 @@ namespace MyProject01.Util
             {
                 case DataTimeType.None:
                     break;
-                case DataTimeType.Time10Min:
+                case DataTimeType.M10:
                     countLimit *= 10;
                     break;
-                case DataTimeType.Time1Min:
+                    /*
+                case DataTimeType.M1:
                     countLimit *= 1;
                     break;
-                case DataTimeType.Time5Min:
+                     */
+                case DataTimeType.M5:
                     countLimit *= 5;
                     break;
-                case DataTimeType.Timer1Day:
+                case DataTimeType.D1:
                     countLimit *= 60 * 24;
                     break;
                 default:

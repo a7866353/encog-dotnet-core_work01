@@ -202,7 +202,61 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+    class RawRateTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+        public DataTimeType TimeFrame
+        {
+            set { dataFactory.TimeFrame = value; }
+        }
 
+        private NEATRateStateKeepControllerFactory controllerFactory;
+        private OldRateTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public RawRateTestCase()
+        {
+            controllerFactory = new NEATRateStateKeepControllerFactory();
+            dataFactory = new OldRateTrainingDataFactory();
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+            controllerFactory.InputLength = 32;
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            BlockDataNormalizer norm = new BlockDataNormalizer();
+            norm.Normalize(trainerFactory.TrainingData.TrainDataBlock);
+            controllerFactory.Name = TestName;
+            controllerFactory.Offset = norm.Offset;
+            controllerFactory.Scale = norm.Scacle;
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
     class FwtNorm1DayTestCase : BasicRateMarketTestCase
     {
         public int DataBlockLength
@@ -357,6 +411,58 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+    class FwtNormTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+        public DataTimeType TimeFrame
+        {
+            set { dataFactory.TimeFrame = value; }
+        }
 
+        private NEATFWTNromStateKeepControllerFactory controllerFactory;
+        private OldRateTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public FwtNormTestCase()
+        {
+            controllerFactory = new NEATFWTNromStateKeepControllerFactory();
+            dataFactory = new OldRateTrainingDataFactory();
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            controllerFactory.NormalyzeData = trainerFactory.TrainingData.TrainDataBlock;
+            controllerFactory.Name = TestName;
+
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
 
 }

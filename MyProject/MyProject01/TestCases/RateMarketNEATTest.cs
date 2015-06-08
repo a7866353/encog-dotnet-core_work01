@@ -58,7 +58,7 @@ namespace MyProject01.TestCases
             DataLoader loader;
             if (DataSoreceType == 0)
             {
-                loader = new MTDataLoader("USDJPY", DataTimeType.Time5Min);
+                loader = new MTDataLoader("USDJPY", DataTimeType.M5);
                 // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
             }
             else
