@@ -4,12 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace MyProject01
 {
     abstract class BasicTestCase
     {
         public string TestName = DateTime.Now.ToString("yyyyMMdd__HHmmss__fff");
+        public BasicTestCase()
+        {
+            Thread.Sleep(1);
+        }
         virtual public string TestDescription
         {
             get { return "None"; }

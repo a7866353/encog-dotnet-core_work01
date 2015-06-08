@@ -13,21 +13,25 @@ namespace MyProject01.DAO
         // public static string ConnectionString = @"mongodb://192.168.1.11";
         public static string ConnectionString = @"mongodb://127.0.0.1";
 
+        private static MongoServer server = null;
+
         public MongoDatabase Database
         {
             get { return db; }
         }
 
-        private MongoServer server;
         private MongoDatabase db;
 
 
         public MongoDatabase Connect()
         {
-            server = MongoServer.Create(ConnectionString);
-            if (null == server)
+            if (server == null)
             {
-                throw (new Exception("Cannot connect to server!"));
+                server = MongoServer.Create(ConnectionString);
+                if (null == server)
+                {
+                    throw (new Exception("Cannot connect to server!"));
+                }
             }
 
             db = server.GetDatabase(DatabaseName); // Create a new Database or get a current Database
@@ -41,7 +45,7 @@ namespace MyProject01.DAO
 
         public void Close()
         {
-            server.Disconnect();
+            // server.Disconnect();
             db = null;
         }
     }
@@ -64,19 +68,21 @@ namespace MyProject01.DAO
             get { return db; }
         }
 
-        private MongoServer server;
+        private static MongoServer server = null;
         private MongoDatabase db;
 
 
         public MongoDatabase Connect()
         {
             // Lock.WaitOne();
-
-            MongoClient client = new MongoClient(ConnectionString);
-            server = client.GetServer();
-            if (null == server)
+            if (server == null)
             {
-                throw (new Exception("Cannot connect to server!"));
+                MongoClient client = new MongoClient(ConnectionString);
+                server = client.GetServer();
+                if (null == server)
+                {
+                    throw (new Exception("Cannot connect to server!"));
+                }
             }
 
             db = server.GetDatabase(DatabaseName); // Create a new Database or get a current Database
@@ -90,7 +96,7 @@ namespace MyProject01.DAO
 
         public void Close()
         {
-            server.Disconnect();
+            // server.Disconnect();
             db = null;
             // Lock.Release();
         }

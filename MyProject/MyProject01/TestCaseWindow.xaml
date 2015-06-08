@@ -10,5 +10,6 @@
         </ScrollViewer>
         <Label Content="TestName: " HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.929,0.464" Margin="39,0,0,0" Visibility="Hidden"/>
         <TextBox Name="TestNameTextBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" Margin="114,2,0,0" Visibility="Hidden"/>
+        <Button Content="Start All" Name="StartAllButton" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="120,0,0,0"/>
     </Grid>
 </Window>

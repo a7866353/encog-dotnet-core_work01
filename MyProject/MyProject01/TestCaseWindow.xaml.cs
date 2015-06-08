@@ -31,6 +31,7 @@ using MyProject01.Win;
 using MyProject01.Util.DllTools;
 using MyProject01.Controller;
 using MyProject01.TestCases.RateMarketTestCases;
+using System.Threading;
 
 namespace MyProject01
 {
@@ -79,7 +80,7 @@ namespace MyProject01
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.Closing += TestCaseWindow_Closing;
             TestCaseList = new TestCaseGroup();
-
+            StartAllButton.Click += StartAllButton_Click;
             AddTestCase();
             int i = 0;
 
@@ -105,6 +106,11 @@ namespace MyProject01
                 MainStackPanel.Children.Add(border);
             }
 
+
+        }
+
+        void StartAllButton_Click(object sender, RoutedEventArgs e)
+        {
 
         }
 
@@ -445,6 +451,7 @@ namespace MyProject01
             this.Dispatcher.BeginInvoke(new Func(delegate()
             {
                 DataBaseViewer win = new DataBaseViewer();
+                Thread.CurrentThread.Priority = ThreadPriority.Highest;
                 win.Show();
             }));
         }
@@ -452,7 +459,7 @@ namespace MyProject01
 
         private void AddCrossTestCase(TestCaseGroup group)
         {
-            int populatim = 512;
+            int populatim = 64;
             int[] dataBlockLength = new int[]{32 ,1024};
             DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.D1 };
             foreach (int blockLength in dataBlockLength)
