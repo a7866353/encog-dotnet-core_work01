@@ -16,13 +16,15 @@ namespace SocketTestClient.ConnectionContoller
         private RateDataControlDAO _dataController;
         private ITradeDesisoin _decisionCtrl;
         private DateTime _lastTradeTime;
+        public int MagicNumber;
 
-        public TradeOrder(string rateDataControllerName, string networkControllerName)
+        public TradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
             NetworkController _networkController = NetworkController.Open(networkControllerName);
             _decisionCtrl = _networkController.GetDecisionController();
             _lastTradeTime = DateTime.Now;
+            MagicNumber = magicNumber;
         }
 
         public string SymbolName
@@ -62,6 +64,7 @@ namespace SocketTestClient.ConnectionContoller
             // _tradeOrderList.Add(new TradeOrder("test01", "Long_5MinTest02"));
             // _tradeOrderList.Add(new TradeOrder("test01", "Long_01"));
             // _tradeOrderList.Add(new TradeOrder("test01", "Short_01"));
+            _tradeOrderList.Add(new TradeOrder("USDJPY240", "20150609__231247__844", 1));
 
 
         }

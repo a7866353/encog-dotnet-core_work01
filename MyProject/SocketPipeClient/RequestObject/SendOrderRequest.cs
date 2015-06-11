@@ -19,18 +19,20 @@ namespace SocketTestClient.RequestObject
         public RequestType OrderType = RequestType.SendOrderRequest;
         public string SymbolName;
         public Cmd OrderCmd;
+        public int MagicNumber;
 
-        private SendOrderResult _result;
+        private int _result;
 
         public byte[] GetBytes()
         {
             // Clear Result
-            _result = SendOrderResult.None;
+            _result = 0;
 
             DataSendBuffer sb = new DataSendBuffer();
             sb.Add((int)OrderType);
             sb.Add(SymbolName);
-            sb.Add((char)OrderCmd);
+            sb.Add((int)OrderCmd);
+            sb.Add(MagicNumber);
 
             return sb.GetBytes();
         }
@@ -38,17 +40,13 @@ namespace SocketTestClient.RequestObject
         public void FromBytes(byte[] data, int length)
         {
             DataRcvBuffer rb = new DataRcvBuffer(data, length);
-            if( rb.GetBool() == true )
-            {
-                _result = SendOrderResult.OK;
-            }
-            else
-            {
-                _result = SendOrderResult.NG;
-            }
+            
+            // Get type
+            rb.GetInt();
+            _result = rb.GetInt();
         }
 
-        public SendOrderResult Result
+        public int Result
         {
             get { return _result; }
         }

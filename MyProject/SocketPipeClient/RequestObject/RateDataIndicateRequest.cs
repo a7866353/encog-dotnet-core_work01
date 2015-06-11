@@ -11,10 +11,12 @@ namespace SocketTestClient.RequestObject
     {
         public string time;
         public double open;
+        public double close;
         public double high;
         public double low;
-        public double close;
-        public bool isEnd;
+        public long tick_volume;
+        public long real_volume;
+        public int spread;
     }
 
     class RateDataIndicateRequest : IRequest
@@ -35,17 +37,18 @@ namespace SocketTestClient.RequestObject
             int count = rb.GetInt();
             if (count <= 0)
                 return;
-            EndFlag = rb.GetBool();
             RateInfoArray = new RateInfo[count];
             for (int i = 0; i < count;i++ )
             {
                 RateInfoArray[i] = new RateInfo();
                 RateInfoArray[i].time = rb.GetString();
                 RateInfoArray[i].open = rb.GetDouble();
+                RateInfoArray[i].close = rb.GetDouble();
                 RateInfoArray[i].high = rb.GetDouble();
                 RateInfoArray[i].low = rb.GetDouble();
-                RateInfoArray[i].close = rb.GetDouble();
-                RateInfoArray[i].isEnd = rb.GetBool();
+                RateInfoArray[i].tick_volume = rb.GetLong();
+                RateInfoArray[i].real_volume = rb.GetLong();
+                RateInfoArray[i].spread = rb.GetInt();
 
             }
         }

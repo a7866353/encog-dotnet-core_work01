@@ -52,6 +52,9 @@ namespace SocketTestClient.RateDataController
         public double high;
         public double low;
         public double close;
+        public long tick_volume;
+        public long real_volume;
+        public int spread;
  
     }
     class RateDataControlDAO

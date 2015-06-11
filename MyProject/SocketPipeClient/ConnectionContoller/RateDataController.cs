@@ -111,6 +111,9 @@ namespace SocketTestClient.ConnectionContoller
                     data.low = info.low;
                     data.open = info.open;
                     data.close = info.close;
+                    data.real_volume = info.real_volume;
+                    data.tick_volume = info.tick_volume;
+                    data.spread = info.spread;
 
                     dataList.Add(data);
                 }
@@ -124,7 +127,7 @@ namespace SocketTestClient.ConnectionContoller
             _currentTargetDao.LastGetTime = _lastRequest.StopTime;
             _currentTargetDao.Save();
 
-            Printf("Get:" + _currentTargetDao.SymbolName + " From" + _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
+            // Printf("Get:" + _currentTargetDao.SymbolName + " From" + _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
 
             if (indicate.EndFlag == true)
             {

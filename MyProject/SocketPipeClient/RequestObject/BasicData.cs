@@ -109,6 +109,13 @@ namespace SocketTestClient.RequestObject
             _index += length;
             return str;
         }
+        public long GetLong()
+        {
+            int length = sizeof(long);
+            long ret = BitConverter.ToInt64(_buffer, _index);
+            _index += length;
+            return ret;
+        }
         public int GetInt()
         {
             int length = sizeof(int);
