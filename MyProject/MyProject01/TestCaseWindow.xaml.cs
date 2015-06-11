@@ -459,9 +459,9 @@ namespace MyProject01
 
         private void AddCrossTestCase(TestCaseGroup group)
         {
-            int populatim = 64;
-            int[] dataBlockLength = new int[]{32 ,1024};
-            DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.D1 };
+            int populatim = 512;
+            int[] dataBlockLength = new int[]{16, 32, 64, 1024};
+            DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.H2,  DataTimeType.D1 };
             foreach (int blockLength in dataBlockLength)
             {
                 foreach(DataTimeType timeFrame in timeFrameArr)
