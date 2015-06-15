@@ -85,17 +85,17 @@ namespace SocketTestClient.ConnectionContoller
                 if (cmd == MarketActions.Buy)
                 {
                     req.OrderCmd = SendOrderRequest.Cmd.Buy;
-                    Printf("Buy");
+                    Printf(order.MagicNumber + ": Buy");
                 }
                 else if (cmd == MarketActions.Sell)
                 {
                     req.OrderCmd = SendOrderRequest.Cmd.Sell;
-                    Printf("Sell");
+                    Printf(order.MagicNumber + ": Sell");
                 }
                 else if (cmd == MarketActions.Close)
                 {
                     req.OrderCmd = SendOrderRequest.Cmd.Close;
-                    Printf("Close");
+                    Printf(order.MagicNumber + ": Close");
                 }
                 else
                     throw (new Exception("Parm error!"));
