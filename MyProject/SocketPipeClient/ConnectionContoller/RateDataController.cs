@@ -127,8 +127,11 @@ namespace SocketTestClient.ConnectionContoller
             _currentTargetDao.LastGetTime = _lastRequest.StopTime;
             _currentTargetDao.Save();
 
-            // Printf("Get:" + _currentTargetDao.SymbolName + " From" + _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
-
+            if (dataList.Count > 0)
+            {
+                Printf("Get:" + _currentTargetDao.SymbolName + "_" + _currentTargetDao.TimeFrame + " From" + 
+                    _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
+            }
             if (indicate.EndFlag == true)
             {
                 _currentTargetDao = null;

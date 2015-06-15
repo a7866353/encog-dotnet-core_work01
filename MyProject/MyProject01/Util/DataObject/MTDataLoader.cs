@@ -12,7 +12,7 @@ namespace MyProject01.Util
     enum DataTimeType
     {
         None = 0,
-        // M1 = 1,
+        M1 = 1,
         M5 = 5,
         M10 = 10,
         M30 = 30,

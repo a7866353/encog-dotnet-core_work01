@@ -57,8 +57,8 @@ namespace MyProject01.Controller
             }
             else
             {
-                return null;
-                // controller = new NetworkController(dao);
+                // return null;
+                controller = new NetworkController(dao);
 
             }
 
@@ -78,6 +78,8 @@ namespace MyProject01.Controller
         {
             this._dao = dao;
             this._tradeDecisionController = _dao.GetTradeDecisionController();
+            this.BestNetwork = dao.GetNetwork();
+            this._tradeDecisionController.UpdateNetwork(dao.GetNetwork());
         }
         // Create a new one.
         private NetworkController(ControllerDAO dao, ITradeDesisoin ctrl)

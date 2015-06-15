@@ -7,11 +7,15 @@ using System.Threading;
 
 namespace MyProject01.DAO
 {
+    public class DataBaseAddress
+    {
+        static public string ConnectionString = @"mongodb://192.168.1.15";
+    }
     class MarketRateDatabaseConnector
     {
         public static string DatabaseName = "MarketRateDB";
-        // public static string ConnectionString = @"mongodb://192.168.1.11";
-        public static string ConnectionString = @"mongodb://127.0.0.1";
+        public static string ConnectionString = DataBaseAddress.ConnectionString;
+        // public static string ConnectionString = @"mongodb://127.0.0.1";
 
         private static MongoServer server = null;
 
@@ -52,7 +56,9 @@ namespace MyProject01.DAO
     class TestCaseDatabaseConnector
     {
         public static string DatabaseName = "NetWorkTestDB";
-        public static string ConnectionString = @"mongodb://127.0.0.1";
+        // public static string ConnectionString = @"mongodb://127.0.0.1";
+        public static string ConnectionString = DataBaseAddress.ConnectionString;
+
         // public static string ConnectionString = @"mongodb://192.168.1.15";
         // public static string ConnectionString = @"mongodb://192.168.1.11";
 

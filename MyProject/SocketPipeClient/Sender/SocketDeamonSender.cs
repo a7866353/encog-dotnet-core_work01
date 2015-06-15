@@ -71,7 +71,7 @@ namespace SocketTestClient.Sender
             }
 
             // send request
-            printf("[Srv]Send:" + req.GetType());
+            // printf("[Srv]Send:" + req.GetType());
             _sendRquest = req;
             _sendRequestEvent.Release();
             _sendFinishEvent.WaitOne();

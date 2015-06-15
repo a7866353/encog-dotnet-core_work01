@@ -297,19 +297,21 @@ namespace SocketTestClient.RateDataController
             MongoCollection<RateData> collection = db.GetCollection<RateData>(CollectiongName);
             QueryDocument query = new QueryDocument();
             BsonDocument b = new BsonDocument();
-            b.Add("$lt", endTime);
+            b.Add("$lte", endTime);
             query.Add("time", b);
 
             SortByDocument sDown = new SortByDocument();
             sDown.Add("time", -1);
 
             SortByDocument sUp = new SortByDocument();
-            sDown.Add("time", 1);
+            sUp.Add("time", 1);
 
+            MongoCursor<RateData> curst;
+            curst = collection.Find(query).SetSortOrder(sDown).SetLimit(count);
+            List<RateData> dataList = curst.ToList<RateData>();
+            dataList.Sort(new RateDataDateComparer(true));
 
-            var curst = collection.Find(query).SetSortOrder(sDown).SetLimit(count).SetSortOrder(sUp);
-            RateData[] dataArr = curst.ToArray<RateData>();
-            return dataArr;
+            return dataList.ToArray();
         }
         public RateData[] Get(int startIndex, int count)
         {

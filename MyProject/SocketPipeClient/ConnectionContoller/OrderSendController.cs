@@ -23,7 +23,8 @@ namespace SocketTestClient.ConnectionContoller
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
             NetworkController _networkController = NetworkController.Open(networkControllerName);
             _decisionCtrl = _networkController.GetDecisionController();
-            _lastTradeTime = DateTime.Now;
+			// For Debug at first run
+            _lastTradeTime = DateTime.Now.AddDays(-10);
             MagicNumber = magicNumber;
         }
 
@@ -64,7 +65,10 @@ namespace SocketTestClient.ConnectionContoller
             // _tradeOrderList.Add(new TradeOrder("test01", "Long_5MinTest02"));
             // _tradeOrderList.Add(new TradeOrder("test01", "Long_01"));
             // _tradeOrderList.Add(new TradeOrder("test01", "Short_01"));
-            _tradeOrderList.Add(new TradeOrder("USDJPY240", "20150609__231247__844", 1));
+            // _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150614__083013__256", 1));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro5", "20150614__083013__256", 1));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150615__005834__666", 2));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150615__005834__654", 3));
 
 
         }
@@ -77,6 +81,7 @@ namespace SocketTestClient.ConnectionContoller
                     continue;
                 SendOrderRequest req = new SendOrderRequest();
                 req.SymbolName = order.SymbolName;
+                req.MagicNumber = order.MagicNumber;
                 if (cmd == MarketActions.Buy)
                 {
                     req.OrderCmd = SendOrderRequest.Cmd.Buy;

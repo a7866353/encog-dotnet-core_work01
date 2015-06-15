@@ -78,6 +78,7 @@ namespace MyProject01
             InitializeComponent();
 
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.Idle;
             this.Closing += TestCaseWindow_Closing;
             TestCaseList = new TestCaseGroup();
             StartAllButton.Click += StartAllButton_Click;
@@ -461,7 +462,7 @@ namespace MyProject01
         {
             int populatim = 512;
             int[] dataBlockLength = new int[]{16, 32, 64, 1024};
-            DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.H2,  DataTimeType.D1 };
+            DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M1, DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.H2,  DataTimeType.D1 };
             foreach (int blockLength in dataBlockLength)
             {
                 foreach(DataTimeType timeFrame in timeFrameArr)
