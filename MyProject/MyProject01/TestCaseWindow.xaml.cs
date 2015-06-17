@@ -473,10 +473,19 @@ namespace MyProject01
                     group.Add(fwtCase);
                 }
             }
-            
-
-                
         }
+        private void AddRecentCrossTestCase(TestCaseGroup group)
+        {
+            int populatim = 512;
+            int[] dataBlockLength = new int[]{16, 32, 64, 1024, 2048, 4096};
+            foreach (int blockLength in dataBlockLength)
+            {
+                FwtNormRecentM30TestCase fwtCase = new FwtNormRecentM30TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
+                group.Add(fwtCase);
+            }
+        }
+
+        
         private void AddTestCase()
         {
             TestCaseGroup oldTestList = new TestCaseGroup()
@@ -505,6 +514,7 @@ namespace MyProject01
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
 
+            AddRecentCrossTestCase(newTestList);
             AddCrossTestCase(newTestList);
             /*
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });

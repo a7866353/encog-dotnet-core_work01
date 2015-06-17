@@ -55,6 +55,8 @@ namespace MyProject01.Util.View
 
         public void AddMark(int index, Brush color)
         {
+            if (index >= _dataArray.Length)
+                index = _dataArray.Length - 1;
             GraphMark mark = new GraphMark(_partenPanel, new Point(index, _dataArray[index]), color, 1);
             mark.ScaleX = ScaleX;
             mark.ScaleY = ScaleY;

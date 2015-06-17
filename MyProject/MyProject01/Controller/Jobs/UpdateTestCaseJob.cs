@@ -90,6 +90,15 @@ namespace MyProject01.Controller.Jobs
                 if (agent.IsEnd == true)
                     break;
             } // end while
+
+            if( agent.index < trainedDataIndex )
+            {
+                trainedMoney = agent.CurrentValue;
+                // trainDealCount = dealCount;
+                trainDealCount = agent.DealCount;
+                trainedDataIndex = agent.index;
+            }
+
             endMoney = agent.CurrentValue;
 
             epsodeLog.TrainedDataEarnRate = (trainedMoney / startMoney) * 100;

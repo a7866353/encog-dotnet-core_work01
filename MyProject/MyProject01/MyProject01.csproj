@@ -103,6 +103,7 @@
     <Compile Include="DAO\MongoDBUtility.cs" />
     <Compile Include="DAO\MyNetDAO.cs" />
     <Compile Include="ExchangeRateTrade\TradeController.cs" />
+    <Compile Include="Factorys\TrainingDataFactorys\RecentDataFactory.cs" />
     <Compile Include="IControllerFactory.cs" />
     <Compile Include="InputDataAnalyzerTool\InputDataAnalyzer.cs" />
     <Compile Include="MyNet.cs" />
