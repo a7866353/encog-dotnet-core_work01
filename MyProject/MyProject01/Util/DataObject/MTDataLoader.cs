@@ -69,10 +69,10 @@ namespace MyProject01.Util
 
         private void AddAll(MTDataBuffer buffer)
         {
-            foreach(MtDataObject mtData in buffer)
+            foreach(RateData mtData in buffer)
             {
                 RateSet currRateSet;
-                currRateSet = new RateSet(mtData.Date, (mtData.HighPrice + mtData.LowPrice) / 2);
+                currRateSet = new RateSet(mtData.time, (mtData.high + mtData.low) / 2);
                 Add(currRateSet);
                 if (Count >= _dataCountLimit)
                     break;
@@ -87,9 +87,9 @@ namespace MyProject01.Util
             checker.Set(buffer[0]);
             RateSet currRateSet;
 
-            foreach (MtDataObject mtData in buffer)
+            foreach (RateData mtData in buffer)
             {
-                if (checker.IsOver(mtData.Date) == true)
+                if (checker.IsOver(mtData.time) == true)
                 {
                     currRateSet = new RateSet(checker.startDate, (checker.highPrice + checker.lowPrice) / 2);
                     Add(currRateSet);
@@ -131,9 +131,9 @@ namespace MyProject01.Util
             _type = type;
         }
 
-        abstract protected MongoCursor<MtDataObject> GetData(MongoCollection collection);
+        abstract protected MongoCursor<RateData> GetData(MongoCollection collection);
         abstract protected bool CheckEnd(RateSet obj);
-        private void AddByTime(MongoCursor<MtDataObject> buffer, int interval)
+        private void AddByTime(MongoCursor<RateData> buffer, int interval)
         {
             DateCheck checker = new DateCheck();
             bool isFirst = true;
@@ -141,7 +141,7 @@ namespace MyProject01.Util
             checker.Interval = _dir * interval;
             RateSet currRateSet;
 
-            foreach (MtDataObject mtData in buffer)
+            foreach (RateData mtData in buffer)
             {
                 if (isFirst == true)
                 {
@@ -150,7 +150,7 @@ namespace MyProject01.Util
                 }
                 else
                 {
-                    if (checker.IsOver(mtData.Date) == true)
+                    if (checker.IsOver(mtData.time) == true)
                     {
                         currRateSet = new RateSet(checker.startDate, (checker.highPrice + checker.lowPrice) / 2);
                         if (CheckEnd(currRateSet) == true)
@@ -171,7 +171,7 @@ namespace MyProject01.Util
             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
             MongoDatabase db = connector.Connect();
             MongoCollection collection = db.GetCollection(_tickerName);
-            MongoCursor<MtDataObject> curs = GetData(collection);
+            MongoCursor<RateData> curs = GetData(collection);
 
             AddByTime(curs, (int)_type);
 
@@ -196,18 +196,18 @@ namespace MyProject01.Util
             _endDate = endDate;
         }
   
-        protected override MongoCursor<MtDataObject> GetData(MongoCollection collection)
+        protected override MongoCursor<RateData> GetData(MongoCollection collection)
         {
             // Add by date limit
             QueryDocument query = new QueryDocument();
             BsonDocument b = new BsonDocument();
             b.Add("$lt", _endDate);
-            query.Add("Date", b);
+            query.Add("time", b);
 
             SortByDocument sd = new SortByDocument();
             sd.Add("_id", -1);
 
-            var curst = collection.FindAs<MtDataObject>(query);
+            var curst = collection.FindAs<RateData>(query);
             curst.BatchSize = 1000;
             curst.SetSortOrder(sd);
             // curst.SetLimit(count);  // set limit
@@ -241,18 +241,18 @@ namespace MyProject01.Util
             _endDate = endDate;
         }
 
-        protected override MongoCursor<MtDataObject> GetData(MongoCollection collection)
+        protected override MongoCursor<RateData> GetData(MongoCollection collection)
         {
             // Add by date limit
             QueryDocument query = new QueryDocument();
             BsonDocument b = new BsonDocument();
             b.Add("$lt", _endDate);
-            query.Add("Date", b);
+            query.Add("time", b);
 
             SortByDocument sd = new SortByDocument();
             sd.Add("_id", -1);
 
-            var curst = collection.FindAs<MtDataObject>(query);
+            var curst = collection.FindAs<RateData>(query);
             curst.BatchSize = 1000;
             curst.SetSortOrder(sd);
             // curst.SetLimit(count);  // set limit
@@ -286,11 +286,11 @@ namespace MyProject01.Util
 
         public int Interval;
 
-        public void Set(MtDataObject mtData)
+        public void Set(RateData mtData)
         {
-            highPrice = mtData.HighPrice;
-            lowPrice = mtData.LowPrice;
-            startDate = mtData.Date;
+            highPrice = mtData.high;
+            lowPrice = mtData.low;
+            startDate = mtData.time;
             targetTime = CalcEndTime(startDate, Interval);
              
         }
@@ -314,12 +314,12 @@ namespace MyProject01.Util
             }
         }
 
-        public void Add(MtDataObject mtData)
+        public void Add(RateData mtData)
         {
-            if (highPrice < mtData.HighPrice)
-                highPrice = mtData.HighPrice;
-            if (lowPrice > mtData.LowPrice)
-                lowPrice = mtData.LowPrice;
+            if (highPrice < mtData.high)
+                highPrice = mtData.high;
+            if (lowPrice > mtData.low)
+                lowPrice = mtData.low;
         }
 
         private DateTime CalcEndTime(DateTime date, int interval)

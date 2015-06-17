@@ -15,35 +15,24 @@ namespace MyProject01.Util
         public ObjectId _id;
     }
 
-    class MtDataObject : BasicDataObject
-    {
-        public String Ticker { set; get; }
-        public DateTime Date { set; get; }
-        public double OpenPrice { set; get; }
-        public double HighPrice { set; get; }
-        public double LowPrice { set; get; }
-        public double ClosePrice { set; get; }
-        public double Volume { set; get; }
-    }
-
-    class MtDateComparer : IComparer<MtDataObject>  
+    class MtDateComparer : IComparer<RateData>  
     {
         private bool _isIncr = false;
 
         public MtDateComparer()
         {
         }
-        public int Compare(MtDataObject x, MtDataObject y)
+        public int Compare(RateData x, RateData y)
         {
-            if (x.Date > y.Date)
+            if (x.time > y.time)
                 return 1;
-            else if (x.Date == y.Date)
+            else if (x.time == y.time)
                 return 0;
             else
                 return -1;
         }
     }
-    class MTDataBuffer : List<MtDataObject>
+    class MTDataBuffer : List<RateData>
     {
         static List<MTDataBuffer> _loaderList;
         static Semaphore _getLock;
@@ -95,10 +84,10 @@ namespace MyProject01.Util
             if (true)
             {
                 /*
-                MongoCursor cursor = collection.FindAllAs<MtDataObject>();
+                MongoCursor cursor = collection.FindAllAs<RateData>();
                 cursor.BatchSize = 1000;
                 int loadMaxCount = 200000;
-                foreach (MtDataObject dataObj in cursor)
+                foreach (RateData dataObj in cursor)
                 {
                     Add(dataObj);
                     loadMaxCount--;
@@ -114,13 +103,13 @@ namespace MyProject01.Util
                 b.Add("$gt", DateTime.Now.AddMonths(-24));
                 b.Add("$lt", DateTime.Now);
                 query.Add("Date", b);
-                var curst = collection.FindAs<MtDataObject>(query);
+                var curst = collection.FindAs<RateData>(query);
                 */
 
-                var curst = collection.FindAllAs<MtDataObject>();
+                var curst = collection.FindAllAs<RateData>();
                 curst.BatchSize = 1000;
                 curst.SetLimit(countLimit);  // set limit
-                foreach (MtDataObject dataObj in curst)
+                foreach (RateData dataObj in curst)
                 {
                     Add(dataObj);
                 }
@@ -128,7 +117,7 @@ namespace MyProject01.Util
             }
             else // for parallel
             {
-                var collc = collection.ParallelScanAs<MtDataObject>(new ParallelScanArgs() { NumberOfCursors = 128, BatchSize = 1000 });
+                var collc = collection.ParallelScanAs<RateData>(new ParallelScanArgs() { NumberOfCursors = 128, BatchSize = 1000 });
 
                 Parallel.ForEach(collc, curs =>
                 {

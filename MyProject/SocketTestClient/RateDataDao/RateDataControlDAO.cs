@@ -9,7 +9,7 @@ using MongoDB.Driver.Builders;
 using MyProject01.DAO;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace SocketTestClient.RateDataController
+namespace MyProject01.DAO
 {
     class RateDataDateComparer : IComparer<RateData>
     {

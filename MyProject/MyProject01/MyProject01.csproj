@@ -78,6 +78,8 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="DAO\RateDataControlDAO.cs" />
+    <Compile Include="DAO\RateDataDAOList.cs" />
     <Compile Include="Factorys\ControllerFactorys\BasicControllerFactory.cs" />
     <Compile Include="Factorys\ControllerFactorys\NEATExchangeControllerFactory.cs" />
     <Compile Include="Factorys\ControllerFactorys\NeatFwtExchangeControllerFactory.cs" />
@@ -100,7 +102,6 @@
     <Compile Include="DAO\BasicTestCaseDAO.cs" />
     <Compile Include="DAO\MongoDBUtility.cs" />
     <Compile Include="DAO\MyNetDAO.cs" />
-    <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="ExchangeRateTrade\TradeController.cs" />
     <Compile Include="IControllerFactory.cs" />
     <Compile Include="InputDataAnalyzerTool\InputDataAnalyzer.cs" />

@@ -55,8 +55,6 @@
     <Compile Include="DatabaseConnector.cs" />
     <Compile Include="RateDataDao\RateDataDAOList.cs" />
     <Compile Include="RateDataDao\RateDataControlDAO.cs" />
-    <Compile Include="RateDataDao\RateDataDAO.cs" />
-    <Compile Include="RateDataDao\RateDataDeamon.cs" />
     <Compile Include="RequestObject\BasicData.cs" />
     <Compile Include="RequestObject\RateDataIndicateRequest.cs" />
     <Compile Include="RequestObject\RateRequest.cs" />

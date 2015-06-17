@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SocketTestClient.RateDataController
+namespace MyProject01.DAO
 {
-    class RateDataDAOList : List<RateDataControlDAO>
+    public class RateDataDAOList : List<RateDataControlDAO>
     {
         public RateDataDAOList()
         {

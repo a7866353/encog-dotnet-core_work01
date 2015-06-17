@@ -9,21 +9,57 @@ using MongoDB.Driver.Builders;
 using MyProject01.DAO;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace SocketTestClient.RateDataController
+namespace MyProject01.DAO
 {
-    class RateData
+    class RateDataDateComparer : IComparer<RateData>
+    {
+        private bool _isIncr = false;
+
+        public RateDataDateComparer(bool isIncr)
+        {
+            _isIncr = isIncr;
+        }
+        public int Compare(RateData x, RateData y)
+        {
+            if (_isIncr)
+            {
+                if (x.time > y.time)
+                    return 1;
+                else if (x.time == y.time)
+                    return 0;
+                else
+                    return -1;
+            }
+            else
+            {
+                if (x.time < y.time)
+                    return 1;
+                else if (x.time == y.time)
+                    return 0;
+                else
+                    return -1;
+            }
+
+        }
+    }
+    public abstract class BasicDataObject
     {
         public ObjectId _id;
-
+    }
+    public class RateData : BasicDataObject
+    {
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         public DateTime time;
         public double open;
         public double high;
         public double low;
         public double close;
+        public long tick_volume;
+        public long real_volume;
+        public int spread;
  
     }
-    class RateDataControlDAO
+    public class RateDataControlDAO
     {
         static private string _controlCollectionName = "RateDataControl";
         static public RateDataControlDAO[] GetList()
@@ -129,8 +165,23 @@ namespace SocketTestClient.RateDataController
 
             Remove();
             this.Save();
+            SetIndex();
+
         }
 
+        private void SetIndex()
+        {
+            MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
+            MongoDatabase db = connector.Connect();
+            MongoCollection<RateData> collection = db.GetCollection<RateData>(CollectiongName);
+            // collection.CreateIndex("time", IndexOptions.SetUnique);
+
+
+            collection.CreateIndex(IndexKeys.Descending("time"), IndexOptions.SetUnique(true));
+            connector.Close();
+
+
+        }
         public void Save()
         {
             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
@@ -240,7 +291,30 @@ namespace SocketTestClient.RateDataController
 
             return dataArr;
         }
+        public RateData[] GetByEndTime(DateTime endTime, int count)
+        {
+            MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
 
+            MongoDatabase db = connector.Connect();
+            MongoCollection<RateData> collection = db.GetCollection<RateData>(CollectiongName);
+            QueryDocument query = new QueryDocument();
+            BsonDocument b = new BsonDocument();
+            b.Add("$lte", endTime);
+            query.Add("time", b);
+
+            SortByDocument sDown = new SortByDocument();
+            sDown.Add("time", -1);
+
+            SortByDocument sUp = new SortByDocument();
+            sUp.Add("time", 1);
+
+            MongoCursor<RateData> curst;
+            curst = collection.Find(query).SetSortOrder(sDown).SetLimit(count);
+            List<RateData> dataList = curst.ToList<RateData>();
+            dataList.Sort(new RateDataDateComparer(true));
+
+            return dataList.ToArray();
+        }
         public RateData[] Get(int startIndex, int count)
         {
             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
