@@ -61,14 +61,11 @@ namespace SocketTestClient.ConnectionContoller
         public OrderSendController()
         {
             _tradeOrderList = new List<TradeOrder>();
-            // _tradeOrderList.Add(new TradeOrder("test01", "Long_5MinTest02"));
-            // _tradeOrderList.Add(new TradeOrder("test01", "Long_01"));
-            // _tradeOrderList.Add(new TradeOrder("test01", "Short_01"));
-            // _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150614__083013__256", 1));
-            _tradeOrderList.Add(new TradeOrder("USDJPYpro5", "20150614__083013__256", 1));
-            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150615__005834__666", 2));
-            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150615__005834__654", 3));
-
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150622__172651__151", 2));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150622__172656__283", 3));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150622__064758__749", 4));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150622__172651__151", 5));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150623__074144__028", 6));
 
         }
         public IRequest GetRequest()

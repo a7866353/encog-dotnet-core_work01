@@ -19,6 +19,7 @@ namespace SocketTestClient.ConnectionContoller
     class RateDataRequestController : IRequestController
     {
         private RateDataDAOList _rateDataList;
+        private List<RateDataControlDAO> _watchList;
         private RateDataControlDAO _currentTargetDao;
         private RateRequest _lastRequest;
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
@@ -60,6 +61,7 @@ namespace SocketTestClient.ConnectionContoller
         public RateDataRequestController()
         {
             _rateDataList = new RateDataDAOList();
+            _watchList = new List<RateDataControlDAO>();
             _currentTargetDao = null;
             _dtFormat = new DateTimeFormatInfo();
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
@@ -79,7 +81,7 @@ namespace SocketTestClient.ConnectionContoller
                 return req;
             }
 
-            foreach( RateDataControlDAO dao in _rateDataList)
+            foreach (RateDataControlDAO dao in _watchList)
             {
                 _lastRequest = GetNextReq(dao);
                 if (_lastRequest != null)
@@ -160,17 +162,17 @@ namespace SocketTestClient.ConnectionContoller
             return req;
         }
 
+        public bool AddWatchSymbol(string name)
+        {
+            RateDataControlDAO res = _rateDataList.Get(name);
+            if (res == null)
+                return false;
+            _watchList.Add(res);
+            return true;
+        }
+
         public void UpdateSymbolList(string[] symbols)
         {
-            // Add Test Symbol
-            foreach (RateDataNeed info in _need)
-            {
-                if (_rateDataList.Get(info.Name) == null)
-                {
-                    _rateDataList.Add(info.Name, info.SymbolName, info.Timeframe, new DateTime(1988, 1, 1, 0, 0, 0));
-                }
-            }
-
             // Add all Symbol
             foreach( string symbol in symbols)
             {
@@ -185,6 +187,12 @@ namespace SocketTestClient.ConnectionContoller
                 }
             }
             _isSymbolListUpdated = true;
+
+            // Add All symbol to watch list.
+            foreach(RateDataControlDAO dao in _rateDataList)
+            {
+                _watchList.Add(dao);
+            }
         }
 
         private void Printf(string str)

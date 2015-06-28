@@ -77,7 +77,7 @@ namespace MyProject01
         {
             InitializeComponent();
 
-            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
             System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.Idle;
             this.Closing += TestCaseWindow_Closing;
             TestCaseList = new TestCaseGroup();
@@ -485,6 +485,17 @@ namespace MyProject01
             }
         }
 
+        private void AddRecentM5CrossTestCase(TestCaseGroup group)
+        {
+            int populatim = 512;
+            int[] dataBlockLength = new int[] { 16, 32, 64, 1024, 2048, 4096 };
+            foreach (int blockLength in dataBlockLength)
+            {
+                BasicRateMarketTestCase fwtCase = new FwtNormRecentM5TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
+                group.Add(fwtCase);
+            }
+        }
+
         
         private void AddTestCase()
         {
@@ -514,6 +525,7 @@ namespace MyProject01
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
 
+            AddRecentM5CrossTestCase(newTestList);
             AddRecentCrossTestCase(newTestList);
             AddCrossTestCase(newTestList);
             /*
