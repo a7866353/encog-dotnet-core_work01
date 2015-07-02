@@ -1,0 +1,64 @@
+https://www.mql5.com/en/signals/74251
+
+Trades: 401
+The total amount of trades made. If this amount is not large, it does not characterize your trading, the profit gained can be casual.
+
+Profit Trades: 355 (88.53%)
+The total amount of profitable trades. Their percentage of the total amount of trades is given in brackets.
+
+Loss Trades: 46 (11.47%)
+The total amount of losing trades. Their percentage of the total amount of trades is given in brackets.
+
+Best trade: 26.25 EUR
+The trade resulted in the largest profit. Extreme values are not usually considered for estimation to be more objective.
+
+Worst trade: -160.30 EUR
+The trade resulted in the largest loss. It is often more important than the largest profit trade.
+
+Gross Profit: 2 124.42 EUR (10 518 pips)
+Gross profit is the total of all profitable trades in money terms.
+
+Gross Loss: -1 073.94 EUR (4 073 pips)
+Gross loss is the total of all losing trades in money terms.
+
+Maximum consecutive wins: 58 (309.95 EUR)
+The amount of trades in the longest profitable sequence. The total profit of this sequence is given in brackets.
+
+Maximal consecutive profit: 309.95 EUR (58)
+The largest profit in a continuous profitable sequence. The amount of trades made within this sequence is given in brackets.
+
+Sharpe Ratio: 0.16
+One of the most important ratios between the profitability and the risk. Sharp Ratio shows by how many times the arithmetic mean exceeds the standard deviation from the equity volatility. For example, Sharp=0.6 means that there is an average risk to lose 10 dollars per a profit of 6 dollars. The larger is this value, the less risky is the trading. However, large profit values in individual trades can result in larger value of the standard deviation that, in its turn, results in unreasonable decreasing of Sharp Ratio.
+
+Recovery Factor: 3.93
+Recovery factor is calculated as the ratio of the absolute profit to the maximum drawdown. The higher the recovery factor, the faster a system is recovered after a drawdown. 
+
+Long Trades: 221 (55.11%)
+The number of deals that have fixed profit from buying a financial instrument. The percentage of profitable long trades is specified in brackets.
+
+Short Trades: 180 (44.89%)
+The number of deals that have fixed profit from selling a financial instrument. The percentage of profitable short trades is specified in brackets.
+
+Profit Factor: 1.98
+The profit factor shows how many times the gross profit exceeds the gross loss. The larger is this value, the better.
+
+Expected Payoff: 2.62 EUR
+Expected payoff (the average profit per trade) is the quotient of the net profit and the total amount of trades.
+
+Average Profit: 5.98 EUR
+Average profit is a quotient of the gross profit and the amount of profitable trades.
+
+Average Loss: -23.35 EUR
+Average loss is a quotient of the gross loss and the amount of losing trades.
+
+Maximum consecutive losses: 6 (-26.02 EUR)
+The amount of trades in the longest losing sequence. The total loss of this sequence is given in brackets.
+
+Maximal consecutive loss: -236.82 EUR (2)
+The largest loss in a continuous losing sequence. The amount of trades made within this sequence is given in brackets.
+
+Monthly growth: -13.98%
+Account growth for the last 30 days
+
+Annual Forecast: -100.00%
+Annual forecast of growth based on the current trading results
