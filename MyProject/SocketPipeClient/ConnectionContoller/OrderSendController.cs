@@ -66,6 +66,7 @@ namespace SocketTestClient.ConnectionContoller
             _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150622__064758__749", 4));
             _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150622__172651__151", 5));
             _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150623__074144__028", 6));
+            _tradeOrderList.Add(new TradeOrder("USDJPYpro30", "20150625__231317__582", 7));
 
         }
         public IRequest GetRequest()
