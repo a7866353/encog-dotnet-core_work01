@@ -1,6 +1,5 @@
 ﻿using MyProject01.Controller;
 using MyProject01.DAO;
-using SocketTestClient.RateDataController;
 using SocketTestClient.RequestObject;
 using SocketTestClient.Sender;
 using System;

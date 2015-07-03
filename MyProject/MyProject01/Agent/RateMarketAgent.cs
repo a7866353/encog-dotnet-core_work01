@@ -59,6 +59,15 @@ namespace MyProject01.Agent
     {
         public double[] RateDataArray;
         public double Reward;
+
+        public double InitMoney;
+        public double CurrentMoney;
+        public double TotalBenifit;
+        public double TotalBenifitRate;
+
+        public OrderLog LastOrderLog;
+
+
     }
 
     interface IRateMarketUser
@@ -110,14 +119,20 @@ namespace MyProject01.Agent
             return _money + Benifit();
             // return _money;
         }
-        public void StartOrder( OrderType type, double currentRate)
+        public double GetCurrentBenifit(double currentRate)
         {
+            _currentRate = currentRate;
+            return Benifit();
+        }
+        public OrderLog StartOrder(OrderType type, double currentRate)
+        {
+            OrderLog log = null;
             _currentRate = currentRate;
             _lastAction = MarketActions.Nothing;
             if (_type == type)
-                return;
+                return log;
             else if (_type != type && (_type != OrderType.Nothing))
-                CloseOrder(currentRate);
+                log = CloseOrder(currentRate);
             _dealCount++;
             _type = type;
             _startRatePre = _startRate;
@@ -131,14 +146,26 @@ namespace MyProject01.Agent
                 _startRate = Bid();
                 _lastAction = MarketActions.Sell;
             }
+
+            return log;
         }
-        public void CloseOrder(double currentRate)
+        public OrderLog CloseOrder(double currentRate)
         {
             _currentRate = currentRate;
-            double res = Benifit();
-            _money += res;
+
+            OrderLog log = new OrderLog()
+            {
+                BenifitMoney = Benifit(),
+                BenifitRate = Benifit() / _money,
+                StartPrice = _startRate,
+                ClosePrice = _currentRate,
+            };
+
+            _money += Benifit();
             _type = OrderType.Nothing;
             _lastAction = MarketActions.Close;
+
+            return log;
         }
 
         private double Benifit()
@@ -166,6 +193,14 @@ namespace MyProject01.Agent
             SellOrder,
         }
 
+    }
+
+    class OrderLog
+    {
+        public double StartPrice;
+        public double ClosePrice;
+        public double BenifitMoney;
+        public double BenifitRate;
     }
 
     class RateMarketAgent
@@ -226,6 +261,9 @@ namespace MyProject01.Agent
 
             GetArrayValue(_stateData.RateDataArray, index);
             _stateData.Reward = 0;
+            _stateData.InitMoney = InitMoney;
+            _stateData.CurrentMoney = InitMoney;
+            _stateData.TotalBenifit = 0;
             return _stateData;
         }
 
@@ -245,22 +283,27 @@ namespace MyProject01.Agent
         }
         public RateMarketAgentData TakeAction(MarketActions action)
         {
+            OrderLog log = null;
             switch (action)
             {
                 case MarketActions.Buy:
-                    _order.StartOrder(Order.OrderType.BuyOrder, _currentRate);
+                    log = _order.StartOrder(Order.OrderType.BuyOrder, _currentRate);
                     break;
                 case MarketActions.Sell:
-                    _order.StartOrder(Order.OrderType.SellOrder, _currentRate);
+                    log = _order.StartOrder(Order.OrderType.SellOrder, _currentRate);
                     break;
                 case MarketActions.Close:
-                    _order.CloseOrder(_currentRate);
+                    log = _order.CloseOrder(_currentRate);
                     break;
                 case MarketActions.Nothing:
                     break;
                 default:
                     break;
             }
+            _stateData.CurrentMoney = CurrentValue;
+            _stateData.TotalBenifit = CurrentValue - InitMoney;
+            _stateData.TotalBenifitRate = (CurrentValue - InitMoney) / InitMoney;
+            _stateData.LastOrderLog = log;
             _stateData.Reward = (CurrentValue - InitMoney) / InitMoney;
             GetArrayValue(_stateData.RateDataArray, index);
             return _stateData;
@@ -274,47 +317,7 @@ namespace MyProject01.Agent
         private void GetArrayValue(double[] buffer, int offset)
         {
             _dataBlock.Copy(buffer, offset);
-
-            /*
-            // adj to same end point
-            */
-            // DataNormallizer n = new DataNormallizer();
-            // n.DataValueAdjust(buffer, 1.0, 0.0);
-                // double[] res = new double[length];
-                // Array.Copy(_dataArray, index, res, 0, length);
-
-            // DataAdj(buffer);
-            // DataAdj_Offset(buffer);
-                return;
+            return;
         }
-        private void DataAdj_Offset(double[] buffer)
-        {
-            // adj to same end point
-            double offset = buffer[buffer.Length-1];
-            for (int i = 0; i < buffer.Length; i++)
-                buffer[i] = buffer[i] - offset + 0.5;
-        }
-        private void DataAdj(double[] buffer)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-                buffer[i] -= buffer[buffer.Length - 1];
-
-            double min, max;
-            min = max = buffer[0];
-            foreach(double d in buffer)
-            {
-                if (d > max)
-                    max = d;
-                if (d < min)
-                    min = d;
-            }
-            double scale = 0.5 / Math.Max(Math.Abs(min), Math.Abs(max));
-
-            for (int i = 0; i < buffer.Length; i++)
-                buffer[i] = buffer[i] * scale + 0.5;
-
-
-        }
-        
     }
 }

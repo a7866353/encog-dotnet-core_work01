@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using SocketTestClient.Sender;
 using SocketTestClient.RequestObject;
-using SocketTestClient.RateDataController;
 
 namespace SocketTestClient.ConnectionContoller
 {
