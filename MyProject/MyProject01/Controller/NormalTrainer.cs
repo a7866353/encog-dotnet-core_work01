@@ -22,6 +22,7 @@ namespace MyProject01.Controller
         private RateMarketTestDAO _testDAO;
 
         public ITradeDesisoin DecisionCtrl;
+        public ICalculateScore ScoreCtrl;
         public BasicDataBlock TrainDataBlock;
         public BasicPopulationFactory PopulationFacotry;
 
@@ -29,17 +30,12 @@ namespace MyProject01.Controller
         {
             // Init context
             _context = new TrainerContex();
-
-            RateMarketScore score = new RateMarketScore();
-            score.TradeDecisionCtrl = DecisionCtrl;
-            score.SetData(TrainDataBlock);
-            _context.TestScore = score;
             _context._trainDataBlock = TrainDataBlock;
 
             // train the neural network
             train = NEATUtil.ConstructNEATTrainer(
-                PopulationFacotry.Get(DecisionCtrl.NetworkInputVectorLength, DecisionCtrl.NetworkOutputVectorLenth), 
-                score );
+                PopulationFacotry.Get(DecisionCtrl.NetworkInputVectorLength, DecisionCtrl.NetworkOutputVectorLenth),
+                ScoreCtrl);
             _context.train = train;
 
         }
@@ -54,12 +50,23 @@ namespace MyProject01.Controller
         }
     }
 
-    public class RateMarketScore : ICalculateScore
+    public class NormalScore : ICalculateScore
     {
         private BasicDataBlock _dataBlock;
         public int StartIndex;
         public int Length;
         public ITradeDesisoin TradeDecisionCtrl;
+        public BasicDataBlock dataBlock
+        {
+            get { return _dataBlock; }
+            set
+            {
+                _dataBlock = value;
+                StartIndex = 0;
+                Length = _dataBlock.BlockCount;
+            }
+        }
+
         public void SetData(BasicDataBlock dataBlock)
         {
             _dataBlock = dataBlock;
@@ -97,6 +104,64 @@ namespace MyProject01.Controller
             // System.Console.WriteLine("S: " + score);
             // return score;
             return agent.CurrentValue;
+        }
+
+    }
+
+    public class ReduceLossScore : ICalculateScore
+    {
+        private BasicDataBlock _dataBlock;
+        public int StartIndex;
+        public int Length;
+        public ITradeDesisoin TradeDecisionCtrl;
+        public BasicDataBlock dataBlock
+        {
+            get { return _dataBlock; }
+            set
+            {
+                _dataBlock = value;
+                StartIndex = 0;
+                Length = _dataBlock.BlockCount;
+            }
+        }
+
+        public void SetData(BasicDataBlock dataBlock)
+        {
+            _dataBlock = dataBlock;
+            StartIndex = 0;
+            Length = _dataBlock.BlockCount;
+        }
+
+        public bool ShouldMinimize
+        {
+            get { return false; }
+        }
+        public bool RequireSingleThreaded
+        {
+            get { return false; }
+        }
+
+        public double CalculateScore(IMLMethod network)
+        {
+            RateMarketAgent agent = new RateMarketAgent(_dataBlock.GetNewBlock(StartIndex, Length));
+            ITradeDesisoin decisionCtrl = TradeDecisionCtrl.Clone();
+            decisionCtrl.UpdateNetwork((IMLRegression)network);
+            TradeController tradeCtrl = new TradeController(agent, decisionCtrl);
+            while (true)
+            {
+                if (agent.CurrentRateValue > 0)
+                {
+                    // Get Action Value
+                    tradeCtrl.DoAction();
+                }
+                if (agent.IsEnd == true)
+                    break;
+            }
+            double score =
+                tradeCtrl.TradeLog.GrossLoss  +
+                tradeCtrl.Agent.CurrentValue;
+
+            return score;
         }
 
     }

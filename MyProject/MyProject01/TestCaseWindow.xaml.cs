@@ -480,9 +480,17 @@ namespace MyProject01
             int[] dataBlockLength = new int[]{16, 32, 64, 1024, 2048, 4096};
             foreach (int blockLength in dataBlockLength)
             {
+                FwtReduceLossRecentM5TestCase fwtCase = new FwtReduceLossRecentM5TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
+                group.Add(fwtCase);
+            } 
+            
+            foreach (int blockLength in dataBlockLength)
+            {
                 FwtNormRecentM30TestCase fwtCase = new FwtNormRecentM30TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
                 group.Add(fwtCase);
             }
+
+
         }
 
         private void AddRecentM5CrossTestCase(TestCaseGroup group)
@@ -527,7 +535,7 @@ namespace MyProject01
 
             AddRecentM5CrossTestCase(newTestList);
             AddRecentCrossTestCase(newTestList);
-            AddCrossTestCase(newTestList);
+            // AddCrossTestCase(newTestList);
             /*
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });

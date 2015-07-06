@@ -16,7 +16,6 @@ namespace MyProject01.Factorys.TrainingDataFactorys
         public DateTime StartDateTime = DateTime.Now.AddMonths(-24);
         private DataTimeType TimeFrame = DataTimeType.M30;
         private string SymbolName = "USDJPYpro_30_USDJPYpro30";
-        public int Count = 1000;
         protected override TrainingData Create()
         {
             BasicTestDataLoader loader;
@@ -47,7 +46,7 @@ namespace MyProject01.Factorys.TrainingDataFactorys
         public DateTime StartDateTime = DateTime.Now.AddMonths(-24);
         private DataTimeType TimeFrame = DataTimeType.M5;
         private string SymbolName = "USDJPYpro_5_USDJPYpro5";
-        public int Count = 1000;
+
         protected override TrainingData Create()
         {
             BasicTestDataLoader loader;

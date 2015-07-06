@@ -42,6 +42,11 @@ namespace MyProject01.Factorys.TrainerFactorys
             trainer.DecisionCtrl = Controller.GetDecisionController();
             trainer.TrainDataBlock = TrainingData.TrainDataBlock;
             trainer.PopulationFacotry = PopulationFacotry;
+            trainer.ScoreCtrl = new NormalScore()
+            {
+                TradeDecisionCtrl = trainer.DecisionCtrl,
+                dataBlock = trainer.TrainDataBlock,
+            };
 
             return trainer;
         }
@@ -49,6 +54,53 @@ namespace MyProject01.Factorys.TrainerFactorys
         public override string Description
         {
             get { return "NormalTrainer"; }
+        }
+    }
+
+    class ReduceLossTrainerFactory : BasicTrainerFactory
+    {
+        public string TestCaseName;
+        public string TestDescription;
+        public NetworkController Controller;
+        public TrainingData TrainingData;
+        public BasicPopulationFactory PopulationFacotry;
+
+        protected override Trainer Create()
+        {
+            NormalTrainer trainer = new NormalTrainer();
+
+            TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
+            mainCheckCtrl.Add(new CheckNetworkChangeJob());
+            mainCheckCtrl.Add(new UpdataControllerJob(Controller));
+
+            // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
+            // subCheckCtrl.Add(new UpdateTestCaseJob() 
+            mainCheckCtrl.Add(new UpdateTestCaseJob()
+            {
+                TestName = TestCaseName,
+                TestDescription = TestDescription,
+                DecisionCtrl = Controller.GetDecisionController(),
+                TestDataBlock = TrainingData.TestDataBlock,
+            });
+
+            // mainCheckCtrl.Add(subCheckCtrl);
+
+            trainer.CheckCtrl = mainCheckCtrl;
+            trainer.DecisionCtrl = Controller.GetDecisionController();
+            trainer.TrainDataBlock = TrainingData.TrainDataBlock;
+            trainer.PopulationFacotry = PopulationFacotry;
+            trainer.ScoreCtrl = new ReduceLossScore()
+            {
+                TradeDecisionCtrl = trainer.DecisionCtrl,
+                dataBlock = trainer.TrainDataBlock,
+            };
+
+            return trainer;
+        }
+
+        public override string Description
+        {
+            get { return "ReduceLossTrainer"; }
         }
     }
 }
