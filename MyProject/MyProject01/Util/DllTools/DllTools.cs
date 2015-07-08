@@ -26,6 +26,13 @@ namespace MyProject01.Util.DllTools
                     -.085441273882, .035226291882};
         private static double[] g = new double[]{.035226291882, .085441273882, -.135011020010, -.459877502118,  
                     .806891509311, -.332670552950};
+
+        private static DllMemoryPoolCtrl _poolCtrl;
+        
+        static DllTools()
+        {
+            _poolCtrl = new DllMemoryPoolCtrl();
+        }
         public static void FTW(double[] input, double[] output, double[] temp)
         {
             int level = 1;
@@ -116,6 +123,42 @@ namespace MyProject01.Util.DllTools
 #endif
 
         }
+
+        public static void FTW_4(double[] input, double[] output, double[] temp)
+        {
+            FWTParam param;
+            param.temp = IntPtr.Zero;
+            param.h = IntPtr.Zero;
+            param.g = IntPtr.Zero;
+            param.filterLength = 0;
+
+#if false // non copy
+            param.input = Marshal.UnsafeAddrOfPinnedArrayElement(input, 0);
+            param.output = Marshal.UnsafeAddrOfPinnedArrayElement(output, 0);
+            param.inputLength = input.Length;
+            DllTools_DWT1D_V2(ref param);
+
+#else
+            param.inputLength = input.Length;
+            int len = Marshal.SizeOf(typeof(double)) * input.Length;
+            MemoryObject inputMemory = _poolCtrl.Get(len);
+            param.input = inputMemory.Ptr;
+            Marshal.Copy(input, 0, param.input, input.Length);
+
+            MemoryObject outputMemory = _poolCtrl.Get(len);
+            param.output = outputMemory.Ptr;
+
+            DllTools_DWT1D_V2(ref param);
+            Marshal.Copy(param.output, output, 0, output.Length);
+
+            _poolCtrl.Free(inputMemory);
+            _poolCtrl.Free(outputMemory);
+
+
+#endif
+
+        }
+
 
         public static void FTW_3(double[] input, double[] output, double[] temp)
         {

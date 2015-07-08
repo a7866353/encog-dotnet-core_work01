@@ -65,7 +65,7 @@ namespace MyProject01.Controller
                 throw (new Exception("Input Param Error!"));
             }
 
-            DllTools.FTW_2(rateDataArray, Buffer, _tempBuffer);
+            DllTools.FTW_4(rateDataArray, Buffer, _tempBuffer);
 
 
             MyProject01.Util.DataNormallizer adj = new MyProject01.Util.DataNormallizer();
@@ -158,7 +158,7 @@ namespace MyProject01.Controller
                 throw (new Exception("Input Param Error!"));
             }
 
-            DllTools.FTW_2(rateDataArray, Buffer, _tempBuffer);
+            DllTools.FTW_4(rateDataArray, Buffer, _tempBuffer);
 
 
             for (int i = 0; i < Buffer.Length;i++ )
