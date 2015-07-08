@@ -13,12 +13,14 @@ namespace MyProject01.Controller.Jobs
         {
             this._ctrl = ctrl;
         }
-        public void Do(TrainerContex context)
+        public bool Do(TrainerContex context)
         {
             if (context.IsChanged == false)
-                return;
+                return true;
             _ctrl.BestNetwork = context.BestNetwork;
             _ctrl.Save();
+
+            return true;
         }
     }
 }

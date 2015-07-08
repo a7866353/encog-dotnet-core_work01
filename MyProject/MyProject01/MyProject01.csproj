@@ -78,6 +78,7 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="Controller\DataUpdateJob.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="DAO\RateDataDAOList.cs" />
     <Compile Include="Factorys\ControllerFactorys\BasicControllerFactory.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="DAO\MongoDBUtility.cs" />
     <Compile Include="DAO\MyNetDAO.cs" />
     <Compile Include="ExchangeRateTrade\TradeController.cs" />
+    <Compile Include="Factorys\TrainerFactorys\StepTrainerFactory.cs" />
     <Compile Include="Factorys\TrainingDataFactorys\RecentDataFactory.cs" />
     <Compile Include="IControllerFactory.cs" />
     <Compile Include="InputDataAnalyzerTool\InputDataAnalyzer.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="TestCases\RateMarketTest.cs" />
     <Compile Include="TestCases\RateMarketTestCases\BasicRateMarketTestCase.cs" />
     <Compile Include="TestCases\RateMarketTestCases\NormalRateMarketTestCase.cs" />
+    <Compile Include="TestCases\RateMarketTestCases\StepTrainingTestCase.cs" />
     <Compile Include="TestParameters\NormalParameterSet.cs" />
     <Compile Include="Test\DealTest.cs" />
     <Compile Include="Test\FeedForwardNetworkTest.cs" />

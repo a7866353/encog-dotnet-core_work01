@@ -503,6 +503,16 @@ namespace MyProject01
                 group.Add(fwtCase);
             }
         }
+        private void AddRecentM5StepCrossTestCase(TestCaseGroup group)
+        {
+            int populatim = 512;
+            int[] dataBlockLength = new int[] { 16, 32, 64, 1024, 2048, 4096 };
+            foreach (int blockLength in dataBlockLength)
+            {
+                FwtReduceLossRecentM5StepTestCase fwtCase = new FwtReduceLossRecentM5StepTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
+                group.Add(fwtCase);
+            }
+        }
 
         
         private void AddTestCase()
@@ -532,7 +542,8 @@ namespace MyProject01
 
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
-
+            
+            AddRecentM5StepCrossTestCase(newTestList);
             AddRecentM5CrossTestCase(newTestList);
             AddRecentCrossTestCase(newTestList);
             // AddCrossTestCase(newTestList);

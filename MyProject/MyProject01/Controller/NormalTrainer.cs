@@ -158,8 +158,9 @@ namespace MyProject01.Controller
                     break;
             }
             double score =
-                tradeCtrl.TradeLog.GrossLoss  +
-                tradeCtrl.Agent.CurrentValue;
+                tradeCtrl.TradeLog.GrossLoss * 10  +
+                tradeCtrl.TradeLog.MaxLoss * 10 +
+                (tradeCtrl.Agent.CurrentValue - tradeCtrl.Agent.InitMoney);
 
             return score;
         }

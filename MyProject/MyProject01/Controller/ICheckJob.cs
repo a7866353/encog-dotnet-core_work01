@@ -9,6 +9,6 @@ namespace MyProject01.Controller
 {
     interface ICheckJob
     {
-        void Do(TrainerContex context);
+        bool Do(TrainerContex context);
     }
 }

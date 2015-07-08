@@ -28,13 +28,14 @@ namespace MyProject01.Controller
             _jobList.Add(job);
         }
 
-        public void Do(TrainerContex context)
+        public bool Do(TrainerContex context)
         {
             lock (_contextTaskList)
             {
                 _contextTaskList.Add(context.Clone());
             }
             _workThread.Interrupt();
+            return true;
         }
 
         private void WorkTask()
@@ -68,7 +69,8 @@ namespace MyProject01.Controller
 
                 foreach(ICheckJob job in _jobList)
                 {
-                    job.Do(context);
+                    if (job.Do(context) == false)
+                        break;
                 }
                 
             }
@@ -91,12 +93,14 @@ namespace MyProject01.Controller
             _jobList.Add(job);
         }
 
-        public void Do(TrainerContex context)
+        public bool Do(TrainerContex context)
         {
             foreach (ICheckJob job in _jobList)
             {
-                job.Do(context);
+                if (job.Do(context) == false)
+                    break;
             }
+            return true;
         }
     }
 

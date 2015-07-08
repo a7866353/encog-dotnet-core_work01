@@ -12,7 +12,7 @@ namespace MyProject01.Controller.Jobs
     class CheckNetworkChangeJob : ICheckJob
     {
         private byte[] LastNetData;
-        public void Do(TrainerContex context)
+        public bool Do(TrainerContex context)
         {
             NEATNetwork episodeNet = (NEATNetwork)context.train.CODEC.Decode(context.train.BestGenome);
             byte[] netData = NetworkToByte(episodeNet);
@@ -26,7 +26,7 @@ namespace MyProject01.Controller.Jobs
             {
                 context.IsChanged = false;
             }
-
+            return true;
         }
 
         private byte[] NetworkToByte(NEATNetwork network)

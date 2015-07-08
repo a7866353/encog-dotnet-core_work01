@@ -31,10 +31,10 @@ namespace MyProject01.Controller.Jobs
             LogFile.WriteLine(_log.GetTitle());
             _testCaseDAO = null;
         }
-        public void Do(TrainerContex context)
+        public bool Do(TrainerContex context)
         {
             if (context.IsChanged == false)
-                return;
+                return true;
 
             if (_testCaseDAO == null)
             {
@@ -52,6 +52,8 @@ namespace MyProject01.Controller.Jobs
             _testCaseDAO.NetworkData = null;
             _testCaseDAO.Step = _epoch;
             _testCaseDAO.Save();
+
+            return true;
 
         }
         private void TestResult(NEATNetwork network, RateMarketTestDAO dao)

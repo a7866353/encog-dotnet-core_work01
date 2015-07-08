@@ -10,7 +10,7 @@ namespace MyProject01.Factorys.TrainingDataFactorys
 {
     class RecentUSDJPYM30DataFactory : BasicTrainingDataFactory
     {
-        public double TestDataRate = 0.9;
+        public double TestDataRate = 0.7;
         // public DateTime StartDateTime = new DateTime(2012, 6, 1);
         public DateTime EndDateTime = DateTime.Now;
         public DateTime StartDateTime = DateTime.Now.AddMonths(-24);
@@ -40,10 +40,10 @@ namespace MyProject01.Factorys.TrainingDataFactorys
 
     class RecentUSDJPYM5DataFactory : BasicTrainingDataFactory
     {
-        public double TestDataRate = 0.9;
+        public double TestDataRate = 0.5;
         // public DateTime StartDateTime = new DateTime(2012, 6, 1);
         public DateTime EndDateTime = DateTime.Now;
-        public DateTime StartDateTime = DateTime.Now.AddMonths(-24);
+        public DateTime StartDateTime = DateTime.Now.AddDays(-10);
         private DataTimeType TimeFrame = DataTimeType.M5;
         private string SymbolName = "USDJPYpro_5_USDJPYpro5";
 
