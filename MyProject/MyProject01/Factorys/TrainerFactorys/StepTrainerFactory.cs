@@ -30,7 +30,7 @@ namespace MyProject01.Factorys.TrainerFactorys
                     TradeDecisionCtrl = Controller.GetDecisionController(),
                 });
             mainCheckCtrl.Add(dataUpdateJob);
-            mainCheckCtrl.Add(new CheckNetworkChangeJob());
+            mainCheckCtrl.Add(new CheckNetworkChangeJobV2());
             mainCheckCtrl.Add(new UpdataControllerJob(Controller));
 
             // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();

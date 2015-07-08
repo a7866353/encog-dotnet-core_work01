@@ -1,4 +1,5 @@
-﻿using Encog.Neural.NEAT;
+﻿using Encog.ML.EA.Genome;
+using Encog.Neural.NEAT;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,4 +56,24 @@ namespace MyProject01.Controller.Jobs
             return true;
         }
     }
+    class CheckNetworkChangeJobV2 : ICheckJob
+    {
+        private IGenome _lastResult;
+        public bool Do(TrainerContex context)
+        {
+            if (_lastResult != context.train.BestGenome)
+            {
+                _lastResult = context.train.BestGenome;
+                NEATNetwork episodeNet = (NEATNetwork)context.train.CODEC.Decode(context.train.BestGenome);
+                context.BestNetwork = episodeNet;
+                context.IsChanged = true;
+            }
+            else
+            {
+                context.IsChanged = false;
+            }
+            return true;
+        }
+    }
+
 }
