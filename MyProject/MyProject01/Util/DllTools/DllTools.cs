@@ -174,9 +174,54 @@ namespace MyProject01.Util.DllTools
         private static extern void DllTools_DWT1D(ref FWTParam param);
 
         [DllImport("DllTools.dll", EntryPoint = "DllTools_DWT1D_V2")]
-        private static extern void DllTools_DWT1D_V2(ref FWTParam param);
+        public static extern void DllTools_DWT1D_V2(ref FWTParam param);
 
         [DllImport("dwtHaar1D.dll", EntryPoint = "OneDFwt")]
         private static extern void OneDFwt(IntPtr signal, uint slength, IntPtr output);
+    }
+
+    class FWTCalculator
+    {
+        static private DllMemoryPoolCtrl _poolCtrl;
+        static FWTCalculator()
+        {
+            _poolCtrl = new DllMemoryPoolCtrl();
+        }
+
+
+        private MemoryObject _inputMemory;
+        private MemoryObject _outputMemory;
+        public FWTCalculator(int dataSize)
+        {
+            _inputMemory = _poolCtrl.Get(dataSize);
+            _outputMemory = _poolCtrl.Get(dataSize);
+        }
+        ~FWTCalculator()
+        {
+            _poolCtrl.Free(_inputMemory);
+            _poolCtrl.Free(_outputMemory);
+        }
+
+        public void Compute(double[] input, double[] output, double[] temp)
+        {
+            FWTParam param;
+            param.temp = IntPtr.Zero;
+            param.h = IntPtr.Zero;
+            param.g = IntPtr.Zero;
+            param.filterLength = 0;
+
+            param.inputLength = input.Length;
+            int len = Marshal.SizeOf(typeof(double)) * input.Length;
+            param.input = _inputMemory.Ptr;
+            Marshal.Copy(input, 0, param.input, input.Length);
+
+            param.output = _outputMemory.Ptr;
+
+            DllTools.DllTools_DWT1D_V2(ref param);
+            Marshal.Copy(param.output, output, 0, output.Length);
+
+            _poolCtrl.Free(_inputMemory);
+            _poolCtrl.Free(_outputMemory);
+        }
     }
 }

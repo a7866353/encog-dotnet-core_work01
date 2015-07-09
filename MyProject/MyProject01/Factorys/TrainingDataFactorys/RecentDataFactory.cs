@@ -54,7 +54,6 @@ namespace MyProject01.Factorys.TrainingDataFactorys
             loader.Load();
             // loader.Fillter(new DateTime(2013, 1, 1), DateTime.Now);
 
-            RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
             TrainingData td = new TrainingData(
                 new RateDataBlock(loader, 0, loader.Count, DataBlockLength),
                 new RateDataBlock(loader, 0, (int)(loader.Count * TestDataRate), DataBlockLength)

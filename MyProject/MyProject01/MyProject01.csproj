@@ -151,6 +151,7 @@
     <Compile Include="Util\DataObject\DataLoader.cs" />
     <Compile Include="Util\DataObject\FenghuangDataLoader.cs" />
     <Compile Include="Util\DataObject\IDataBlock.cs" />
+    <Compile Include="Util\DataObject\KDJDataBlock.cs" />
     <Compile Include="Util\DllTools\DllMemoryPool.cs" />
     <Compile Include="Util\DllTools\DllTools.cs" />
     <Compile Include="Util\IDescriptionProvider.cs" />
