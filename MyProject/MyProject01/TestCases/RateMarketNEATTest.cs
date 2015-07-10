@@ -65,6 +65,7 @@ namespace MyProject01.TestCases
             {
                 loader = new MTData2Loader(RateDataControllerName);
             }
+            /* Loader中的无用处理，改到用InputConver中实现
             if(controller.DataScale == 0)
             {
                 controller.DataScale = loader.Scale;
@@ -74,6 +75,7 @@ namespace MyProject01.TestCases
             {
                 loader.Normallize(controller.DataOffset, controller.DataScale);
             }
+            */
             BasicDataBlock testBlock;
 
             // testBlock = loader.CreateDataBlock(0, loader.Count, DataBlockLength);

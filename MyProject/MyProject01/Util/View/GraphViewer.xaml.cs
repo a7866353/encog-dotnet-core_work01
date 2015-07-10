@@ -31,7 +31,7 @@ namespace MyProject01.Util.View
             double[] dataArr = new double[rateSetArr.Length];
             for (int i = 0; i < dataArr.Length; i++)
             {
-                dataArr[i] = rateSetArr[i].Value;
+                dataArr[i] = rateSetArr[i].Close;
             }
             setData(dataArr);
             markList = new List<int>();
@@ -380,7 +380,7 @@ namespace MyProject01.Util.View
         {
             double[] dataArray = new double[rateSetArr.Length];
             for (int i = 0; i < dataArray.Length; i++)
-                dataArray[i] = rateSetArr[i].Value;
+                dataArray[i] = rateSetArr[i].Close;
             return AddLineData(dataArray);
 
 

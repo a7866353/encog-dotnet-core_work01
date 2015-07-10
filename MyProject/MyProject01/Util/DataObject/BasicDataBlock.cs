@@ -35,7 +35,7 @@ namespace MyProject01.Util.DataObject
         {
             for (int i = 0; i < _data.Length; i++)
             {
-                _data[i] = _loader[i + _startIndex].Value;
+                _data[i] = _loader[i + _startIndex].Close;
             }
 
         }

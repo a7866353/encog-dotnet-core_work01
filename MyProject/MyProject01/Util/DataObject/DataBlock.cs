@@ -27,11 +27,11 @@ namespace MyProject01.Util
         }
         override public double GetRate(int i)
         {
-            return _loader[_startIndex + _blockLength - 1 + i].RealValue;
+            return _loader[_startIndex + _blockLength - 1 + i].Close;
         }
         public override DateTime GetDate(int i)
         {
-            return _loader[_startIndex + _blockLength - 1 + i].Date;
+            return _loader[_startIndex + _blockLength - 1 + i].Time;
         }
         override public BasicDataBlock GetNewBlock(int startIndex, int length)
         {
@@ -72,7 +72,7 @@ namespace MyProject01.Util
         {
             for (int i = 0; i < _dataBufferLength; i++)
             {
-                _data[i] = _loader[i + _startIndex].Value * _scale + _offset;
+                _data[i] = _loader[i + _startIndex].Close * _scale + _offset;
             }
 
         }

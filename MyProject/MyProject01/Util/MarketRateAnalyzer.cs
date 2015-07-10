@@ -41,7 +41,7 @@ namespace MyProject01.Util
             _sourceDataArr = new double[rateSetArr.Length];
             for (int i = 0; i < rateSetArr.Length; i++)
             {
-                _sourceDataArr[i] = rateSetArr[i].Value;
+                _sourceDataArr[i] = rateSetArr[i].Close;
             }
 
             _graphLineArr = new GraphLine[4];

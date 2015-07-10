@@ -16,7 +16,7 @@ namespace MyProject01.Util
             RateData[] dataArr = _rateDataCtrl.Get(0, _rateDataCtrl.Count);
             AddAll(dataArr);
 
-            DataValueAdjust();
+            // DataValueAdjust();
         }
 
         private void AddAll(RateData[] buffer)
@@ -24,7 +24,7 @@ namespace MyProject01.Util
             foreach (RateData data in buffer)
             {
                 RateSet currRateSet;
-                currRateSet = new RateSet(data.time, (data.high + data.low) / 2);
+                currRateSet = new RateSet(data);
                 Add(currRateSet);
             }
         }

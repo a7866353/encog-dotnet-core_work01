@@ -64,7 +64,7 @@ namespace MyProject01.Util
                 AddByTime(dataBuffer, (int)type);
             }
 
-            DataValueAdjust();
+            // DataValueAdjust();
         }
 
         private void AddAll(MTDataBuffer buffer)
@@ -72,7 +72,7 @@ namespace MyProject01.Util
             foreach(RateData mtData in buffer)
             {
                 RateSet currRateSet;
-                currRateSet = new RateSet(mtData.time, (mtData.high + mtData.low) / 2);
+                currRateSet = new RateSet(mtData);
                 Add(currRateSet);
                 if (Count >= _dataCountLimit)
                     break;
@@ -85,14 +85,12 @@ namespace MyProject01.Util
 
             checker.Interval = interval;
             checker.Set(buffer[0]);
-            RateSet currRateSet;
 
             foreach (RateData mtData in buffer)
             {
                 if (checker.IsOver(mtData.time) == true)
                 {
-                    currRateSet = new RateSet(checker.startDate, (checker.highPrice + checker.lowPrice) / 2);
-                    Add(currRateSet);
+                    Add(checker.GetRateSet());
 
                     checker.Set(mtData);
 
@@ -107,8 +105,7 @@ namespace MyProject01.Util
             }
 
             // add last
-            currRateSet = new RateSet(checker.startDate, (checker.highPrice + checker.lowPrice) / 2);
-            Add(currRateSet);
+            Add(checker.GetRateSet());
         }
 
 
@@ -139,8 +136,6 @@ namespace MyProject01.Util
             bool isFirst = true;
 
             checker.Interval = _dir * interval;
-            RateSet currRateSet;
-
             foreach (RateData mtData in buffer)
             {
                 if (isFirst == true)
@@ -152,8 +147,7 @@ namespace MyProject01.Util
                 {
                     if (checker.IsOver(mtData.time) == true)
                     {
-                        currRateSet = new RateSet(checker.startDate, (checker.highPrice + checker.lowPrice) / 2);
-                        if (CheckEnd(currRateSet) == true)
+                        if (CheckEnd(checker.GetRateSet()) == true)
                             break;
                         checker.Set(mtData);
                     }
@@ -260,7 +254,7 @@ namespace MyProject01.Util
 
         protected override bool CheckEnd(RateSet obj)
         {
-            if (obj.Date >= _startDate)
+            if (obj.Time >= _startDate)
             {
                 Add(obj);
                 return false;
@@ -281,6 +275,9 @@ namespace MyProject01.Util
     {
         public double highPrice;
         public double lowPrice;
+        public double openPrice;
+        public double closePrice;
+
         public DateTime startDate;
         public DateTime targetTime;
 
@@ -288,11 +285,12 @@ namespace MyProject01.Util
 
         public void Set(RateData mtData)
         {
+            openPrice = mtData.open;
+            closePrice = mtData.close;
             highPrice = mtData.high;
             lowPrice = mtData.low;
             startDate = mtData.time;
             targetTime = CalcEndTime(startDate, Interval);
-             
         }
 
         public bool IsOver(DateTime date)
@@ -320,6 +318,20 @@ namespace MyProject01.Util
                 highPrice = mtData.high;
             if (lowPrice > mtData.low)
                 lowPrice = mtData.low;
+            closePrice = mtData.close;
+        }
+
+        public RateSet GetRateSet()
+        {
+            RateSet currRateSet = new RateSet();
+            currRateSet.Time = startDate;
+            currRateSet.High = openPrice;
+            currRateSet.Low = lowPrice;
+            currRateSet.Open = openPrice;
+            currRateSet.Close = closePrice;
+            currRateSet.TickVolume = currRateSet.RealVolume = 0;
+
+            return currRateSet;
         }
 
         private DateTime CalcEndTime(DateTime date, int interval)

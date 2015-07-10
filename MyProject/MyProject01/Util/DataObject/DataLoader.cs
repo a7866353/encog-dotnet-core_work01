@@ -43,18 +43,35 @@ namespace MyProject01.Util
 
     public class RateSet
     {
-        public DateTime Date;
-        public double Value;
-        public double RealValue;
-        public RateSet(DateTime date, double value)
+        public DateTime Time;
+        public double Open;
+        public double High;
+        public double Low;
+        public double Close;
+        public long TickVolume;
+        public long RealVolume;
+
+        public RateSet()
+        { 
+}
+        public RateSet(RateData data)
         {
-            this.Date = date;
-            this.Value = value;
-            this.RealValue = value;
+            Open = data.open;
+            Close = data.close;
+            High = data.high;
+            Low = data.low;
+            RealVolume = data.real_volume;
+            TickVolume = data.tick_volume;
+            Time = data.time;
+        }
+
+        public void SetValue(double v)
+        {
+            Open = Close = High = Low = v;
         }
         public override string ToString()
         {
-            return Date.ToShortDateString() + " " + Date.ToShortTimeString() + ": " + Value.ToString();
+            return Time.ToShortDateString() + " " + Time.ToShortTimeString() + ": " + Close.ToString();
         }
         public RateSet Clone()
         {
@@ -63,31 +80,13 @@ namespace MyProject01.Util
     }
     public abstract class DataLoader : List<RateSet>
     {
-        private double _dataMaxValue;
-        private double _dataMinValue;
-        private double _dataOffset;
-        private double _dataScale;
-
-        private const double _targetDataMargin = 0.25;
-        private const double _targDataMax = 0 + _targetDataMargin;
-        private const double _targDataMin = 0 - _targetDataMargin;
-
-        public double Offset
-        {
-            get { return _dataOffset; }
-        }
-        public double Scale
-        {
-            get { return _dataScale; }
-        }
-    
         public double[] GetArr(DateTime date)
         {
             int index = SerachByDate(date);
             if (index >= 0)
             {
                 double[] valueArr = new double[1];
-                valueArr[0] = this[index].Value;
+                valueArr[0] = this[index].Close;
                 return valueArr;
             }
             else
@@ -96,8 +95,31 @@ namespace MyProject01.Util
         }
         public double[] GetArr(DateTime startDate, int days)
         {
-            return GetArr(startDate, startDate.AddDays(days));
+            // return GetArr(startDate, startDate.AddDays(days));
+            return null;
         }
+        public double[] GetArr(DateTime startDate, DateTime endDate)
+        {
+            return null;
+            /*
+            if (endDate < startDate)
+                return null;
+
+            List<double> valueList = new List<double>();
+            int index = 0;
+            while (startDate < endDate)
+            {
+                index = SerachByDate(startDate);
+                if (index >= 0)
+                {
+                    valueList.Add(this[index].Value);
+                }
+                startDate = startDate.AddDays(1);
+            }
+            return valueList.ToArray();
+            */
+        }
+
 
         public double[] GetArr(int startIndex, int length)
         {
@@ -108,7 +130,7 @@ namespace MyProject01.Util
             double[] res = new double[length];
             for (int i = 0; i < length; i++)
             {
-                res[i] = this[startIndex + i].Value;
+                res[i] = this[startIndex + i].Close;
             }
             return res;
         }
@@ -118,34 +140,6 @@ namespace MyProject01.Util
             return new RateDataBlock(this, startIndex, length, blockLength);
         }
 
-        public double[] GetArr(DateTime startDate, DateTime endDate)
-        {
-            if( endDate < startDate)
-                return null;
-
-            List<double> valueList = new List<double>();
-            int index=0;
-            while(startDate < endDate)
-            {
-                index = SerachByDate(startDate);
-                if(index >= 0)
-                {
-                    valueList.Add(this[index].Value);
-                }
-                startDate = startDate.AddDays(1);
-            }
-            return valueList.ToArray();
-        }
-
-        public void Normallize(double offset, double scale)
-        {
-            _dataOffset = offset;
-            _dataScale = scale;
-            foreach (RateSet data in this)
-            {
-                data.Value = DataConv(data.RealValue, _dataOffset, _dataScale);
-            }
-        }
         public void Fillter(DateTime startTime, DateTime endTime)
         {
             int startIndex = -1;
@@ -155,12 +149,12 @@ namespace MyProject01.Util
             {
                 if(startIndex == -1)
                 {
-                    if (this[idx].Date >= startTime)
+                    if (this[idx].Time >= startTime)
                         startIndex = idx;
                 }
                 if(stopIndex == -1)
                 {
-                    if (this[idx].Date > endTime)
+                    if (this[idx].Time > endTime)
                         stopIndex = idx;
                 }
                 if(stopIndex != -1 && startIndex != -1)
@@ -186,33 +180,10 @@ namespace MyProject01.Util
             Sort(new DateComparer(true));
         }
 
-        protected void DataValueAdjust()
-        {
-            _dataMaxValue = _dataMinValue = this[0].Value;
-            foreach (RateSet data in this)
-            {
-                if (data.Value > _dataMaxValue)
-                    _dataMaxValue = data.Value;
-                else if (data.Value < _dataMinValue)
-                    _dataMinValue = data.Value;
-            }
-
-            _dataScale = (_targDataMax - _targDataMin) / (_dataMaxValue - _dataMinValue);
-
-            _dataOffset = (_dataMaxValue - _dataMinValue) * _targDataMax / (_targDataMax - _targDataMin) - _dataMaxValue;
-            
-
-            Normallize(_dataOffset, _dataScale);
-        }
-
-        private double DataConv(double value, double offset, double scale)
-        {
-            return (value + offset) * scale;
-        }
 
         private int SerachByDate(DateTime date)
         {
-            return BinarySearch(new RateSet(date, 0), new DateComparer(true));
+            return BinarySearch(new RateSet() { Time = date }, new DateComparer(true));
         }
     }
     // Compare By Date
@@ -228,18 +199,18 @@ namespace MyProject01.Util
         {
             if (_isIncr)
             {
-                if (x.Date > y.Date)
+                if (x.Time > y.Time)
                     return 1;
-                else if (x.Date == y.Date)
+                else if (x.Time == y.Time)
                     return 0;
                 else
                     return -1;
             }
             else
             {
-                if (x.Date < y.Date)
+                if (x.Time < y.Time)
                     return 1;
-                else if (x.Date == y.Date)
+                else if (x.Time == y.Time)
                     return 0;
                 else
                     return -1;

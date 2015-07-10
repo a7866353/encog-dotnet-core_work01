@@ -29,7 +29,9 @@ namespace MyProject01.Util
                         continue;
                     if (string.IsNullOrWhiteSpace(strArr[1]) == true)
                         continue;
-                    currRateSet = new RateSet(DateTime.Parse(strArr[0]), double.Parse(strArr[1]));
+                    currRateSet = new RateSet();
+                    currRateSet.Time = DateTime.Parse(strArr[0]);
+                    currRateSet.High = currRateSet.Low = currRateSet.Open = currRateSet.Close = double.Parse(strArr[1]);
                     Add(currRateSet);
                 }
                 sr.Close();
@@ -40,14 +42,16 @@ namespace MyProject01.Util
                 foreach (MarketData rawObj in rawDataArr)
                 {
                     RateSet currRateSet;
-                    currRateSet = new RateSet(DateTime.Parse(rawObj.Data), double.Parse(rawObj.MiddleRate));
+                    currRateSet = new RateSet();
+                    currRateSet.Time = DateTime.Parse(rawObj.Data);
+                    currRateSet.High = currRateSet.Low = currRateSet.Open = currRateSet.Close = double.Parse(rawObj.MiddleRate);
                     Add(currRateSet);
                 }
             }
 
 
             SortByDate();
-            DataValueAdjust();
+            // DataValueAdjust();
 
         }
     }
