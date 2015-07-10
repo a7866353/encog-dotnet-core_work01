@@ -10,37 +10,7 @@ using MyProject01.DAO;
 
 namespace MyProject01.Util
 {
-    class MarketData
-    {
-        public ObjectId _id;
-        public string Data { get; set; }
-        public string MiddleRate { get; set; }
-
-    }
-
-     class DataProvider
-     {
-         public static MarketData[] GetAllMarketData()
-         {
-             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
-             MongoDatabase db = connector.Connect();
-
-             string collectionName = "MiddleRate";
-             MongoCollection collection = db.GetCollection(collectionName);
-              
-             MongoCursor cursor = collection.FindAllAs<MarketData>();
-             MarketData[] dataArr = new MarketData[cursor.Count()];
-
-             long index = 0;
-             foreach (MarketData dataObj in cursor)
-             {
-                 dataArr[index++] = dataObj;
-             }
-             connector.Close();
-             return dataArr;
-         }
-     }
-
+  
     public class RateSet
     {
         public DateTime Time;

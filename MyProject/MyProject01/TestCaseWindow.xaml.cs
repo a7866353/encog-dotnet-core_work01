@@ -141,9 +141,12 @@ namespace MyProject01
 
         private void TestMarketAnalyz()
         {
+            // TODO
+            /*
             DataLoader loader = new FenghuangDataLoader();
             MarketRateAnalyzer analyzer = new MarketRateAnalyzer(loader.ToArray());
             DealPointInfomation[] info = analyzer.GetDealInfo();
+             */
         }
 
         private void RateAnalyzeTest()
@@ -153,9 +156,12 @@ namespace MyProject01
             {
                 win = new GraphViewer();
                 win.Show();
+                // TODO
+                /*
                 DataLoader dataLoader = new FenghuangDataLoader();
                 MarketRateAnalyzer test = new MarketRateAnalyzer(dataLoader.ToArray());
                 test.GetDealInfo();
+                 */ 
             }));
 
 

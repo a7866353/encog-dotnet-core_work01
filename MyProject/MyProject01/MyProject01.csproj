@@ -149,7 +149,6 @@
     <Compile Include="Util\DataObject\DataBaseBuffer.cs" />
     <Compile Include="Util\DataObject\DataBlock.cs" />
     <Compile Include="Util\DataObject\DataLoader.cs" />
-    <Compile Include="Util\DataObject\FenghuangDataLoader.cs" />
     <Compile Include="Util\DataObject\IDataBlock.cs" />
     <Compile Include="Util\DataObject\KDJDataBlock.cs" />
     <Compile Include="Util\DllTools\DllMemoryPool.cs" />
