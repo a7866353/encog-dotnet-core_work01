@@ -325,7 +325,7 @@ namespace MyProject01.Util
         {
             RateSet currRateSet = new RateSet();
             currRateSet.Time = startDate;
-            currRateSet.High = openPrice;
+            currRateSet.High = highPrice;
             currRateSet.Low = lowPrice;
             currRateSet.Open = openPrice;
             currRateSet.Close = closePrice;

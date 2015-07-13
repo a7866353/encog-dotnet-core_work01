@@ -23,7 +23,7 @@ namespace MyProject01.Util
 
         public RateSet()
         { 
-}
+        }
         public RateSet(RateData data)
         {
             Open = data.open;
