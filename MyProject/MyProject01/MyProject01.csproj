@@ -79,9 +79,11 @@
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
     <Compile Include="Controller\DataUpdateJob.cs" />
+    <Compile Include="Controller\KDJFromater.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="DAO\RateDataDAOList.cs" />
     <Compile Include="Factorys\ControllerFactorys\BasicControllerFactory.cs" />
+    <Compile Include="Factorys\ControllerFactorys\KdjControllerFactory.cs" />
     <Compile Include="Factorys\ControllerFactorys\NEATExchangeControllerFactory.cs" />
     <Compile Include="Factorys\ControllerFactorys\NeatFwtExchangeControllerFactory.cs" />
     <Compile Include="Controller\IInputDataFormater.cs" />
@@ -126,6 +128,7 @@
     <Compile Include="TestCases\RateMarketNEATTest.cs" />
     <Compile Include="TestCases\RateMarketTest.cs" />
     <Compile Include="TestCases\RateMarketTestCases\BasicRateMarketTestCase.cs" />
+    <Compile Include="TestCases\RateMarketTestCases\KDJTestCase.cs" />
     <Compile Include="TestCases\RateMarketTestCases\NormalRateMarketTestCase.cs" />
     <Compile Include="TestCases\RateMarketTestCases\StepTrainingTestCase.cs" />
     <Compile Include="TestParameters\NormalParameterSet.cs" />

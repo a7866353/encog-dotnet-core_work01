@@ -91,4 +91,31 @@ namespace MyProject01.Factorys.TrainingDataFactorys
             get { return "USDJPY_5MIN"; }
         }
     }
+
+    class OldRate5MinKDJDataFactory : BasicTrainingDataFactory
+    {
+        public double TestDataRate = 0.7;
+        public DateTime StartDateTime = new DateTime(2014, 7, 31);
+        public DateTime EndDateTime = new DateTime(2014, 10, 31);
+        public int Count = 1000;
+        protected override TrainingData Create()
+        {
+            BasicTestDataLoader loader;
+            loader = new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, DataBlockLength - 1);
+            loader.Load();
+            RateDataBlock testBlock = new RateDataBlock(loader, 0, loader.Count, DataBlockLength);
+            TrainingData td = new TrainingData(
+                new KDJDataBlock(loader, 0, loader.Count, DataBlockLength),
+                new KDJDataBlock(loader, 0, (int)(loader.Count * TestDataRate), DataBlockLength)
+                );
+
+            return td;
+        }
+
+        public override string Description
+        {
+            get { return "USDJPY_5MIN_KDJ"; }
+        }
+    }
+
 }

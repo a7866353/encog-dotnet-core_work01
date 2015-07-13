@@ -9,12 +9,16 @@ namespace MyProject01.Util
 {
     public class RateDataBlock : BasicDataBlock
     {
-        private double _scale;
-        private double _offset;
+        private double _scale = 1.0;
+        private double _offset = 0;
+        private double[] _data;
 
         public RateDataBlock(DataLoader loader, int startIndex, int length, int blockLength) 
             : base(loader, startIndex, length, blockLength)
         {
+            _data = new double[_dataBufferLength];
+            _blockLen = blockLength;
+            UpdateData();
         }
 
         override public int BlockCount
@@ -27,11 +31,11 @@ namespace MyProject01.Util
         }
         override public double GetRate(int i)
         {
-            return _loader[_startIndex + _blockLength - 1 + i].Close;
+            return this[_blockLength - 1 + i].Close;
         }
         public override DateTime GetDate(int i)
         {
-            return _loader[_startIndex + _blockLength - 1 + i].Time;
+            return this[_blockLength - 1 + i].Time;
         }
         override public BasicDataBlock GetNewBlock(int startIndex, int length)
         {
