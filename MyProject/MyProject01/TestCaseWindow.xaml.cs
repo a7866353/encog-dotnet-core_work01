@@ -521,7 +521,7 @@ namespace MyProject01
         }
         private void AddKdjM5StepCrossTestCase(TestCaseGroup group)
         {
-            int populatim = 32;
+            int populatim = 512;
             int[] dataBlockLength = new int[] { 16, 32, 64, 1024, 2048, 4096 };
             foreach (int blockLength in dataBlockLength)
             {

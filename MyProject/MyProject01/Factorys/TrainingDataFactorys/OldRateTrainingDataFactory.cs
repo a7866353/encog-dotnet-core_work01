@@ -95,7 +95,7 @@ namespace MyProject01.Factorys.TrainingDataFactorys
     class OldRate5MinKDJDataFactory : BasicTrainingDataFactory
     {
         public double TestDataRate = 0.7;
-        public DateTime StartDateTime = new DateTime(2014, 7, 31);
+        public DateTime StartDateTime = new DateTime(2014, 10, 20);
         public DateTime EndDateTime = new DateTime(2014, 10, 31);
         public int Count = 1000;
         protected override TrainingData Create()

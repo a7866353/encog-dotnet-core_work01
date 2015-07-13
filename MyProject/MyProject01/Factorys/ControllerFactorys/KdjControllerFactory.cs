@@ -14,7 +14,8 @@ namespace MyProject01.Factorys.ControllerFactorys
             NetworkController controller;
 
             TradeDecisionController decisionCtrl = new TradeDecisionController();
-            decisionCtrl._inputFormater = new KDJFormater(_inputLength);
+            // decisionCtrl._inputFormater = new KDJFormater(_inputLength);
+            decisionCtrl._inputFormater = new KDJOnlyFormater(_inputLength);
             decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
             decisionCtrl.BestNetwork = null;
 
