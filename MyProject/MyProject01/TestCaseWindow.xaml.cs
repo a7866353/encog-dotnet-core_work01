@@ -559,6 +559,17 @@ namespace MyProject01
                 group.Add(fwtCase);
             }
         }   
+        private void AddFwtNormM5RecentCrossTestCase(TestCaseGroup group)
+        {
+            int populatim = 512;
+            int[] dataBlockLength = new int[] { 16, 32, 64, 128, 1024, 2048, 4096 };
+            foreach (int blockLength in dataBlockLength)
+            {
+                KDJNormRecentTestCase fwtCase = new KDJNormRecentTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
+                group.Add(fwtCase);
+            }
+        }   
+        
         private void AddTestCase()
         {
             TestCaseGroup oldTestList = new TestCaseGroup()
@@ -587,6 +598,7 @@ namespace MyProject01
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
 
+            AddFwtNormM5RecentCrossTestCase(newTestList);
             AddKdjNormM5CrossTestCase(newTestList);
             AddKdjM5CrossTestCase(newTestList);
             AddRateNormM5CrossTestCase(newTestList);
