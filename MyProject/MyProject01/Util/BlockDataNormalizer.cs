@@ -109,6 +109,14 @@ namespace MyProject01.Util
                 _dataMinValue = data;
         }
 
+        public void Set(DataSection secData)
+        {
+            for(int i=0;i<secData.Length;i++)
+            {
+                Set(secData[i]);
+            }
+        }
+
         public void SetTarget(double middleValue, double margin)
         {
             _targetDataMid = middleValue;
@@ -135,8 +143,14 @@ namespace MyProject01.Util
 
         public Normalizer Normalizer
         {
-            get { return new Normalizer(Offset, Scale); }
+            get { return new NormalizerWithTrim(Offset, Scale, 1, 0); }
         }
+/*
+        public NormalizerWithTrim NormalizeWithTrim
+        {
+            get { return new NormalizerWithTrim(Offset, Scale, 1, 0); }
+        }
+*/
     }
 
     [Serializable]
@@ -151,14 +165,48 @@ namespace MyProject01.Util
             this.Scale = scale;
         }
 
-        public double Convert(double value)
+        virtual public double Convert(double value)
         {
             return (value + Offset) * Scale;
+        }
+
+        public void Convert(DataSection dataSec)
+        {
+            for (int i = 0; i < dataSec.Length; i++)
+                dataSec[i] = Convert(dataSec[i]);
         }
 
         public override string ToString()
         {
             return "O"+Offset.ToString("G") + "|S" + Scale.ToString("G");
+        }
+    }
+
+    class NormalizerWithTrim : Normalizer
+    {
+        public double MaxValue;
+        public double MinValue;
+
+        public NormalizerWithTrim(double offset, double scale, double maxValue, double minValue)
+            :base(offset, scale)
+        {
+            MaxValue = maxValue;
+            MinValue = minValue;
+        }
+        public override double Convert(double value)
+        {
+            double v = base.Convert(value);
+            if (v > MaxValue)
+                v = MaxValue;
+            else if (v < MinValue)
+                v = MinValue;
+            return v;
+        }
+        public override string ToString()
+        {
+            return "O" + Offset.ToString("G") + "|S" + Scale.ToString("G")
+                + "|H" + MaxValue.ToString("G") + "|L" + MinValue.ToString("G");
+
         }
     }
 

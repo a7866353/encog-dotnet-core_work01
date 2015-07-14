@@ -28,4 +28,30 @@ namespace MyProject01.Factorys.ControllerFactorys
             get { return "KDJ_" + _inputLength.ToString(); }
         }
     }
+
+    class KdjNormControllerFactory : BasicControllerFactory
+    {
+        protected override NetworkController Create()
+        {
+            NetworkController controller;
+
+            TradeDecisionController decisionCtrl = new TradeDecisionController();
+
+            KDJFormater form = new KDJFormater(_inputLength);
+
+
+            decisionCtrl._inputFormater = form;
+            decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
+            decisionCtrl.BestNetwork = null;
+
+            controller = NetworkController.Create(Name, decisionCtrl);
+            return controller;
+        }
+
+        public override string Description
+        {
+            get { return "KDJ_" + _inputLength.ToString(); }
+        }
+    }
+
 }
