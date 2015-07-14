@@ -164,6 +164,7 @@ namespace MyProject01.Controller
         public IInputDataFormater Clone()
         {
             KDJFormater formater = new KDJFormater(_blockLength);
+            formater._rateNorm = _rateNorm;
             return formater;
         }
 

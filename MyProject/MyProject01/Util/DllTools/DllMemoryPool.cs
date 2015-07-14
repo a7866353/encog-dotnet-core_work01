@@ -36,13 +36,12 @@ namespace MyProject01.Util.DllTools
         public MemoryObject Get()
         {
             MemoryObject res;
-            lock (this)
+            lock (_emptyList)
             {
-                if (_emptyListCount > 0)
+                if (_emptyList.Count > 0)
                 {
-                    res = _emptyList[_emptyListCount - 1];
-                    _emptyList.RemoveAt(_emptyListCount - 1);
-                    _emptyListCount--;
+                    res = _emptyList[0];
+                    _emptyList.RemoveAt(0);
                 }
                 else
                 {
@@ -58,11 +57,9 @@ namespace MyProject01.Util.DllTools
         }
         public void Free(MemoryObject obj)
         {
-            lock (this)
+            lock (_emptyList)
             {
                 _emptyList.Add(obj);
-                _emptyListCount++;
-                _bufferCount--;
             }
         }
     }

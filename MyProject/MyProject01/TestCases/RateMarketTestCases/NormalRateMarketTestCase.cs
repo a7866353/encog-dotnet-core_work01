@@ -257,6 +257,63 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+    class RawRateM5ShortTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private NEATRateStateKeepControllerFactory controllerFactory;
+        private OldRateTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public RawRateM5ShortTestCase()
+        {
+            controllerFactory = new NEATRateStateKeepControllerFactory();
+            dataFactory = new OldRateTrainingDataFactory()
+                {
+                    StartDateTime = OldRateDataRange.M5ShortStart,
+                    EndDateTime = OldRateDataRange.M5ShortEnd,
+                    TimeFrame = DataTimeType.M5,
+                };
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+            controllerFactory.InputLength = 32;
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            BlockDataNormalizer norm = new BlockDataNormalizer();
+            norm.Normalize(trainerFactory.TrainingData.TrainDataBlock);
+            controllerFactory.Name = TestName;
+            controllerFactory.Offset = norm.Offset;
+            controllerFactory.Scale = norm.Scacle;
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
+
     class FwtNorm1DayTestCase : BasicRateMarketTestCase
     {
         public int DataBlockLength
@@ -464,6 +521,60 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+    class FwtNormM5ShortTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+        private NEATFWTNromStateKeepControllerFactory controllerFactory;
+        private OldRateTrainingDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public FwtNormM5ShortTestCase()
+        {
+            controllerFactory = new NEATFWTNromStateKeepControllerFactory();
+            dataFactory = new OldRateTrainingDataFactory()
+                {
+                     StartDateTime = OldRateDataRange.M5ShortStart,
+                     EndDateTime = OldRateDataRange.M5ShortEnd,
+                     TimeFrame = DataTimeType.M5,
+                };
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            controllerFactory.NormalyzeData = trainerFactory.TrainingData.TrainDataBlock;
+            controllerFactory.Name = TestName;
+
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
+
     class FwtNormRecentM30TestCase : BasicRateMarketTestCase
     {
         public int DataBlockLength

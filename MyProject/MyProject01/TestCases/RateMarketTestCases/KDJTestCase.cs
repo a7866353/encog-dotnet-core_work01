@@ -58,4 +58,52 @@ namespace MyProject01.TestCases.RateMarketTestCases
             _train = trainerFactory.Get();
         }
     }
+    class KDJNormTestCase : BasicRateMarketTestCase
+    {
+        public int DataBlockLength
+        {
+            set { controllerFactory.InputLength = value; }
+        }
+        public int PopulationNumber
+        {
+            set { popFactory.PopulationNumber = value; }
+        }
+
+        private KdjNormControllerFactory controllerFactory;
+        private OldRate5MinKDJDataFactory dataFactory;
+        private FirstTrainerFactory trainerFactory;
+        private NormalPopulationFactory popFactory;
+
+        public KDJNormTestCase()
+        {
+            controllerFactory = new KdjNormControllerFactory();
+            dataFactory = new OldRate5MinKDJDataFactory();
+            trainerFactory = new FirstTrainerFactory();
+            popFactory = new NormalPopulationFactory();
+
+            controllerFactory.InputLength = 32;
+
+            _descList.Add(controllerFactory);
+            _descList.Add(dataFactory);
+            _descList.Add(trainerFactory);
+            _descList.Add(popFactory);
+        }
+
+        protected override void Init()
+        {
+            dataFactory.DataBlockLength = controllerFactory.InputLength;
+
+            trainerFactory.PopulationFacotry = popFactory;
+            trainerFactory.TestDescription = TestDescription;
+
+            trainerFactory.TrainingData = dataFactory.Get();
+            trainerFactory.TestCaseName = TestName;
+
+            controllerFactory.Name = TestName;
+            controllerFactory.NormalyzeData = dataFactory.Get().TestDataBlock;
+            trainerFactory.Controller = controllerFactory.Get();
+
+            _train = trainerFactory.Get();
+        }
+    }
 }

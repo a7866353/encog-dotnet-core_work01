@@ -60,7 +60,7 @@ namespace MyProject01.Util.DataObject
 
                 if (_jArr[i] > 1)
                     _jArr[i] = 1;
-                else if (_kArr[i] < 0)
+                else if (_jArr[i] < 0)
                     _jArr[i] = 0;
             }
         }

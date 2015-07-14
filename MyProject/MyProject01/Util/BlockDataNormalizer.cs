@@ -181,7 +181,7 @@ namespace MyProject01.Util
             return "O"+Offset.ToString("G") + "|S" + Scale.ToString("G");
         }
     }
-
+    [Serializable]
     class NormalizerWithTrim : Normalizer
     {
         public double MaxValue;

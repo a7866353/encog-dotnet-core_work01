@@ -1,4 +1,5 @@
 ﻿using MyProject01.Controller;
+using MyProject01.Util.DataObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,6 @@ namespace MyProject01.Factorys.ControllerFactorys
             NetworkController controller;
 
             TradeDecisionController decisionCtrl = new TradeDecisionController();
-            // decisionCtrl._inputFormater = new KDJFormater(_inputLength);
             decisionCtrl._inputFormater = new KDJOnlyFormater(_inputLength);
             decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
             decisionCtrl.BestNetwork = null;
@@ -31,6 +31,9 @@ namespace MyProject01.Factorys.ControllerFactorys
 
     class KdjNormControllerFactory : BasicControllerFactory
     {
+        public BasicDataBlock NormalyzeData;
+        public double MiddleValue = 0.5;
+        public double Margin = 0.2;
         protected override NetworkController Create()
         {
             NetworkController controller;
@@ -38,7 +41,7 @@ namespace MyProject01.Factorys.ControllerFactorys
             TradeDecisionController decisionCtrl = new TradeDecisionController();
 
             KDJFormater form = new KDJFormater(_inputLength);
-
+            form.Normilize(NormalyzeData, MiddleValue, Margin);
 
             decisionCtrl._inputFormater = form;
             decisionCtrl._outputConvertor = new TradeStateKeepConvertor();
@@ -50,7 +53,7 @@ namespace MyProject01.Factorys.ControllerFactorys
 
         public override string Description
         {
-            get { return "KDJ_" + _inputLength.ToString(); }
+            get { return "KDJNorm_" + _inputLength.ToString(); }
         }
     }
 
