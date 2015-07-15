@@ -102,7 +102,7 @@ namespace MyProject01.Controller
         }
         public int InputDataLength
         {
-            get { return _buffer.Length; }
+            get { return _blockLength; }
         }
 
         public int ResultDataLength
