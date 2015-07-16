@@ -357,14 +357,14 @@ namespace MyProject01.Util.DllTools
             public int activationCycles;
         };
 
-        [DllImport("DllTools.dll", EntryPoint = "DllTools_NEATNetwork")]
+        [DllImport("DllTools.dll", EntryPoint = "DllTools_NEATNetwork", CallingConvention=CallingConvention.StdCall)]
         private static extern void DllTools_NEATNetwork(NEATNetworkParm param);
 
         private NEATNetworkParm parm;
         private Link[] _linkArr;
         private double[] _inputBuffer;
         private double[] _outputBuffer;
-
+        private BasicMLData outData;
         public NetworkDllTools(Encog.Neural.NEAT.NEATNetwork network)
         {
             parm = new NEATNetworkParm();
@@ -402,6 +402,7 @@ namespace MyProject01.Util.DllTools
             _outputBuffer = new double[network.OutputCount];
             // parm.output = Marshal.UnsafeAddrOfPinnedArrayElement(_outputBuffer, 0);
             parm.output = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(double)) * parm.outputCount);
+            outData = new BasicMLData(_outputBuffer, false);
 
             parm.activationCycles = network.ActivationCycles;
 
@@ -424,17 +425,10 @@ namespace MyProject01.Util.DllTools
 
                 Marshal.Copy(inputData.Data, 0, parm.input, inputData.Data.Length);
 
-                try
-                {
-                    DllTools_NEATNetwork(parm);
-                }
-                catch (Exception e)
-                {
 
-                }
+                DllTools_NEATNetwork(parm);
+  
                 Marshal.Copy(parm.output, _outputBuffer, 0, _outputBuffer.Length);
-                BasicMLData outData = new BasicMLData(_outputBuffer, false);
-            
             return outData;
         }
 

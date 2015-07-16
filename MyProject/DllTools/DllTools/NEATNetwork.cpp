@@ -89,8 +89,7 @@ EXTERN_C
 
 	DLLTOOLS_API void __stdcall DllTools_NEATNetwork(NEATNetworkParm param)
 	{
-		NEATNetworkParm internalParam = param;
-		Compute(&internalParam);
+		Compute(&param);
 	}
 
 }

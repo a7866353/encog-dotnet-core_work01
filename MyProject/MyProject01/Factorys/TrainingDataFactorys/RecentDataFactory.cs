@@ -41,7 +41,7 @@ namespace MyProject01.Factorys.TrainingDataFactorys
 
     class RecentUSDJPYM5DataFactory : BasicTrainingDataFactory
     {
-        public double TestDataRate = 0.5;
+        public double TestDataRate = 0.85;
         // public DateTime StartDateTime = new DateTime(2012, 6, 1);
         public DateTime EndDateTime = DateTime.Now;
         public DateTime StartDateTime = DateTime.Now.AddMonths(-3);
@@ -71,7 +71,7 @@ namespace MyProject01.Factorys.TrainingDataFactorys
 
     class RecentUSDJPYKDJM5DataFactory : BasicTrainingDataFactory
     {
-        public double TestDataRate = 0.5;
+        public double TestDataRate = 0.85;
         // public DateTime StartDateTime = new DateTime(2012, 6, 1);
         public DateTime EndDateTime = DateTime.Now;
         public DateTime StartDateTime = DateTime.Now.AddMonths(-3);

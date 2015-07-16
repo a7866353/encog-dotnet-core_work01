@@ -86,7 +86,8 @@ namespace SocketTestClient.ConnectionContoller
         protected override MarketActions GetNextCommand(RateDataControlDAO dataController, ITradeDesisoin decisionCtrl)
         {
             DateTime lastTradeTime = dataController.LastItemTime;
-            TestDataCountLoader loader = new TestDataCountLoader(_dataController.Name, DataTimeType.M5, lastTradeTime, 1000);
+            TestDataDateRangeLoader loader = new TestDataDateRangeLoader(dataController.CollectiongName, DataTimeType.M5, lastTradeTime.AddDays(-10), lastTradeTime, 1024);
+            loader.Load();
             KDJDataBlock dataBlock = new KDJDataBlock(loader, 0, loader.Count, decisionCtrl.InputDataLength);
 
             double[] buffer = new double[decisionCtrl.InputDataLength * 4];
@@ -110,11 +111,12 @@ namespace SocketTestClient.ConnectionContoller
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 5));
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150623__074144__028", 6));
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150625__231317__582", 7));
+            _tradeOrderList.Add(new KDJTradeOrder("USDJPYpro1", "20150716__210730__425", 8));
 
         }
         public IRequest GetRequest()
         {
-            foreach(RateTradeOrder order in _tradeOrderList)
+            foreach (BasicTradeOrder order in _tradeOrderList)
             {
                 MarketActions cmd = order.GetNextCommand();
                 if (cmd == MarketActions.Nothing)

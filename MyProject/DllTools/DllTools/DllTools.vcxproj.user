@@ -6,7 +6,7 @@
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommand>S:\workplace\FANN\Workplace\Encod\Source\encog-dotnet-core_work01\MyProject\MyProject01\bin\Release\MyProject01.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(SolutionDir)\MyProject\MyProject01\bin\Release\MyProject01.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
   </PropertyGroup>

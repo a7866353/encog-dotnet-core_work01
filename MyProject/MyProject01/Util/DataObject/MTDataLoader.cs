@@ -218,7 +218,7 @@ namespace MyProject01.Util
         }
     }
 
-    class TestDataDateRangeLoader : BasicTestDataLoader
+    public class TestDataDateRangeLoader : BasicTestDataLoader
     {
         private DateTime _startDate;
         private DateTime _endDate;
