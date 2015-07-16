@@ -71,14 +71,18 @@ namespace MyProject01.Util
         {
             get 
             {
+                /*
                 if (index < 0 || index >= _startIndex + _length)
                     throw (new Exception("数组越界！"));
+                 */ 
                 return _data[index + _startIndex]; 
             }
             set
             {
+                /*
                 if (index < 0 || index >= _startIndex + _length)
                     throw (new Exception("数组越界！"));
+                */
                 _data[index + _startIndex] = value; 
             }
         }

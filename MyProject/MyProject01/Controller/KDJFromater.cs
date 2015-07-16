@@ -148,11 +148,6 @@ namespace MyProject01.Controller
             
             for(int i=0;i<_blockLength;i++)
             {
-                int index = _blockLength * 4 + i;
-                _buffer[index] = Math.Abs(reader.Get(1, i) - reader.Get(2, i))
-                    + Math.Abs(reader.Get(1, i) - reader.Get(3, i))
-                    + Math.Abs(reader.Get(2, i) - reader.Get(3, i));
-
                 outputSec.Cross3Line[i] = Math.Abs(inputSec.K[i] - inputSec.D[i])
                     + Math.Abs(inputSec.K[i] - inputSec.J[i])
                     + Math.Abs(inputSec.D[i] - inputSec.J[i]);
