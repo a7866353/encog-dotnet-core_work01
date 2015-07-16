@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Util.DataObject
 {
-    class KDJDataBlock : BasicDataBlock
+    public class KDJDataBlock : BasicDataBlock
     {
         private double[] _rateArr;
         private double[] _kArr;

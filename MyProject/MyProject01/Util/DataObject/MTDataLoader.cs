@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Util
 {
-    enum DataTimeType
+    public enum DataTimeType
     {
         None = 0,
         M1 = 1,
@@ -111,7 +111,7 @@ namespace MyProject01.Util
 
 
     }
-    abstract class BasicTestDataLoader : DataLoader
+    public abstract class BasicTestDataLoader : DataLoader
     {
         private string _tickerName;
         private DataTimeType _type;
@@ -178,7 +178,7 @@ namespace MyProject01.Util
 
 
     }
-    class TestDataCountLoader : BasicTestDataLoader
+    public class TestDataCountLoader : BasicTestDataLoader
     {
         private DateTime _endDate;
         private int _dataCountLimit;

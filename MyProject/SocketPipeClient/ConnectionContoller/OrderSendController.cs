@@ -1,6 +1,7 @@
 ﻿using MyProject01.Controller;
 using MyProject01.DAO;
 using MyProject01.Util;
+using MyProject01.Util.DataObject;
 using SocketTestClient.RequestObject;
 using SocketTestClient.Sender;
 using System;
@@ -77,7 +78,6 @@ namespace SocketTestClient.ConnectionContoller
     // TODO
     class KDJTradeOrder : BasicTradeOrder
     {
-        private int _preRange = 9;
         public KDJTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
             : base(rateDataControllerName, networkControllerName, magicNumber)
         {
@@ -86,20 +86,15 @@ namespace SocketTestClient.ConnectionContoller
         protected override MarketActions GetNextCommand(RateDataControlDAO dataController, ITradeDesisoin decisionCtrl)
         {
             DateTime lastTradeTime = dataController.LastItemTime;
-            RateData[] rateDataArr = dataController.GetByEndTime(lastTradeTime, decisionCtrl.InputDataLength);
+            TestDataCountLoader loader = new TestDataCountLoader(_dataController.Name, DataTimeType.M5, lastTradeTime, 1000);
+            KDJDataBlock dataBlock = new KDJDataBlock(loader, 0, loader.Count, decisionCtrl.InputDataLength);
 
-            return Calculte(rateDataArr);
-        }
-        private MarketActions Calculte(RateData[] rateDataArr)
-        {
-            double[] dataArr = new double[rateDataArr.Length];
-            for (int i = 0; i < dataArr.Length; i++)
-                dataArr[i] = (rateDataArr[i].high + rateDataArr[i].low) / 2;
-            MarketActions res = _decisionCtrl.GetAction(dataArr);
+            double[] buffer = new double[decisionCtrl.InputDataLength * 4];
+            dataBlock.Copy(buffer, dataBlock.BlockCount - 1);
 
+            MarketActions res = _decisionCtrl.GetAction(buffer);
             return res;
         }
-
     }
 
     class OrderSendController : IRequestController

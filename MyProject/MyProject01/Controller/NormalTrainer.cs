@@ -13,6 +13,8 @@ using MyProject01.Util;
 using Encog.Neural.Networks.Training;
 using Encog.ML;
 using MyProject01.Factorys.PopulationFactorys;
+using Encog.ML.Data;
+using MyProject01.Util.DllTools;
 
 namespace MyProject01.Controller
 {
@@ -87,7 +89,12 @@ namespace MyProject01.Controller
         {
             RateMarketAgent agent = new RateMarketAgent(_dataBlock.GetNewBlock(StartIndex, Length));
             ITradeDesisoin decisionCtrl = TradeDecisionCtrl.Clone();
+#if true
+            NetworkDllTools dllNet = new NetworkDllTools((NEATNetwork)network);
+            decisionCtrl.UpdateNetwork((IMLRegression)dllNet);
+#else
             decisionCtrl.UpdateNetwork((IMLRegression)network);
+#endif
             TradeController tradeCtrl = new TradeController(agent, decisionCtrl);
             while (true)
             {
@@ -165,5 +172,28 @@ namespace MyProject01.Controller
             return score;
         }
 
+    }
+
+    class CNeatNetwork : IMLRegression
+    {
+        public CNeatNetwork(NEATNetwork network)
+        {
+            
+        }
+
+        public IMLData Compute(Encog.ML.Data.IMLData input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int InputCount
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public int OutputCount
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }
