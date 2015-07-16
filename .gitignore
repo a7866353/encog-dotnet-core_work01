@@ -42,6 +42,7 @@ encog-core-cs.5.1.ReSharper.user.orig
 *.vsp
 /si_prj
 /MyProject/DllTools/DllTools/Debug
+/MyProject/DllTools/DllTools/x64
 /Debug
 /MyProject/DllTools/DllTools/Release
 /MyProject/DllTools/DllTools/x64/Release
@@ -49,7 +50,7 @@ encog-core-cs.5.1.ReSharper.user.orig
 /MyProject/SocketPipeClient/obj
 /MyProject/DataImporter/obj
 /MyProject/common
-/x64/Release
+/x64
 /*.sdf
 /Release
 /ipch
