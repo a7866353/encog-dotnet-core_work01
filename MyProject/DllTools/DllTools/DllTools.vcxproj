@@ -158,6 +158,7 @@
     </ClCompile>
     <ClCompile Include="DllTools.cpp" />
     <ClCompile Include="FWT.cpp" />
+    <ClCompile Include="NEATNetwokr_AVX.cpp" />
     <ClCompile Include="NEATNetwork.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

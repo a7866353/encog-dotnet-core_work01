@@ -44,5 +44,8 @@
     <ClCompile Include="NEATNetwork.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="NEATNetwokr_AVX.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
