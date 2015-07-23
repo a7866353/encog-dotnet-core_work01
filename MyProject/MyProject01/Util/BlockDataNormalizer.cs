@@ -92,8 +92,8 @@ namespace MyProject01.Util
 
     class NormalizeAnalyzer
     {
-        private double _targetDataMargin = 0.01;
-        private double _targetDataMid = 0.5;
+        private double _targetDataMargin = 0.25;
+        private double _targetDataMid = 0;
 
         private double _targDataMax;
         private double _targDataMin;

@@ -180,7 +180,7 @@ namespace MyProject01.Agent
         
         private double Bid()
         {
-            return _currentRate + SellOffset;
+            return _currentRate - SellOffset;
         }
         private double Ask()
         {

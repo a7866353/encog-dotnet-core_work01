@@ -13,7 +13,7 @@ namespace MyProject01.Factorys.PopulationFactorys
         {
             NEATPopulation population = new NEATPopulation(inputVectoryNumber, outputVectoryNumber, PopulationNumber);
             population.InitialConnectionDensity = 1.0;
-            population.WeightRange = 0.1;
+            population.WeightRange = 1;
             population.Reset();
 
             return population;

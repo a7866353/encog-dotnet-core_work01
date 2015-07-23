@@ -14,7 +14,12 @@ EXTERN_C
 		int fromNeuron;
 		double weight;
 	};
-
+	struct OutputBufferCtrl
+	{
+		float *pBuf;
+		float *pBufStart;
+		int length;
+	};
 	struct NEATNetworkParm
 	{
 		int linkCount;
@@ -37,12 +42,7 @@ EXTERN_C
 		int activationCycles;
 	};
 
-	struct OutputBufferCtrl
-	{
-		float *pBuf;
-		float *pBufStart;
-		int length;
-	};
+
 
 	static inline double ActivationSigmoid(double v)
 	{

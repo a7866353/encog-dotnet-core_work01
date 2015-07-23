@@ -442,5 +442,113 @@ namespace MyProject01.Util.DllTools
             get { return parm.outputCount; }
         }
     }
+    class NetworkFloatDllTools : IMLRegression
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        struct Link
+        {
+            public int toNeuron;
+            public int fromNeuron;
+            public float weight;
+        };
+        [StructLayout(LayoutKind.Sequential)]
+        struct NEATNetworkParm
+        {
+            public int linkCount;
+            public IntPtr link;
+
+            public int neuronCount;
+            public int outputIndex;
+            public IntPtr preActivation;
+            public IntPtr postActivation;
+
+            public int inputCount;
+            public IntPtr input;
+
+            public int outputCount;
+            public IntPtr output;
+
+            public int activationCycles;
+        };
+
+        [DllImport("DllTools.dll", EntryPoint = "DllTools_NEATNetworkFloat", CallingConvention = CallingConvention.StdCall)]
+        private static extern void DllTools_NEATNetworkFloat(NEATNetworkParm param);
+
+        private NEATNetworkParm parm;
+        private Link[] _linkArr;
+        private double[] _outputBuffer;
+        private BasicMLData outData;
+        public NetworkFloatDllTools(Encog.Neural.NEAT.NEATNetwork network)
+        {
+            parm = new NEATNetworkParm();
+
+            parm.linkCount = network.Links.Length;
+            _linkArr = new Link[parm.linkCount];
+            int index = 0;
+            foreach (NEATLink l in network.Links)
+            {
+                _linkArr[index].fromNeuron = l.FromNeuron;
+                _linkArr[index].toNeuron = l.ToNeuron;
+                _linkArr[index].weight = (float)l.Weight;
+                index++;
+            }
+            parm.link = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Link)) * parm.linkCount);
+            IntPtr pAddr = parm.link;
+            for (int i = 0; i < _linkArr.Length; i++)
+            {
+                Marshal.StructureToPtr(_linkArr[i], pAddr, false);
+                pAddr += Marshal.SizeOf(typeof(Link));
+            }
+
+            parm.neuronCount = network.PostActivation.Length;
+            parm.outputIndex = network.OutputIndex;
+            parm.preActivation = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(float)) * parm.neuronCount);
+            parm.postActivation = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(float)) * parm.neuronCount);
+
+            parm.inputCount = network.InputCount;
+            parm.input = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(double)) * parm.inputCount);
+
+            parm.outputCount = network.OutputCount;
+            _outputBuffer = new double[network.OutputCount];
+            parm.output = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(double)) * parm.outputCount);
+            outData = new BasicMLData(_outputBuffer, false);
+
+            parm.activationCycles = network.ActivationCycles;
+
+        }
+        ~NetworkFloatDllTools()
+        {
+            Marshal.FreeHGlobal(parm.preActivation);
+            Marshal.FreeHGlobal(parm.postActivation);
+            Marshal.FreeHGlobal(parm.input);
+            Marshal.FreeHGlobal(parm.output);
+            Marshal.FreeHGlobal(parm.link);
+        }
+
+        public IMLData Compute(IMLData input)
+        {
+            BasicMLData inputData = (BasicMLData)input;
+            // parm.link = Marshal.UnsafeAddrOfPinnedArrayElement(_linkArr, 0);
+            // parm.input = Marshal.UnsafeAddrOfPinnedArrayElement(_inputBuffer, 0);
+            // parm.output = _outputBuffer, 0);
+
+            Marshal.Copy(inputData.Data, 0, parm.input, inputData.Data.Length);
+
+            DllTools_NEATNetworkFloat(parm);
+
+            Marshal.Copy(parm.output, _outputBuffer, 0, _outputBuffer.Length);
+            return outData;
+        }
+
+        public int InputCount
+        {
+            get { return parm.inputCount; }
+        }
+
+        public int OutputCount
+        {
+            get { return parm.outputCount; }
+        }
+    }
 
 }

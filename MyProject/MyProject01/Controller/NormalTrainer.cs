@@ -90,7 +90,8 @@ namespace MyProject01.Controller
             RateMarketAgent agent = new RateMarketAgent(_dataBlock.GetNewBlock(StartIndex, Length));
             ITradeDesisoin decisionCtrl = TradeDecisionCtrl.Clone();
 #if true
-            NetworkDllTools dllNet = new NetworkDllTools((NEATNetwork)network);
+            // NetworkDllTools dllNet = new NetworkDllTools((NEATNetwork)network);
+            NetworkFloatDllTools dllNet = new NetworkFloatDllTools((NEATNetwork)network);
             decisionCtrl.UpdateNetwork((IMLRegression)dllNet);
 #else
             decisionCtrl.UpdateNetwork((IMLRegression)network);
