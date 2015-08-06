@@ -20,6 +20,7 @@ namespace SocketTestClient.ConnectionContoller
     {
         private RateDataDAOList _rateDataList;
         private List<RateDataControlDAO> _watchList;
+        private int _watchListIndex;
         private RateDataControlDAO _currentTargetDao;
         private RateRequest _lastRequest;
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
@@ -66,6 +67,7 @@ namespace SocketTestClient.ConnectionContoller
             _dtFormat = new DateTimeFormatInfo();
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
             _isSymbolListUpdated = false;
+            _watchListIndex = 0;
         }
 
         public IRequest GetRequest()
@@ -81,15 +83,25 @@ namespace SocketTestClient.ConnectionContoller
                 return req;
             }
 
-            foreach (RateDataControlDAO dao in _watchList)
+            int checkCount = 0;
+            while(true)
             {
+                RateDataControlDAO dao = _watchList[_watchListIndex];
                 _lastRequest = GetNextReq(dao);
                 if (_lastRequest != null)
                 {
                     _currentTargetDao = dao;
                     break;
                 }
+                _watchListIndex++;
+                if(_watchListIndex>=_watchList.Count)
+                    _watchListIndex = 0;
+
+                checkCount++;
+                if (checkCount >= _watchList.Count)
+                    break;
             }
+        
             return _lastRequest;
         }
 
