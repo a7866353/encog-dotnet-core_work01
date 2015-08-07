@@ -20,11 +20,11 @@ namespace SocketTestClient.ConnectionContoller
     class RateDataRequestController : IRequestController
     {
         private RateDataControlDAO _dao;
-        private int _updateInterval;
+        private double _updateInterval;
         private DateTimeFormatInfo _dtFormat;
         private RateRequest _lastRequest;
 
-        public RateDataRequestController(RateDataControlDAO dao, int updateInterval)
+        public RateDataRequestController(RateDataControlDAO dao, double updateInterval)
         {
             _dao = dao;
             _updateInterval = updateInterval;
@@ -37,7 +37,7 @@ namespace SocketTestClient.ConnectionContoller
         public IRequest GetRequest()
         {
             // dao.Update(); // error
-            TimeSpan timeDulation = new TimeSpan(0, 0, 10);
+            TimeSpan timeDulation = new TimeSpan(0, 0, (int)(_updateInterval * _dao.TimeFrame));
             if (DateTime.Now - _dao.LastGetTime <= timeDulation)
                 return null;
 
@@ -106,6 +106,91 @@ namespace SocketTestClient.ConnectionContoller
 
     }
 
+    class RateByCountRequestController : IRequestController
+    {
+        private int _getCount = 1024;
+        private RateDataControlDAO _dao;
+        private double _updateInterval;
+        private DateTimeFormatInfo _dtFormat;
+        private DateTime _lastUpdateTime;
+        private RateByCountRequest _lastRequest;
+
+        public RateByCountRequestController(RateDataControlDAO dao, double updateInterval)
+        {
+            _dao = dao;
+            _updateInterval = updateInterval;
+            
+            _lastRequest = null;
+            _dtFormat = new DateTimeFormatInfo();
+            _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
+        }
+
+        public IRequest GetRequest()
+        {
+            // dao.Update(); // error
+            TimeSpan timeDulation = new TimeSpan(0, 0, (int)(_updateInterval * _dao.TimeFrame));
+            if (DateTime.Now - _dao.LastGetTime <= timeDulation)
+                return null;
+
+            _lastUpdateTime = DateTime.Now;
+            TimeSpan nextDulation = new TimeSpan((long)_dao.TimeFrame * TimeSpan.TicksPerMinute * 1024);
+            RateByCountRequest req = new RateByCountRequest();
+            req.SymbolName = _dao.SymbolName;
+            req.TimeFrame = _dao.TimeFrame;
+            req.StartTime = _dao.LastItemTime;
+            req.Count = _getCount;
+            req.ReqCtrl = this;
+
+            return req;
+        }
+
+        public void SetResult(IRequest req)
+        {
+            RateDataIndicateRequest indicate = (RateDataIndicateRequest)req;
+            RateInfo[] infoArr = indicate.RateInfoArray;
+            List<RateData> dataList = new List<RateData>();
+
+            if (infoArr != null)
+            {
+                foreach (RateInfo info in infoArr)
+                {
+                    DateTime time = Convert.ToDateTime(info.time, _dtFormat);
+                    if (time <= _dao.LastItemTime)
+                        continue;
+
+                    RateData data = new RateData();
+                    data.time = time;
+                    data.high = info.high;
+                    data.low = info.low;
+                    data.open = info.open;
+                    data.close = info.close;
+                    data.real_volume = info.real_volume;
+                    data.tick_volume = info.tick_volume;
+                    data.spread = info.spread;
+
+                    dataList.Add(data);
+                }
+                if (dataList.Count != 0)
+                    _dao.Add(dataList.ToArray());
+            }
+
+            _dao.LastGetTime = _lastUpdateTime;
+            _dao.Save();
+
+            if (dataList.Count > 0)
+            {
+                Printf("Get:" + _dao.SymbolName + "_" + _dao.TimeFrame + " From" + 
+                    _lastRequest.StartTime + " Count " + _lastRequest.Count + " GetCount:" + dataList.Count);
+            }
+        }
+
+        private void Printf(string str)
+        {
+            System.Console.WriteLine("[RateDataController]" + str);
+        }
+
+    }
+
     class RateDataController : IRequestController
     {
         private RateDataDAOList _rateDataList;
@@ -113,7 +198,7 @@ namespace SocketTestClient.ConnectionContoller
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
         private bool _isSymbolListUpdated;
 
-        private List<RateDataRequestController> _watchList;
+        private List<IRequestController> _watchList;
 
         private RateDataNeed[] _need = new RateDataNeed[]
         {
@@ -139,7 +224,7 @@ namespace SocketTestClient.ConnectionContoller
         public RateDataController()
         {
             _rateDataList = new RateDataDAOList();
-            _watchList = new List<RateDataRequestController>();
+            _watchList = new List<IRequestController>();
             _isSymbolListUpdated = false;
             _watchListIndex = -1;
         }
@@ -162,7 +247,7 @@ namespace SocketTestClient.ConnectionContoller
                     if (_watchListIndex >= _watchList.Count)
                         _watchListIndex = 0;
 
-                    RateDataRequestController rateReqCtrl = _watchList[_watchListIndex];
+                    IRequestController rateReqCtrl = _watchList[_watchListIndex];
                     rateReq = rateReqCtrl.GetRequest();
                     if (rateReq != null)
                     {
@@ -199,7 +284,8 @@ namespace SocketTestClient.ConnectionContoller
             // Add All symbol to watch list.
             foreach(RateDataControlDAO dao in _rateDataList)
             {
-                _watchList.Add(new RateDataRequestController(dao, 512));
+                // _watchList.Add(new RateDataRequestController(dao, 512));
+                _watchList.Add(new RateByCountRequestController(dao, 512));
             }
         }
 

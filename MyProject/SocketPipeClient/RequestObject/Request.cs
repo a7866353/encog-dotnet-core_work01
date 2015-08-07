@@ -17,6 +17,8 @@ namespace SocketTestClient.RequestObject
         RateDataIndicate,
         SymbolNameListRequest,
         SymbolNameListResult,
+        RateByCount,
+        RateByCount_Result,
     }
     class Request
     {
@@ -33,6 +35,9 @@ namespace SocketTestClient.RequestObject
                     res = new TestRequest();
                     break;
                 case RequestType.RateDataIndicate:
+                    res = new RateDataIndicateRequest();
+                    break;
+                case RequestType.RateByCount_Result:
                     res = new RateDataIndicateRequest();
                     break;
             }
