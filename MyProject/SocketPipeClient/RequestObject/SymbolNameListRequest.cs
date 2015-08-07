@@ -19,7 +19,7 @@ namespace SocketTestClient.RequestObject
             return sb.GetBytes();
         }
 
-        public RateDataRequestController ReqCtrl;
+        public RateDataController ReqCtrl;
         public void FromBytes(byte[] data, int length)
         {
             DataRcvBuffer rb = new DataRcvBuffer(data, length);

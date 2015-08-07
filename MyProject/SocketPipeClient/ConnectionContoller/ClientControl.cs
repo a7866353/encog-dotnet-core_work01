@@ -81,7 +81,7 @@ namespace SocketTestClient.ConnectionContoller
             _ctrlList = new List<IRequestController>();
             OrderSendController orderCtrl = new OrderSendController();
             _ctrlList.Add(orderCtrl);
-            RateDataRequestController rateDataCtrl = new RateDataRequestController();
+            RateDataController rateDataCtrl = new RateDataController();
             _ctrlList.Add(rateDataCtrl);
         }
 

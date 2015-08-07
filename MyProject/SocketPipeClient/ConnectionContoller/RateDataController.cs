@@ -16,16 +16,104 @@ namespace SocketTestClient.ConnectionContoller
         public string SymbolName;
         public int Timeframe;
     }
+
     class RateDataRequestController : IRequestController
     {
-        private RateDataDAOList _rateDataList;
-        private List<RateDataControlDAO> _watchList;
-        private int _watchListIndex;
-        private RateDataControlDAO _currentTargetDao;
-        private RateRequest _lastRequest;
-        private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
+        private RateDataControlDAO _dao;
+        private int _updateInterval;
         private DateTimeFormatInfo _dtFormat;
+        private RateRequest _lastRequest;
+
+        public RateDataRequestController(RateDataControlDAO dao, int updateInterval)
+        {
+            _dao = dao;
+            _updateInterval = updateInterval;
+
+            _lastRequest = null;
+            _dtFormat = new DateTimeFormatInfo();
+            _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
+        }
+
+        public IRequest GetRequest()
+        {
+            // dao.Update(); // error
+            TimeSpan timeDulation = new TimeSpan(0, 0, 10);
+            if (DateTime.Now - _dao.LastGetTime <= timeDulation)
+                return null;
+
+            TimeSpan nextDulation = new TimeSpan((long)_dao.TimeFrame * TimeSpan.TicksPerMinute * 1024);
+            RateRequest req = new RateRequest();
+            req.SymbolName = _dao.SymbolName;
+            req.TimeFrame = _dao.TimeFrame;
+            req.StartTime = _dao.LastItemTime;
+            req.StopTime = _dao.LastGetTime + nextDulation;
+            if (req.StopTime > DateTime.Now)
+                req.StopTime = DateTime.Now;
+            req.ReqCtrl = this;
+
+            _lastRequest = req;
+            return req;
+        }
+
+        public void SetResult(IRequest req)
+        {
+            RateDataIndicateRequest indicate = (RateDataIndicateRequest)req;
+            RateInfo[] infoArr = indicate.RateInfoArray;
+            List<RateData> dataList = new List<RateData>();
+
+            if (infoArr != null)
+            {
+                foreach (RateInfo info in infoArr)
+                {
+                    DateTime time = Convert.ToDateTime(info.time, _dtFormat);
+                    if (time <= _dao.LastItemTime)
+                        continue;
+
+                    RateData data = new RateData();
+                    data.time = time;
+                    data.high = info.high;
+                    data.low = info.low;
+                    data.open = info.open;
+                    data.close = info.close;
+                    data.real_volume = info.real_volume;
+                    data.tick_volume = info.tick_volume;
+                    data.spread = info.spread;
+
+                    dataList.Add(data);
+                }
+                if (dataList.Count != 0)
+                    _dao.Add(dataList.ToArray());
+            }
+
+            _dao.LastGetTime = _lastRequest.StopTime;
+            _dao.Save();
+
+            if (dataList.Count > 0)
+            {
+                Printf("Get:" + _dao.SymbolName + "_" + _dao.TimeFrame + " From" + 
+                    _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
+            }
+            if (indicate.EndFlag == true)
+            {
+                _lastRequest = null;
+            }
+        }
+
+        private void Printf(string str)
+        {
+            System.Console.WriteLine("[RateDataController]" + str);
+        }
+
+    }
+
+    class RateDataController : IRequestController
+    {
+        private RateDataDAOList _rateDataList;
+        private int _watchListIndex;
+        private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
         private bool _isSymbolListUpdated;
+
+        private List<RateDataRequestController> _watchList;
 
         private RateDataNeed[] _need = new RateDataNeed[]
         {
@@ -45,143 +133,51 @@ namespace SocketTestClient.ConnectionContoller
             240,    // 4 hours
             1440,   // 1 day
             10080,  // 1 week
-            43200,  // 1 monthv
+            43200,  // 1 month
         };
 
-        public bool IsFinish
-        {
-            get 
-            {
-                if (_currentTargetDao == null)
-                    return true;
-                else
-                    return false;
-            }
-        }
-
-        public RateDataRequestController()
+        public RateDataController()
         {
             _rateDataList = new RateDataDAOList();
-            _watchList = new List<RateDataControlDAO>();
-            _currentTargetDao = null;
-            _dtFormat = new DateTimeFormatInfo();
-            _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
+            _watchList = new List<RateDataRequestController>();
             _isSymbolListUpdated = false;
-            _watchListIndex = 0;
+            _watchListIndex = -1;
         }
 
         public IRequest GetRequest()
         {
-            /*
-            if (_currentTargetDao != null)
-                return null;
-            */
             if (_isSymbolListUpdated == false)
             {
                 SymbolNameListRequest req = new SymbolNameListRequest();
                 req.ReqCtrl = this;
                 return req;
             }
-
-            int checkCount = 0;
-            while(true)
-            {
-                RateDataControlDAO dao = _watchList[_watchListIndex];
-                _lastRequest = GetNextReq(dao);
-                if (_lastRequest != null)
-                {
-                    _currentTargetDao = dao;
-                    break;
-                }
-                _watchListIndex++;
-                if(_watchListIndex>=_watchList.Count)
-                    _watchListIndex = 0;
-
-                checkCount++;
-                if (checkCount >= _watchList.Count)
-                    break;
-            }
-        
-            return _lastRequest;
-        }
-
-        public void SetResult(IRequest req)
-        {
-            RateDataIndicateRequest indicate = (RateDataIndicateRequest)req;
-            RateInfo[] infoArr = indicate.RateInfoArray;
-            List<RateData> dataList = new List<RateData>();
-
-            if (infoArr != null)
-            {
-                foreach (RateInfo info in infoArr)
-                {
-                    DateTime time = Convert.ToDateTime(info.time, _dtFormat);
-                    if (time <= _currentTargetDao.LastItemTime)
-                        continue;
-
-                    RateData data = new RateData();
-                    data.time = time;
-                    data.high = info.high;
-                    data.low = info.low;
-                    data.open = info.open;
-                    data.close = info.close;
-                    data.real_volume = info.real_volume;
-                    data.tick_volume = info.tick_volume;
-                    data.spread = info.spread;
-
-                    dataList.Add(data);
-                }
-                if (dataList.Count != 0)
-                    _currentTargetDao.Add(dataList.ToArray());
-            }
             else
             {
-                infoArr = infoArr;
-            }
-            _currentTargetDao.LastGetTime = _lastRequest.StopTime;
-            _currentTargetDao.Save();
+                IRequest rateReq = null;
+                int checkCount = 0;
+                while (true)
+                {
+                    _watchListIndex++;
+                    if (_watchListIndex >= _watchList.Count)
+                        _watchListIndex = 0;
 
-            if (dataList.Count > 0)
-            {
-                Printf("Get:" + _currentTargetDao.SymbolName + "_" + _currentTargetDao.TimeFrame + " From" + 
-                    _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
-            }
-            if (indicate.EndFlag == true)
-            {
-                _currentTargetDao = null;
-                _lastRequest = null;
+                    RateDataRequestController rateReqCtrl = _watchList[_watchListIndex];
+                    rateReq = rateReqCtrl.GetRequest();
+                    if (rateReq != null)
+                    {
+                        break;
+                    }
+
+                    checkCount++;
+                    if (checkCount >= _watchList.Count)
+                        break;
+                }
+
+                return rateReq;
             }
         }
 
-
-        private RateRequest GetNextReq(RateDataControlDAO dao)
-        {
-            // dao.Update(); // error
-            TimeSpan timeDulation = new TimeSpan(0, 0, 10);
-            if (DateTime.Now - dao.LastGetTime <= timeDulation)
-                return null;
-
-            TimeSpan nextDulation = new TimeSpan( (long)dao.TimeFrame * TimeSpan.TicksPerMinute * 1024 );
-            RateRequest req = new RateRequest();
-            req.SymbolName = dao.SymbolName;
-            req.TimeFrame = dao.TimeFrame;
-            req.StartTime = dao.LastItemTime;
-            req.StopTime = dao.LastGetTime + nextDulation;
-            if (req.StopTime > DateTime.Now)
-                req.StopTime = DateTime.Now;
-            req.ReqCtrl = this;
-
-            return req;
-        }
-
-        public bool AddWatchSymbol(string name)
-        {
-            RateDataControlDAO res = _rateDataList.Get(name);
-            if (res == null)
-                return false;
-            _watchList.Add(res);
-            return true;
-        }
 
         public void UpdateSymbolList(string[] symbols)
         {
@@ -203,13 +199,14 @@ namespace SocketTestClient.ConnectionContoller
             // Add All symbol to watch list.
             foreach(RateDataControlDAO dao in _rateDataList)
             {
-                _watchList.Add(dao);
+                _watchList.Add(new RateDataRequestController(dao, 512));
             }
         }
 
-        private void Printf(string str)
+
+        public void SetResult(IRequest req)
         {
-            System.Console.WriteLine("[RateDataController]" + str);
+            throw new NotImplementedException();
         }
     }
 }
