@@ -29,7 +29,7 @@ namespace SocketTestClient.RequestObject
             switch(type)
             {
                 case RequestType.RateDataRequest:
-                    res = new RateRequest();
+                    res = new RateByTimeRequest();
                     break;
                 case RequestType.TestRequest:
                     res = new TestRequest();

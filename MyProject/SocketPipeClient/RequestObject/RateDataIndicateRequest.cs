@@ -17,13 +17,17 @@ namespace SocketTestClient.RequestObject
         public long tick_volume;
         public long real_volume;
         public int spread;
+
+        public override string ToString()
+        {
+            return "Time:" + time + ", Rate: " + close;
+        }
     }
 
     class RateDataIndicateRequest : IRequest
     {
         public RequestType OrderType = RequestType.RateDataIndicate;
         public RateInfo[] RateInfoArray;
-        public bool EndFlag;
 
         public byte[] GetBytes()
         {

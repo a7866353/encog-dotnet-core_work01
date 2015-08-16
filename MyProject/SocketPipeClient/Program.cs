@@ -45,7 +45,7 @@ namespace SocketTestClient
         static void TestRateRequest()
         {
             SocketDeamonSender sender = new SocketDeamonSender();
-            RateRequest rateReq = new RateRequest();
+            RateByTimeRequest rateReq = new RateByTimeRequest();
             rateReq.SymbolName = "USDJPYpro";
             rateReq.TimeFrame = 5;
             rateReq.StartTime = DateTime.Now.AddDays(-100);

@@ -22,7 +22,7 @@ namespace SocketTestClient.ConnectionContoller
         private RateDataControlDAO _dao;
         private double _updateInterval;
         private DateTimeFormatInfo _dtFormat;
-        private RateRequest _lastRequest;
+        private RateByTimeRequest _lastRequest;
 
         public RateDataRequestController(RateDataControlDAO dao, double updateInterval)
         {
@@ -41,8 +41,12 @@ namespace SocketTestClient.ConnectionContoller
             if (DateTime.Now - _dao.LastGetTime <= timeDulation)
                 return null;
 
-            TimeSpan nextDulation = new TimeSpan((long)_dao.TimeFrame * TimeSpan.TicksPerMinute * 1024);
-            RateRequest req = new RateRequest();
+            TimeSpan nextDulation;
+            if (_lastRequest == null)
+                nextDulation = new TimeSpan((long)((long)_dao.TimeFrame * TimeSpan.TicksPerMinute * _updateInterval));
+            else
+                nextDulation = new TimeSpan();
+            RateByTimeRequest req = new RateByTimeRequest();
             req.SymbolName = _dao.SymbolName;
             req.TimeFrame = _dao.TimeFrame;
             req.StartTime = _dao.LastItemTime;
@@ -93,9 +97,101 @@ namespace SocketTestClient.ConnectionContoller
                 Printf("Get:" + _dao.SymbolName + "_" + _dao.TimeFrame + " From" + 
                     _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
             }
-            if (indicate.EndFlag == true)
+        }
+
+        private void Printf(string str)
+        {
+            System.Console.WriteLine("[RateDataController]" + str);
+        }
+
+    }
+
+    class RateByTimeRequestController : IRequestController
+    {
+        private RateDataControlDAO _dao;
+        private double _updateInterval;
+        private DateTimeFormatInfo _dtFormat;
+        private RateByTimeRequest _lastRequest;
+        private TimeSpan _getDataBlockDuration;
+        private TimeSpan _getDuration;
+
+        public RateByTimeRequestController(RateDataControlDAO dao, double updateInterval)
+        {
+            _dao = dao;
+            _updateInterval = updateInterval;
+
+            _lastRequest = null;
+            _dtFormat = new DateTimeFormatInfo();
+            _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
+
+            _getDataBlockDuration = new TimeSpan(0, 0, (int)(_updateInterval * _dao.TimeFrame));
+            _getDuration = _getDataBlockDuration;
+        }
+
+        public IRequest GetRequest()
+        {
+            // dao.Update(); // error
+            DateTime tartgetTime = _dao.LastGetTime + _getDuration;
+            if (tartgetTime > DateTime.Now)
+                return null;
+
+            RateByTimeRequest req = new RateByTimeRequest();
+            req.SymbolName = _dao.SymbolName;
+            req.TimeFrame = _dao.TimeFrame;
+            req.StartTime = _dao.LastItemTime;
+            req.StopTime = tartgetTime;
+            req.ReqCtrl = this;
+
+            _lastRequest = req;
+            return req;
+        }
+
+        public void SetResult(IRequest req)
+        {
+            RateDataIndicateRequest indicate = (RateDataIndicateRequest)req;
+            RateInfo[] infoArr = indicate.RateInfoArray;
+            List<RateData> dataList = new List<RateData>();
+
+            if (infoArr != null)
             {
-                _lastRequest = null;
+                foreach (RateInfo info in infoArr)
+                {
+                    DateTime time = Convert.ToDateTime(info.time, _dtFormat);
+                    if (time <= _dao.LastItemTime)
+                        continue;
+
+                    RateData data = new RateData();
+                    data.time = time;
+                    data.high = info.high;
+                    data.low = info.low;
+                    data.open = info.open;
+                    data.close = info.close;
+                    data.real_volume = info.real_volume;
+                    data.tick_volume = info.tick_volume;
+                    data.spread = info.spread;
+
+                    dataList.Add(data);
+                }
+                if (dataList.Count != 0)
+                    _dao.Add(dataList.ToArray());
+            }
+
+            _dao.LastGetTime = _lastRequest.StopTime;
+            _dao.Save();
+
+            // for debug
+            if (dataList.Count > 0)
+            {
+                Printf("Get:" + _dao.SymbolName + "_" + _dao.TimeFrame + " From" +
+                    _lastRequest.StartTime + " to " + _lastRequest.StopTime + " Count:" + dataList.Count);
+            }
+            if (dataList.Count == 0)
+            {
+                _getDuration += _getDataBlockDuration;
+            }
+            else
+            {
+                _getDuration = _getDataBlockDuration;
             }
         }
 
@@ -285,7 +381,7 @@ namespace SocketTestClient.ConnectionContoller
             foreach(RateDataControlDAO dao in _rateDataList)
             {
                 // _watchList.Add(new RateDataRequestController(dao, 512));
-                _watchList.Add(new RateByCountRequestController(dao, 512));
+                _watchList.Add(new RateByTimeRequestController(dao, 512));
             }
         }
 

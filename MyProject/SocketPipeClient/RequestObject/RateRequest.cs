@@ -8,7 +8,7 @@ using SocketTestClient.ConnectionContoller;
 
 namespace SocketTestClient.RequestObject
 {
-    class RateRequest : IRequest
+    class RateByTimeRequest : IRequest
     {
         public RequestType OrderType = RequestType.RateDataRequest;
 
@@ -30,7 +30,7 @@ namespace SocketTestClient.RequestObject
         }
 
 
-        public RateDataRequestController ReqCtrl;
+        public IRequestController ReqCtrl;
         public void FromBytes(byte[] data, int length)
         {
             RateDataIndicateRequest idc = new RateDataIndicateRequest();
