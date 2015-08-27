@@ -124,7 +124,9 @@ namespace SocketTestClient.ConnectionContoller
             _dtFormat = new DateTimeFormatInfo();
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
 
-            _getDataBlockDuration = new TimeSpan(0, 0, (int)(_updateInterval * _dao.TimeFrame));
+            int min = (int)(_updateInterval * _dao.TimeFrame);
+            int sec = (int)(_updateInterval * _dao.TimeFrame * 60);
+            _getDataBlockDuration = new TimeSpan(0, min, sec);
             _getDuration = _getDataBlockDuration;
         }
 
@@ -132,7 +134,7 @@ namespace SocketTestClient.ConnectionContoller
         {
             // dao.Update(); // error
             DateTime tartgetTime = _dao.LastGetTime + _getDuration;
-            if (tartgetTime > DateTime.Now)
+            if (tartgetTime > DateTime.Now.AddMinutes(_dao.TimeFrame*-1))
                 return null;
 
             RateByTimeRequest req = new RateByTimeRequest();
@@ -179,6 +181,21 @@ namespace SocketTestClient.ConnectionContoller
             _dao.LastGetTime = _lastRequest.StopTime;
             _dao.Save();
 
+            if (infoArr == null || infoArr.Length == 0)
+            {
+                CSVLogFormater.Add(_dao.Name, _lastRequest.StartTime, _lastRequest.StopTime,
+                    0,
+                    _lastRequest.StartTime,
+                    _lastRequest.StartTime);
+            }
+            else
+            {
+                CSVLogFormater.Add(_dao.Name, _lastRequest.StartTime, _lastRequest.StopTime,
+                    infoArr.Length,
+                    Convert.ToDateTime(infoArr[0].time, _dtFormat),
+                    Convert.ToDateTime(infoArr[infoArr.Length - 1].time, _dtFormat));
+
+            }
             // for debug
             if (dataList.Count > 0)
             {
@@ -296,13 +313,6 @@ namespace SocketTestClient.ConnectionContoller
 
         private List<IRequestController> _watchList;
 
-        private RateDataNeed[] _need = new RateDataNeed[]
-        {
-            new RateDataNeed(){ Name="test01", SymbolName="USDJPYpro", Timeframe=5},
-            new RateDataNeed(){ Name="test02", SymbolName="USDJPYpro", Timeframe=1},
-            new RateDataNeed(){ Name="test03", SymbolName="USDJPYpro", Timeframe=1440},
-
-        };
 
         private int[] _timeFrameArray = new int[]
         {
@@ -385,6 +395,14 @@ namespace SocketTestClient.ConnectionContoller
             }
         }
 
+        public bool AddWatchSymbol(string name, double updateInterval)
+        {
+            RateDataControlDAO dao = _rateDataList.Get(name);
+            if (dao == null)
+                return false;
+            _watchList.Add(new RateByTimeRequestController(dao, updateInterval));
+            return true;
+        }
 
         public void SetResult(IRequest req)
         {

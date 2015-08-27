@@ -79,9 +79,9 @@ namespace SocketTestClient.ConnectionContoller
         private void Init()
         {
             _ctrlList = new List<IRequestController>();
-            OrderSendController orderCtrl = new OrderSendController();
-            _ctrlList.Add(orderCtrl);
             RateDataController rateDataCtrl = new RateDataController();
+            OrderSendController orderCtrl = new OrderSendController(rateDataCtrl);
+            _ctrlList.Add(orderCtrl);
             _ctrlList.Add(rateDataCtrl);
         }
 

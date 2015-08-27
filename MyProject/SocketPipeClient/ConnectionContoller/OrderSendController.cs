@@ -32,6 +32,10 @@ namespace SocketTestClient.ConnectionContoller
         {
             get { return _dataController.SymbolName; }
         }
+        public string Name
+        {
+            get { return _dataController.Name; }
+        }
         public int MagicNumber
         {
             get { return _magicNumber; }
@@ -101,8 +105,9 @@ namespace SocketTestClient.ConnectionContoller
     class OrderSendController : IRequestController
     {
         private List<BasicTradeOrder> _tradeOrderList;
+        private RateDataController _rateDataCtrl;
 
-        public OrderSendController()
+        public OrderSendController(RateDataController RateDataCtrl)
         {
             _tradeOrderList = new List<BasicTradeOrder>();
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 2));
@@ -112,6 +117,12 @@ namespace SocketTestClient.ConnectionContoller
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150623__074144__028", 6));
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150625__231317__582", 7));
             _tradeOrderList.Add(new KDJTradeOrder("USDJPYpro1", "20150716__210730__425", 8));
+
+            _rateDataCtrl = RateDataCtrl;
+            foreach (BasicTradeOrder trader in _tradeOrderList)
+            {
+                _rateDataCtrl.AddWatchSymbol(trader.Name, 0.5);
+            }
 
         }
         public IRequest GetRequest()
