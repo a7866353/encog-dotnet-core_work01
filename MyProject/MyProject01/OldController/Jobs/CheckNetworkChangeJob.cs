@@ -15,7 +15,7 @@ namespace MyProject01.Controller.Jobs
         private byte[] LastNetData;
         public bool Do(TrainerContex context)
         {
-            NEATNetwork episodeNet = (NEATNetwork)context.train.CODEC.Decode(context.train.BestGenome);
+            NEATNetwork episodeNet = (NEATNetwork)context.trainEA.CODEC.Decode(context.trainEA.BestGenome);
             byte[] netData = NetworkToByte(episodeNet);
             if (ByteArrayCompare(netData, LastNetData) == false)
             {
@@ -61,10 +61,10 @@ namespace MyProject01.Controller.Jobs
         private IGenome _lastResult;
         public bool Do(TrainerContex context)
         {
-            if (_lastResult != context.train.BestGenome)
+            if (_lastResult != context.trainEA.BestGenome)
             {
-                _lastResult = context.train.BestGenome;
-                NEATNetwork episodeNet = (NEATNetwork)context.train.CODEC.Decode(context.train.BestGenome);
+                _lastResult = context.trainEA.BestGenome;
+                NEATNetwork episodeNet = (NEATNetwork)context.trainEA.CODEC.Decode(context.trainEA.BestGenome);
                 context.BestNetwork = episodeNet;
                 context.IsChanged = true;
             }

@@ -15,6 +15,7 @@ using Encog.ML;
 using MyProject01.Factorys.PopulationFactorys;
 using Encog.ML.Data;
 using MyProject01.Util.DllTools;
+using Encog.ML.EA.Train;
 
 namespace MyProject01.Controller
 {
@@ -27,28 +28,27 @@ namespace MyProject01.Controller
         public ICalculateScore ScoreCtrl;
         public BasicDataBlock TrainDataBlock;
         public BasicPopulationFactory PopulationFacotry;
-
-        protected override void PrepareRunnTestCase()
-        {
-            // Init context
-            _context = new TrainerContex();
-            _context._trainDataBlock = TrainDataBlock;
-
-            // train the neural network
-            train = NEATUtil.ConstructNEATTrainer(
-                PopulationFacotry.Get(DecisionCtrl.NetworkInputVectorLength, DecisionCtrl.NetworkOutputVectorLenth),
-                ScoreCtrl);
-            _context.train = train;
-
-        }
-
         protected override void PostItration()
         {
-            _context.Epoch = _epoch;
+            _context.Epoch = Epoch;
             CheckCtrl.Do(_context);
 
             // Update Test Data
                 // Nothing
+        }
+
+        protected override TrainEA CreateTrainEA()
+        {
+            _context = new TrainerContex();
+            _context._trainDataBlock = TrainDataBlock;
+
+            // train the neural network
+            TrainEA train = NEATUtil.ConstructNEATTrainer(
+                PopulationFacotry.Get(DecisionCtrl.NetworkInputVectorLength, DecisionCtrl.NetworkOutputVectorLenth),
+                ScoreCtrl);
+            _context.trainEA = train;
+
+            return train;
         }
     }
 

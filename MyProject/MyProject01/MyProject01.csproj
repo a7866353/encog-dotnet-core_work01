@@ -106,6 +106,7 @@
     <Compile Include="Controller\BasicLearnCaseFactory.cs" />
     <Compile Include="Controller\DataBlock.cs" />
     <Compile Include="Controller\DataSource.cs" />
+    <Compile Include="Controller\NewTrainer.cs" />
     <Compile Include="Controller\SensorList.cs" />
     <Compile Include="DAO\LearnCaseDAO.cs" />
     <Compile Include="DAO\NewControllerDAO.cs" />

@@ -14,7 +14,7 @@ namespace MyProject01.Controller.Jobs
     {
         public long Epoch;
 
-        public NormalTrainer Trainer;
+        public Trainer Trainer;
         public bool IsEnd;
         public bool IsChanged;
 
@@ -23,7 +23,7 @@ namespace MyProject01.Controller.Jobs
         public BasicDataBlock _trainDataBlock;
 
         // TestCase
-        public TrainEA train;
+        public TrainEA trainEA;
 
         public NEATNetwork BestNetwork;
 

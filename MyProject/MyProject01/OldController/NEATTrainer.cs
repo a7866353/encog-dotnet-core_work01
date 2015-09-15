@@ -26,9 +26,9 @@ namespace MyProject01.Controller
         public string TestName = "DefaultTest000";
         public ICheckJob CheckCtrl;
 
-        protected long _epoch;
+        private long _epoch;
 
-        protected TrainEA train;
+        private TrainEA train;
         protected long Epoch
         {
             get { return _epoch; }
@@ -37,7 +37,7 @@ namespace MyProject01.Controller
         {
             LogFile.WriteLine(@"Beginning training...");
 
-            PrepareRunnTestCase();
+            train = CreateTrainEA();
             _epoch = 1;
 
             do
@@ -61,7 +61,7 @@ namespace MyProject01.Controller
             LogFile.WriteLine(@"Training end");
         }
 
-        protected abstract void PrepareRunnTestCase();
+        protected abstract TrainEA CreateTrainEA();
 
         protected abstract void PostItration();
     }

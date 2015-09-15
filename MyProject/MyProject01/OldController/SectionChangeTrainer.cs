@@ -129,12 +129,13 @@ namespace MyProject01.Controller
 
         }
 #endif
-        protected override void PrepareRunnTestCase()
+      
+        protected override void PostItration()
         {
             throw new NotImplementedException();
         }
 
-        protected override void PostItration()
+        protected override Encog.ML.EA.Train.TrainEA CreateTrainEA()
         {
             throw new NotImplementedException();
         }
