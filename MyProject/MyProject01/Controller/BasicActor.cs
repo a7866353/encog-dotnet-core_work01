@@ -9,9 +9,10 @@ namespace MyProject01.Controller
 {
     interface IActor
     {
-
+        MarketActions GetAction(IMLData output);
+        int DataLength { get; }
     }
-    class BasicActor
+    class BasicActor : IActor
     {
         private MarketActions _lastAction = MarketActions.Nothing;
         public MarketActions GetAction(IMLData output)
@@ -49,6 +50,14 @@ namespace MyProject01.Controller
 
             _lastAction = currentAction;
             return currentAction;
+        }
+
+        public int DataLength
+        {
+            get
+            {
+                return 3;
+            }
         }
     }
 }

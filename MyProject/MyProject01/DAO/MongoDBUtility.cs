@@ -25,7 +25,7 @@ namespace MyProject01.DAO
             file.Read(buffer, 0, buffer.Length);
             file.Close();
 
-            connector.Close();
+            // connector.Close();
 
             MemoryStream stream = new MemoryStream(buffer);
             BinaryFormatter formatter = new BinaryFormatter();
@@ -51,7 +51,7 @@ namespace MyProject01.DAO
             file.Write(res, 0, res.Length);
             file.Close();
 
-            connector.Close();
+            // connector.Close();
         }
 
         static public void RemoveFromFS(TestCaseDatabaseConnector connector, string fileName)
@@ -61,7 +61,51 @@ namespace MyProject01.DAO
             MongoGridFS fs = new MongoGridFS(db);
             fs.Delete(fileName);
 
-            connector.Close();
+            // connector.Close();
         }
+        static public T[] GetDAO<T>(TestCaseDatabaseConnector connector, string collectionName,
+            QueryDocument query)
+        {
+            T[] retDao;
+            MongoDatabase db = connector.Connect();
+
+            MongoCollection<T> collection = db.GetCollection<T>(collectionName);
+            var curst = collection.Find(query);
+            if (curst.Count() == 0)
+            {
+                // not existed.
+                retDao = null;
+            }
+            else
+            {
+                retDao = new T[curst.Count()];
+                int i=0;
+                foreach(T dao in curst)
+                {
+                    retDao[i] = dao;
+                    i++;
+                }
+            }
+            return retDao;
+        }
+        static public T[] GetAllDAOs<T>(TestCaseDatabaseConnector connector, string collectionName) 
+        {
+            T[] retDaoArr = null;
+            MongoDatabase db = connector.Connect();
+            MongoCollection<T> collection = db.GetCollection<T>(collectionName);
+            var curst = collection.FindAll();
+            long resultCount = curst.Count();
+            if (resultCount != 0)
+            {
+                retDaoArr = new T[resultCount];
+                int index = 0;
+                foreach (T obj in curst)
+                {
+                    retDaoArr[index++] = obj;
+                }
+            }
+            return retDaoArr;
+        }
+
     }
 }

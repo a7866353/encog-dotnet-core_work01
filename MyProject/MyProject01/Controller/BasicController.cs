@@ -13,48 +13,54 @@ namespace MyProject01.Controller
     {
         int TotalLength { get; }
         int CurrentPosition { get; set; }
+        void Init();
         MarketActions GetAction();
+        IController Clone();
+
+        IDataSource DataSource { set; }
 
     }
     class BasicController : IController
     {
-        private SensorGroup _sensorGroup;
-        private BasicActor _actor;
+        private ISensor _sensor;
+        private IActor _actor;
         private BasicMLData _inData;
-        private double[] _inDataArr;
+        private DataBlock _inDataArr;
         private IMLRegression _neuroNetwork;
-        public BasicController()
+        private int _currentPosition;
+        public BasicController(ISensor sensor, IActor actor)
         {
-            _sensorGroup = new SensorGroup();
+            _sensor = sensor;
+            _actor = actor;
+            _currentPosition = _sensor.SkipCount;
         }
 
         public void Init()
         {
-            _inDataArr = new double[TotalLength];
-            _inData = new BasicMLData(_inDataArr, false);
+            _inDataArr = new DataBlock(TotalLength);
+            _inData = new BasicMLData(_inDataArr.Data, false);
+            _currentPosition = _sensor.SkipCount;
         }
         public int TotalLength
         {
-            get { throw new NotImplementedException(); }
+            get { return _sensor.TotalLength; }
         }
 
         public int CurrentPosition
         {
             get
             {
-                throw new NotImplementedException();
+                return _currentPosition;
             }
             set
             {
-                throw new NotImplementedException();
+                _currentPosition = value;
             }
         }
 
         public MarketActions GetAction()
         {
-
-            _sensorGroup.CurrentPosition = CurrentPosition;
-            _sensorGroup.Copy(_inDataArr, 0);
+            _sensor.Copy(_currentPosition, _inDataArr, 0);
 
             IMLData output = _neuroNetwork.Compute(_inData);
 
@@ -69,14 +75,25 @@ namespace MyProject01.Controller
 
         public int NetworkInputVectorLength
         {
-            get { return _inputFormater.ResultDataLength; }
+            get { return _sensor.DataBlockLength; }
         }
 
         public int NetworkOutputVectorLenth
         {
-            get { return _outputConvertor.NetworkOutputLength; }
+            get { return _actor.DataLength; }
         }
-    }
 
+        public IController Clone()
+        {
+            IController ctrl = (IController)MemberwiseClone();
+            ctrl.Init();
+            return ctrl;
+        }
+
+
+        public IDataSource DataSource
+        {
+            set { _sensor.DataSource = value; }
+        }
     }
 }

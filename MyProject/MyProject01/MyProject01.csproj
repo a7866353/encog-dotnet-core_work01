@@ -101,8 +101,14 @@
     <Compile Include="BasicTestCase.cs" />
     <Compile Include="BasicTestParameterSet.cs" />
     <Compile Include="BasicTrainingMethod.cs" />
+    <Compile Include="Controller\BasicActor.cs" />
     <Compile Include="Controller\BasicController.cs" />
+    <Compile Include="Controller\BasicLearnCaseFactory.cs" />
+    <Compile Include="Controller\DataBlock.cs" />
+    <Compile Include="Controller\DataSource.cs" />
     <Compile Include="Controller\SensorList.cs" />
+    <Compile Include="DAO\LearnCaseDAO.cs" />
+    <Compile Include="DAO\NewControllerDAO.cs" />
     <Compile Include="OldController\DataUpdateJob.cs" />
     <Compile Include="OldController\KDJFromater.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
