@@ -104,8 +104,11 @@
     <Compile Include="Controller\BasicActor.cs" />
     <Compile Include="Controller\BasicController.cs" />
     <Compile Include="Controller\BasicLearnCaseFactory.cs" />
+    <Compile Include="Controller\ControllerPacker.cs" />
     <Compile Include="Controller\DataBlock.cs" />
     <Compile Include="Controller\DataSource.cs" />
+    <Compile Include="Controller\NewNetworkController.cs" />
+    <Compile Include="Controller\NewTestCase.cs" />
     <Compile Include="Controller\NewTrainer.cs" />
     <Compile Include="Controller\SensorList.cs" />
     <Compile Include="DAO\LearnCaseDAO.cs" />

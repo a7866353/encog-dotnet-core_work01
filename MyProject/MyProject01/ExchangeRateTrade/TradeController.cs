@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.ExchangeRateTrade
 {
-    class TradeController
+      class TradeController
     {
         private RateMarketAgent _agent;
         private ITradeDesisoin _decisionCtl;

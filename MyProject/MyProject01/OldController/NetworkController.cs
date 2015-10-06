@@ -35,16 +35,6 @@ namespace MyProject01.Controller
             set { _dao.Description = value; }
             get { return _dao.Description; }
         }
-        public double DataOffset
-        {
-            set { _dao.DataOffset = value; }
-            get { return _dao.DataOffset; }
-        }
-        public double DataScale
-        {
-            set { _dao.DataScale = value; }
-            get { return _dao.DataScale; }
-        }
         public static NetworkController Open(string name)
         {
             ControllerDAO dao = ControllerDAO.GetDAO(name, false);

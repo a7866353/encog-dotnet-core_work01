@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    interface IActor
+    public interface IActor
     {
         MarketActions GetAction(IMLData output);
         int DataLength { get; }

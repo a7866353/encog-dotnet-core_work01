@@ -204,11 +204,6 @@ namespace MyProject01.DAO
         public ObjectId _id;
         public string Name { set; get; }
         public DateTime UpdateTime { set; get; }
-        public int InputDataLength { set; get; }
-        public InputDataFormaterType InputType { set; get; }
-        public OutputDataConvertorType OutType { set; get; }
-        public double DataOffset { set; get; }
-        public double DataScale { set; get; }
         public byte[] NetworkData { set; get; }
 
         public byte[] TradeDecisionController { set; get; }
@@ -220,4 +215,98 @@ namespace MyProject01.DAO
         
 
     }
+
+    public class ControllerDAOV2
+    {
+        #region Static Region
+
+        static public string CollectionName
+        {
+            get { return "ControllersV2"; }
+        }
+        static protected TestCaseDatabaseConnector _connector;
+
+        static private MongoCollection<ControllerDAOV2> Collection
+        {
+            get
+            {
+                MongoDatabase db = _connector.Connect();
+                MongoCollection<ControllerDAOV2> collection = db.GetCollection<ControllerDAOV2>(CollectionName);
+                return collection;
+            }
+        }
+
+        static public ControllerDAOV2 GetDAOByName(string name, bool isNew = false)
+        {
+            if (string.IsNullOrWhiteSpace(name) == true)
+            {
+                return null;
+            }
+
+            var query = new QueryDocument { { "Name", name } };
+            ControllerDAOV2[] retArr = MongoDBUtility.GetDAO<ControllerDAOV2>(
+                _connector, CollectionName, query);
+            if( isNew == true)
+            {
+                if( retArr != null)
+                {
+                    foreach (ControllerDAOV2 dao in retArr)
+                        dao.Remove();
+                }
+
+                ControllerDAOV2 retDao = new ControllerDAOV2();
+                retDao.Name = "Controller" + DateTime.Now;
+                return retDao;
+            }
+            if (retArr == null || retArr.Length == 0)
+                return null;
+            return retArr[0];
+        }
+        static public ControllerDAOV2[] GetAllDAOs()
+        {
+            ControllerDAOV2[] retDaoArr = MongoDBUtility.GetAllDAOs<ControllerDAOV2>(
+                _connector, CollectionName);
+            return retDaoArr;
+        }
+        static public ControllerDAOV2[] GetAllDAOs(string caseName)
+        {
+            var query = new QueryDocument { { "CaseName", caseName } };
+            ControllerDAOV2[] retArr = MongoDBUtility.GetDAO<ControllerDAOV2>(
+                _connector, CollectionName, query);
+
+            return retArr;
+        }
+        #endregion
+
+        // ===========================
+        // public region
+        #region public region
+
+        public void Save()
+        {
+            Collection.Save(this);
+        }
+        public void Remove()
+        {
+            var query = new QueryDocument { { "_id ", _id } };
+            Collection.Remove(query);
+        }
+        #endregion
+        // =============================
+        // Data for saving into database.
+        #region Data section
+
+        public ObjectId _id;
+        public string SymbolName { set; get; }
+        public string CaseName { set; get; }
+        public int StepNum { set; get; }
+        public string Name { set; get; }
+        public DateTime UpdateTime { set; get; }
+        public string Description { set; get; }
+        public byte[] ControllerData { set; get; }
+
+        #endregion
+
+    }
+
 }

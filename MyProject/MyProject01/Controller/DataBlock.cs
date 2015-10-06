@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    class DataBlock
+    public class DataBlock
     {
         static public void Copy(DataBlock src, int srcOffset, DataBlock dst, int dstOffset, int length)
         {

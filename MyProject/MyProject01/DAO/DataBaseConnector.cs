@@ -53,7 +53,7 @@ namespace MyProject01.DAO
             db = null;
         }
     }
-    class TestCaseDatabaseConnector
+    public class TestCaseDatabaseConnector
     {
         public static string DatabaseName = "NetWorkTestDB";
         // public static string ConnectionString = @"mongodb://127.0.0.1";

@@ -569,7 +569,11 @@ namespace MyProject01
                 group.Add(fwtCase);
             }
         }   
-        
+        private void AddNewTestCase(TestCaseGroup group)
+        {
+            NewTestCase newtest = new NewTestCase();
+            group.Add(new TestCaseObject(newtest.TestCaseName, "", new TestCaseObject.TestFucntion(newtest.Run)));
+        }
         private void AddTestCase()
         {
             TestCaseGroup oldTestList = new TestCaseGroup()
@@ -597,6 +601,10 @@ namespace MyProject01
 
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
+
+
+            // New test case
+            AddNewTestCase(newTestList);
 
             AddFwtNormM5RecentCrossTestCase(newTestList);
             AddKdjNormM5CrossTestCase(newTestList);

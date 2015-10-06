@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    interface IController
+    public interface IController
     {
         int TotalLength { get; }
         int CurrentPosition { get; set; }
@@ -20,7 +20,7 @@ namespace MyProject01.Controller
         IDataSource DataSource { set; }
 
     }
-    class BasicController : IController
+    public class BasicController : IController
     {
         private ISensor _sensor;
         private IActor _actor;
@@ -37,9 +37,13 @@ namespace MyProject01.Controller
 
         public void Init()
         {
-            _inDataArr = new DataBlock(TotalLength);
+            _inDataArr = new DataBlock(NetworkInputVectorLength);
             _inData = new BasicMLData(_inDataArr.Data, false);
             _currentPosition = _sensor.SkipCount;
+        }
+        public int SkipCount
+        {
+            get { return _sensor.SkipCount; }
         }
         public int TotalLength
         {
@@ -89,11 +93,15 @@ namespace MyProject01.Controller
             ctrl.Init();
             return ctrl;
         }
-
-
         public IDataSource DataSource
         {
             set { _sensor.DataSource = value; }
+            get { return _sensor.DataSource; }
+        }
+        public ControllerPacker GetPacker()
+        {
+            ControllerPacker packer = new ControllerPacker(_sensor, _actor, _neuroNetwork);
+            return packer;
         }
     }
 }

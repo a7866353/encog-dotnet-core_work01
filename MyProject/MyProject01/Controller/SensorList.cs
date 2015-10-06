@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    interface ISensor
+    public interface ISensor
     {
         int SkipCount { get; }
         int TotalLength { get; }
         int DataBlockLength { get; }
-        IDataSource DataSource { set; }
+        IDataSource DataSource { set; get; }
         int Copy(int index, DataBlock buffer, int offset);
         void Init();
     }
@@ -39,10 +39,10 @@ namespace MyProject01.Controller
         {
             get
             {
-                int minValue = this[0].SkipCount;
+                int minValue = this[0].TotalLength;
                 foreach (ISensor sen in this)
                 {
-                    minValue = Math.Min(sen.SkipCount, minValue);
+                    minValue = Math.Min(sen.TotalLength, minValue);
                 }
                 return minValue;
 
@@ -73,17 +73,6 @@ namespace MyProject01.Controller
         }
 
 
-        public IDataSource DataSource
-        {
-            set 
-            { 
-                foreach(ISensor sen in this)
-                {
-                    sen.DataSource = value;
-                }
-            
-            }
-        }
 
 
         public void Init()
@@ -91,6 +80,22 @@ namespace MyProject01.Controller
             foreach (ISensor sen in this)
             {
                 sen.Init();
+            }
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return this[0].DataSource;
+            }
+            set
+            {
+                foreach (ISensor sen in this)
+                {
+                    sen.DataSource = value;
+                }
             }
         }
     }
@@ -113,7 +118,13 @@ namespace MyProject01.Controller
 
         public int TotalLength
         {
-            get { return _dataSource.TotalLength - SkipCount; }
+            get 
+            {
+                if (_dataSource == null)
+                    return 0;
+                else
+                    return _dataSource.TotalLength; 
+            }
         }
 
         public int DataBlockLength
@@ -126,16 +137,22 @@ namespace MyProject01.Controller
             _dataSource.Copy(index, buffer, offset, DataBlockLength);
             return 1;
         }
-
-        public IDataSource DataSource
-        {
-            set { _dataSource = value; }
-        }
-
-
         public void Init()
         {
             // Nothing
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return _dataSource;
+            }
+            set
+            {
+                _dataSource = value;
+            }
         }
     }
     [Serializable]
@@ -173,19 +190,25 @@ namespace MyProject01.Controller
             DataBlock.Copy(_dataBuffer, index, buffer, offset, DataBlockLength);
             return 1;
         }
-
-        public IDataSource DataSource
-        {
-            set { _dataSource = value; }
-        }
-
-
         public void Init()
         {
             _dataBuffer = new DataBlock(_dataSource.TotalLength);
             _dataSource.Copy(0, _dataBuffer, 0, _dataBuffer.Length);
             _norm.Set(_dataBuffer.Data, 0, _dataBuffer.Length);
             _norm.DataValueAdjust(-0.1, 0.1);
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return _dataSource;
+            }
+            set
+            {
+                _dataSource = value;
+            }
         }
     }
     [Serializable]
@@ -248,18 +271,24 @@ namespace MyProject01.Controller
 
             return 1;
         }
-
-        public IDataSource DataSource
-        {
-            set { _dataSource = value; }
-        }
-
-
         public void Init()
         {
             _dataBuffer = new DataBlock(DataBlockLength);
             _outputBuffer = new DataBlock(DataBlockLength);
             _tmpBuffer = new double[DataBlockLength];
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return _dataSource;
+            }
+            set
+            {
+                _dataSource = value;
+            }
         }
     }
 

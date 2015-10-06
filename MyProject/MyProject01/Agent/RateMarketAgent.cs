@@ -7,6 +7,7 @@ using System.Text;
 using MyProject01.Reinforcement;
 using MyProject01.Util.DataObject;
 using MyProject01.Controller;
+using MyProject01.ExchangeRateTrade;
 
 namespace MyProject01.Agent
 {
@@ -101,7 +102,7 @@ namespace MyProject01.Agent
         {
             _money = initMoney;
             _type = OrderType.Nothing;
-            _lastAction = MarketActions.Nothing;
+            _lastAction = MarketActions.Init;
             _startRate = 0;
             _dealCount = 0;
         }
@@ -320,4 +321,138 @@ namespace MyProject01.Agent
             return;
         }
     }
+
+    class LearnRateMarketAgent
+    {
+        public double InitMoney = 10000;
+
+        private IDataSource _dataSource;
+        private Order _order;
+        private long _step;
+        private RateMarketAgentData _stateData;
+        private TradeAnalzeLog _tradeLog;
+
+        private BasicController _ctrl;
+
+        public long CurrentIndex
+        {
+            get
+            {
+                return _ctrl.CurrentPosition;
+            }
+        }
+
+        public bool IsEnd { private set; get; }
+
+        public double CurrentRateValue
+        {
+            get { return _dataSource[_ctrl.CurrentPosition].Close; }
+        }
+        public double CurrentValue
+        {
+            get
+            {
+                return _order.GetCurrentMoney(CurrentRateValue);
+            }
+        }
+        public MarketActions LastAction
+        {
+            get
+            {
+                return _order.LastAction;
+            }
+        }
+        public int DealCount
+        {
+            get { return _order.DealCount; }
+        }
+        public TradeAnalzeLog TradeLog
+        {
+            get { return _tradeLog; }
+        }
+
+        public LearnRateMarketAgent(BasicController ctrl)
+        {
+            _ctrl = ctrl;
+            _dataSource = ctrl.DataSource;
+            _stateData = new RateMarketAgentData();
+            _order = new Order(InitMoney);
+            _tradeLog = new TradeAnalzeLog();
+
+            Reset();
+        }
+
+        private bool Next()
+        {
+            if (IsEnd == true)
+                return false;
+            if ((_ctrl.CurrentPosition + 1) >= _ctrl.TotalLength) 
+            {
+                IsEnd = true;
+                return false;
+            }
+
+            _ctrl.CurrentPosition++;
+            _step++;
+            return true;
+        }
+        private RateMarketAgentData TakeAction(MarketActions action)
+        {
+            OrderLog log = null;
+            switch (action)
+            {
+                case MarketActions.Buy:
+                    log = _order.StartOrder(Order.OrderType.BuyOrder, CurrentRateValue);
+                    break;
+                case MarketActions.Sell:
+                    log = _order.StartOrder(Order.OrderType.SellOrder, CurrentRateValue);
+                    break;
+                case MarketActions.Close:
+                    log = _order.CloseOrder(CurrentRateValue);
+                    break;
+                case MarketActions.Nothing:
+                    break;
+                default:
+                    break;
+            }
+            _stateData.CurrentMoney = CurrentValue;
+            _stateData.TotalBenifit = CurrentValue - InitMoney;
+            _stateData.TotalBenifitRate = (CurrentValue - InitMoney) / InitMoney;
+            _stateData.LastOrderLog = log;
+            _stateData.Reward = (CurrentValue - InitMoney) / InitMoney;
+            return _stateData;
+        }
+        public RateMarketAgentData Reset()
+        {
+            _step = 1;
+            _order = new Order(InitMoney);
+            IsEnd = false;
+
+            // GetArrayValue(_stateData.RateDataArray, index);
+            _stateData.Reward = 0;
+            _stateData.InitMoney = InitMoney;
+            _stateData.CurrentMoney = InitMoney;
+            _stateData.TotalBenifit = 0;
+
+            _ctrl.Init();
+
+            return _stateData;
+        }
+        public void DoAction()
+        {
+            if (IsEnd == true)
+                return;
+
+            if (CurrentRateValue > 0)
+            {
+                // Get Action Value
+                MarketActions _currentAction = _ctrl.GetAction();
+                TakeAction(_currentAction);
+                _tradeLog.SetStateData(_stateData);
+            }
+            Next();
+
+        }
+    }
+
 }

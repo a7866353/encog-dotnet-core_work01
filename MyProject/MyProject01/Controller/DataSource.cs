@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
-    interface IDataSource
+    public interface IDataSource
     {
         void Copy(int index, DataBlock buffer, int offset, int length);
         int TotalLength{ get; }
@@ -28,7 +28,7 @@ namespace MyProject01.Controller
 
         public void Copy(int index, DataBlock buffer, int offset, int length)
         {
-            DataBlock.Copy(_dataBuffer, index, buffer, offset, length);
+            DataBlock.Copy(_dataBuffer, index - length + 1, buffer, offset, length);
         }
         public int TotalLength
         {
