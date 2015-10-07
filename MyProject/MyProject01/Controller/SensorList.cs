@@ -20,8 +20,6 @@ namespace MyProject01.Controller
     [Serializable]
     class SensorGroup : List<ISensor>, ISensor
     {
-        private int _currentPosition;
-       
         public int SkipCount
         {
             get
@@ -103,13 +101,11 @@ namespace MyProject01.Controller
     class RateSensor : ISensor
     {
         private int _dataCount;
-        private int _index;
         [NonSerialized]
         private IDataSource _dataSource;
         public RateSensor(int dataCount)
         {
             _dataCount = dataCount;
-            _index = 0;
         }
         public int SkipCount
         {
