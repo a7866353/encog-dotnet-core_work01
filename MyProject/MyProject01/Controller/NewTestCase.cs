@@ -16,9 +16,9 @@ namespace MyProject01.Controller
 {
     public class NewNormalScore : ICalculateScore
     {
-        public BasicController _ctrl;
+        public IController _ctrl;
 
-        public NewNormalScore(BasicController ctrl)
+        public NewNormalScore(IController ctrl)
         {
             _ctrl = ctrl;
         }

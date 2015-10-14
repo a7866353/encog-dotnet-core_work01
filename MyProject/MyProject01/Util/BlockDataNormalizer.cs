@@ -143,7 +143,7 @@ namespace MyProject01.Util
 
         public Normalizer Normalizer
         {
-            get { return new NormalizerWithTrim(Offset, Scale, 1, 0); }
+            get { return new NormalizerWithTrim(Offset, Scale, 1, 0) { SourceMaxValue = _dataMaxValue, SourceMinValue = _dataMinValue}; }
         }
 /*
         public NormalizerWithTrim NormalizeWithTrim
@@ -156,8 +156,11 @@ namespace MyProject01.Util
     [Serializable]
     class Normalizer
     {
+        public double SourceMaxValue;
+        public double SourceMinValue;
         public double Offset = 0;
         public double Scale = 1;
+
 
         public Normalizer(double offset, double scale)
         {

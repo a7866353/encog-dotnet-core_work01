@@ -1,4 +1,5 @@
 ﻿using Encog.ML;
+using MyProject01.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
+
+
     [Serializable]
-    public class ControllerPacker
+    class ControllerPacker
     {
         private ISensor _sensor;
         private IActor _actor;
         private IMLRegression _neuroNetwork;
-
+        private Normalizer[] _norm;
         static public ControllerPacker FromBinary(byte[] data)
         {
             MemoryStream stream = new MemoryStream(data);
@@ -24,11 +27,12 @@ namespace MyProject01.Controller
             return obj;
         }
 
-        public ControllerPacker(ISensor sensor, IActor actor, IMLRegression net)
+        public ControllerPacker(ISensor sensor, IActor actor, IMLRegression net, Normalizer[] norm)
         {
             _sensor = sensor;
             _actor = actor;
             _neuroNetwork = net;
+            _norm = norm;
         }
 
         public byte[] GetData()
@@ -45,6 +49,7 @@ namespace MyProject01.Controller
         {
             BasicController ctrl = new BasicController(_sensor, _actor);
             ctrl.UpdateNetwork(_neuroNetwork);
+            ctrl.NormalizerArray = _norm;
             return ctrl;
         }
 
