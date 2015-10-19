@@ -19,6 +19,11 @@ namespace MyProject01.Controller
         private IActor _actor;
         private IMLRegression _neuroNetwork;
         private Normalizer[] _norm;
+
+        public IMLRegression NeuroNetwork
+        {
+            set { _neuroNetwork = value; }
+        }
         static public ControllerPacker FromBinary(byte[] data)
         {
             MemoryStream stream = new MemoryStream(data);

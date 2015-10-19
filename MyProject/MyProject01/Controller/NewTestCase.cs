@@ -16,11 +16,11 @@ namespace MyProject01.Controller
 {
     public class NewNormalScore : ICalculateScore
     {
-        public IController _ctrl;
+        public ControllerFactory _ctrlFactory;
 
-        public NewNormalScore(IController ctrl)
+        public NewNormalScore(ControllerFactory ctrlFactory)
         {
-            _ctrl = ctrl;
+            _ctrlFactory = ctrlFactory;
         }
 
         public bool ShouldMinimize
@@ -34,7 +34,7 @@ namespace MyProject01.Controller
 
         public double CalculateScore(IMLMethod network)
         {
-            BasicController ctrl = (BasicController)_ctrl.Clone();
+            BasicController ctrl = (BasicController)_ctrlFactory.Get();
             ctrl.UpdateNetwork((IMLRegression)network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(ctrl);
             
@@ -52,6 +52,8 @@ namespace MyProject01.Controller
             double score = agent.CurrentValue - agent.InitMoney;
             // System.Console.WriteLine("S: " + score);
             // return score;
+            _ctrlFactory.Free(ctrl);
+
             return agent.CurrentValue;
         }
 
@@ -59,11 +61,12 @@ namespace MyProject01.Controller
     class NewUpdateControllerJob : ICheckJob
     {
         private NewNetworkController _ctrl;
+        private ControllerPacker _packer;
         private string _caseName;
-        public NewUpdateControllerJob(string caseName)
+        public NewUpdateControllerJob(string caseName, ControllerPacker packer)
         {
             _caseName = caseName;
-
+            _packer = packer;
         }
 
 
@@ -73,7 +76,8 @@ namespace MyProject01.Controller
             dao.CaseName = _caseName;
             dao.StepNum = (int)context.Epoch;
             dao.UpdateTime = DateTime.Now;
-
+            _packer.NeuroNetwork = context.BestNetwork;
+            dao.ControllerData = _packer.GetData();
 
             dao.Save();
             return true;
@@ -200,6 +204,7 @@ namespace MyProject01.Controller
     class NewTestCase
     {
         public string TestCaseName = "NewTest";
+        private ControllerFactory _ctrlFac;
         private BasicController ctrl;
         public void Run()
         {
@@ -209,12 +214,11 @@ namespace MyProject01.Controller
 
             BasicActor actor = new BasicActor();
 
-            ctrl = new BasicController(senGroup, actor);
-
-
             ctrl.DataSource = new FixDataSource(new MTDataLoader("USDJPY", DataTimeType.M5));
             ctrl.Init();
 
+            ctrl = new BasicController(senGroup, actor);
+            _ctrlFac = new ControllerFactory(ctrl);
 
             NewTrainer trainer = new NewTrainer(ctrl.NetworkInputVectorLength, 
                 ctrl.NetworkOutputVectorLenth);
@@ -222,7 +226,7 @@ namespace MyProject01.Controller
             trainer.CheckCtrl = CreateCheckCtrl();
             trainer.TestName = "";
             trainer.PopulationFacotry = new NormalPopulationFactory();
-            trainer.ScoreCtrl = new NewNormalScore(ctrl);
+            trainer.ScoreCtrl = new NewNormalScore(_ctrlFac);
 
             trainer.RunTestCase();
 
@@ -232,12 +236,11 @@ namespace MyProject01.Controller
         {
             TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
             mainCheckCtrl.Add(new CheckNetworkChangeJob());
-            // TODO
-            // mainCheckCtrl.Add(new NewUpdateControllerJob(Controller));
-
+            mainCheckCtrl.Add(new NewUpdateControllerJob(TestCaseName, ctrl.GetPacker()));
+            
             // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
-            BasicController testCtrl = (BasicController)ctrl.Clone();
+            BasicController testCtrl = (BasicController)_ctrlFac.Get();
             testCtrl.DataSource = ctrl.DataSource;
             mainCheckCtrl.Add(new NewUpdateTestCaseJob()
             {

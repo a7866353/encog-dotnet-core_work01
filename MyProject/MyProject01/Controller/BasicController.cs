@@ -21,6 +21,26 @@ namespace MyProject01.Controller
         IDataSource DataSource { set; }
 
     }
+
+    public class ControllerFactory
+    {
+        public IController BaseController;
+
+        public ControllerFactory(IController baseController)
+        {
+            this.BaseController = baseController;
+        }
+        public IController Get()
+        {
+            IController ctrl = BaseController.Clone();
+            return ctrl;
+        }
+        public void Free(IController ctrl)
+        {
+            // TODO Nothing
+        }
+    }
+
     class BasicController : IController
     {
         private ISensor _sensor;
@@ -130,9 +150,6 @@ namespace MyProject01.Controller
             {
                 _sensor.Copy(i, buffer, 0);
                 norm.Set(buffer.Data);
-
-
-
             }
 
             _normalizerArray = norm.NromalizerArray;
