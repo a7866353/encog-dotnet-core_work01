@@ -19,11 +19,17 @@ namespace MyProject01.Controller
     {
         private DataLoader _loader;
         private DataBlock _dataBuffer;
+        private double _lengthLimit;
 
-        public FixDataSource(DataLoader loader)
+        public FixDataSource(DataLoader loader, double lengthLimit = 1.0)
         {
             _loader = loader;
-            Init();
+
+            _dataBuffer = new DataBlock((int)(_loader.Count*lengthLimit));
+            for (int i = 0; i < _dataBuffer.Length; i++)
+            {
+                _dataBuffer[i] = _loader[i].Close;
+            }
         }
 
         public void Copy(int index, DataBlock buffer, int offset, int length)
@@ -40,17 +46,6 @@ namespace MyProject01.Controller
         public RateSet this[int index]
         {
             get { return _loader[index]; }
-        }
-
-        private void Init()
-        {
-            _dataBuffer = new DataBlock(_loader.Count);
-            for(int i=0;i<_dataBuffer.Length;i++)
-            {
-                _dataBuffer[i] = _loader[i].Close;
-            }
-
-
         }
     }
 }

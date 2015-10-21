@@ -72,7 +72,9 @@ namespace MyProject01.Controller
 
         public bool Do(TrainerContex context)
         {
-            ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName("Controller"+DateTime.Now);
+            // ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName("Controller"+DateTime.Now);
+            ControllerDAOV2 dao = new ControllerDAOV2();
+            dao.Name = "Controller" + DateTime.Now;
             dao.CaseName = _caseName;
             dao.StepNum = (int)context.Epoch;
             dao.UpdateTime = DateTime.Now;
@@ -205,7 +207,7 @@ namespace MyProject01.Controller
     {
         public string TestCaseName = "NewTest";
         private ControllerFactory _ctrlFac;
-        private BasicController ctrl;
+        private BasicController _testCtrl;
         public void Run()
         {
             SensorGroup senGroup = new SensorGroup();
@@ -214,14 +216,19 @@ namespace MyProject01.Controller
 
             BasicActor actor = new BasicActor();
 
-            ctrl.DataSource = new FixDataSource(new MTDataLoader("USDJPY", DataTimeType.M5));
-            ctrl.Init();
+            DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.M5);
 
-            ctrl = new BasicController(senGroup, actor);
-            _ctrlFac = new ControllerFactory(ctrl);
+            _testCtrl = new BasicController(senGroup, actor);
+            _testCtrl.DataSource = new FixDataSource(loader);
+            _testCtrl.Init();
+            _testCtrl.Normilize(0, 0.5);
 
-            NewTrainer trainer = new NewTrainer(ctrl.NetworkInputVectorLength, 
-                ctrl.NetworkOutputVectorLenth);
+            BasicController trainCtrl = (BasicController)_testCtrl.Clone();
+            trainCtrl.DataSource = new FixDataSource(loader, 0.5);
+            _ctrlFac = new ControllerFactory(trainCtrl);
+
+            NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength, 
+                _testCtrl.NetworkOutputVectorLenth);
 
             trainer.CheckCtrl = CreateCheckCtrl();
             trainer.TestName = "";
@@ -229,19 +236,18 @@ namespace MyProject01.Controller
             trainer.ScoreCtrl = new NewNormalScore(_ctrlFac);
 
             trainer.RunTestCase();
-
         }
 
         private ICheckJob CreateCheckCtrl()
         {
             TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
             mainCheckCtrl.Add(new CheckNetworkChangeJob());
-            mainCheckCtrl.Add(new NewUpdateControllerJob(TestCaseName, ctrl.GetPacker()));
+            mainCheckCtrl.Add(new NewUpdateControllerJob(TestCaseName, _testCtrl.GetPacker()));
             
             // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
             BasicController testCtrl = (BasicController)_ctrlFac.Get();
-            testCtrl.DataSource = ctrl.DataSource;
+            testCtrl.DataSource = _testCtrl.DataSource;
             mainCheckCtrl.Add(new NewUpdateTestCaseJob()
             {
                 TestName = TestCaseName,

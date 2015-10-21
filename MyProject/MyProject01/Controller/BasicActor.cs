@@ -12,6 +12,7 @@ namespace MyProject01.Controller
         MarketActions GetAction(IMLData output);
         int DataLength { get; }
     }
+    [Serializable]
     class BasicActor : IActor
     {
         private MarketActions _lastAction = MarketActions.Nothing;

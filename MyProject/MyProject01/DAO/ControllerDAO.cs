@@ -225,7 +225,10 @@ namespace MyProject01.DAO
             get { return "ControllersV2"; }
         }
         static protected TestCaseDatabaseConnector _connector;
-
+        static ControllerDAOV2()
+        {
+            _connector = new TestCaseDatabaseConnector();
+        }
         static private MongoCollection<ControllerDAOV2> Collection
         {
             get
