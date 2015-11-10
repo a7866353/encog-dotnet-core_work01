@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject01.Controller
+namespace MyProject01.DataSources
 {
     public class DataBlock
     {

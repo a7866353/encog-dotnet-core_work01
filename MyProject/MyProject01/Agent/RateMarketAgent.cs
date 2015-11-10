@@ -8,6 +8,7 @@ using MyProject01.Reinforcement;
 using MyProject01.Util.DataObject;
 using MyProject01.Controller;
 using MyProject01.ExchangeRateTrade;
+using MyProject01.DataSources;
 
 namespace MyProject01.Agent
 {
