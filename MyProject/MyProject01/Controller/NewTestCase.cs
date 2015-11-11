@@ -219,12 +219,12 @@ namespace MyProject01.Controller
             DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.M5);
 
             _testCtrl = new BasicController(senGroup, actor);
-            _testCtrl.DataSource = new FixDataSource(loader);
+            _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl();
             _testCtrl.Init();
             _testCtrl.Normilize(0, 0.5);
 
             BasicController trainCtrl = (BasicController)_testCtrl.Clone();
-            trainCtrl.DataSource = new FixDataSource(loader, 0.5);
+            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength, 
@@ -247,7 +247,7 @@ namespace MyProject01.Controller
             // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
             BasicController testCtrl = (BasicController)_ctrlFac.Get();
-            testCtrl.DataSource = _testCtrl.DataSource;
+            testCtrl.DataSourceCtrl = _testCtrl.DataSourceCtrl;
             mainCheckCtrl.Add(new NewUpdateTestCaseJob()
             {
                 TestName = TestCaseName,

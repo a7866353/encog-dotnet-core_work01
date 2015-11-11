@@ -19,7 +19,7 @@ namespace MyProject01.Controller
         MarketActions GetAction();
         IController Clone();
 
-        IDataSource DataSource { set; }
+        DataSourceCtrl DataSourceCtrl { set; }
 
     }
 
@@ -51,6 +51,7 @@ namespace MyProject01.Controller
         private DataBlock _inDataArr;
         private IMLRegression _neuroNetwork;
         private int _currentPosition;
+        private DataSourceCtrl _dataSourceCtrl;
         public BasicController(ISensor sensor, IActor actor)
         {
             _sensor = sensor;
@@ -127,10 +128,17 @@ namespace MyProject01.Controller
             ctrl.Init();
             return ctrl;
         }
-        public IDataSource DataSource
+        public DataSourceCtrl DataSourceCtrl
         {
-            set { _sensor.DataSource = value; }
-            get { return _sensor.DataSource; }
+            set
+            {
+                _dataSourceCtrl = value; 
+                _sensor.DataSourceCtrl = value; 
+            }
+            get
+            {
+                return _dataSourceCtrl;
+            }
         }
         public ControllerPacker GetPacker()
         {
@@ -155,5 +163,6 @@ namespace MyProject01.Controller
 
             _normalizerArray = norm.NromalizerArray;
         }
+
     }
 }

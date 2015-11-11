@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.DataSources
 {
-    class DataSourceCtrl
+    public class DataSourceCtrl
     {
         public DataLoader SourceLoader
         {

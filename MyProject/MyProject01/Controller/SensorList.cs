@@ -1,4 +1,5 @@
 ﻿using MyProject01.DataSources;
+using MyProject01.DataSources.DataSourceParams;
 using MyProject01.Util;
 using MyProject01.Util.DllTools;
 using System;
@@ -14,7 +15,8 @@ namespace MyProject01.Controller
         int SkipCount { get; }
         int TotalLength { get; }
         int DataBlockLength { get; }
-        IDataSource DataSource { set; get; }
+        IDataSource DataSource { get; }
+        DataSourceCtrl DataSourceCtrl { set; }
         int Copy(int index, DataBlock buffer, int offset);
         void Init();
     }
@@ -89,11 +91,16 @@ namespace MyProject01.Controller
             {
                 return this[0].DataSource;
             }
+        }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
             set
             {
                 foreach (ISensor sen in this)
                 {
-                    sen.DataSource = value;
+                    sen.DataSourceCtrl = value;
                 }
             }
         }
@@ -151,6 +158,16 @@ namespace MyProject01.Controller
                 _dataSource = value;
             }
         }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set
+            {
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                this._dataSource = value.Get(param);
+            }
+        }
     }
     [Serializable]
     class RateNormalizeSensor : ISensor
@@ -205,6 +222,16 @@ namespace MyProject01.Controller
             set
             {
                 _dataSource = value;
+            }
+        }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set
+            {
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                this._dataSource = value.Get(param);
             }
         }
     }
@@ -282,9 +309,15 @@ namespace MyProject01.Controller
             {
                 return _dataSource;
             }
+        }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
             set
             {
-                _dataSource = value;
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                this._dataSource = value.Get(param);
             }
         }
     }

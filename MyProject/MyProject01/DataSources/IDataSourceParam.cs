@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyProject01.DataSources
 {
-    interface IDataSourceParam
+    public interface IDataSourceParam
     {
         bool CompareTo(IDataSourceParam param);
         IDataSource Create(DataSourceCtrl ctrl);
