@@ -375,7 +375,7 @@ namespace MyProject01.Agent
         public LearnRateMarketAgent(BasicController ctrl)
         {
             _ctrl = ctrl;
-            _dataSource = ctrl.get;
+            _dataSource = ctrl.DataSource;
             _stateData = new RateMarketAgentData();
             _order = new Order(InitMoney);
             _tradeLog = new TradeAnalzeLog();

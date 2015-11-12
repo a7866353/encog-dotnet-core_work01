@@ -2,6 +2,7 @@
 using Encog.ML.Data;
 using Encog.ML.Data.Basic;
 using MyProject01.DataSources;
+using MyProject01.DataSources.DataSourceParams;
 using MyProject01.Util;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,7 @@ namespace MyProject01.Controller
         private IMLRegression _neuroNetwork;
         private int _currentPosition;
         private DataSourceCtrl _dataSourceCtrl;
+        private IDataSource _dataSource;
         public BasicController(ISensor sensor, IActor actor)
         {
             _sensor = sensor;
@@ -133,12 +135,19 @@ namespace MyProject01.Controller
             set
             {
                 _dataSourceCtrl = value; 
-                _sensor.DataSourceCtrl = value; 
+                _sensor.DataSourceCtrl = value;
+
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                _dataSource = _dataSourceCtrl.Get(param);
             }
             get
             {
                 return _dataSourceCtrl;
             }
+        }
+        public IDataSource DataSource
+        {
+            get { return _dataSource; }
         }
         public ControllerPacker GetPacker()
         {
