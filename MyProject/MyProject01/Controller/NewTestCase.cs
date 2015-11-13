@@ -219,12 +219,12 @@ namespace MyProject01.Controller
             DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.M5);
 
             _testCtrl = new BasicController(senGroup, actor);
-            _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl();
+            _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(loader);
             _testCtrl.Init();
             _testCtrl.Normilize(0, 0.5);
 
             BasicController trainCtrl = (BasicController)_testCtrl.Clone();
-            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(); // TODO
+            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(loader); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength, 
