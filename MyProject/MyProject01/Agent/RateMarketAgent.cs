@@ -383,7 +383,7 @@ namespace MyProject01.Agent
             Reset();
         }
 
-        private bool Next()
+        public bool Next()
         {
             if (IsEnd == true)
                 return false;
@@ -451,8 +451,6 @@ namespace MyProject01.Agent
                 TakeAction(_currentAction);
                 _tradeLog.SetStateData(_stateData);
             }
-            Next();
-
         }
     }
 

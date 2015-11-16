@@ -44,7 +44,7 @@ namespace MyProject01.Controller
                     break;
 
                 agent.DoAction();
-                
+                agent.Next();
                 if (agent.IsEnd == true)
                     break;
             }
@@ -162,7 +162,7 @@ namespace MyProject01.Controller
                     // trainDealCount = dealCount;
                     trainDealCount = agent.DealCount;
                 }
-
+                agent.Next();
 
             } // end while
 

@@ -30,6 +30,7 @@ namespace MyProject01.Controller
             // Do action
             switch (maxActionIndex)
             {
+                    /*
                 case 0:
                     if (_lastAction == MarketActions.Buy)
                         currentAction = MarketActions.Sell;
@@ -37,6 +38,10 @@ namespace MyProject01.Controller
                         currentAction = MarketActions.Buy;
                     else
                         currentAction = MarketActions.Nothing;
+                    break;
+                     */
+                case 0:
+                    currentAction = MarketActions.Close;
                     break;
                 case 1:
                     currentAction = MarketActions.Buy;
