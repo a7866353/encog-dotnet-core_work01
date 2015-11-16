@@ -205,7 +205,7 @@ namespace MyProject01.Controller
 
     class NewTestCase
     {
-        public string TestCaseName = "NewTest";
+        public string TestCaseName = "NewTest" + DateTime.Now;
         private ControllerFactory _ctrlFac;
         private BasicController _testCtrl;
         public void Run()
