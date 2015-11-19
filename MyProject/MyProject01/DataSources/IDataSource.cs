@@ -12,7 +12,7 @@ namespace MyProject01.DataSources
     {
         void Copy(int index, DataBlock buffer, int offset, int length);
         int TotalLength { get; }
-
+        int SkipCount { get; }
         RateSet this[int index] { get; }
 
     }
