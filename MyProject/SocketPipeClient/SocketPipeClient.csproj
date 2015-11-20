@@ -74,6 +74,7 @@
     <Compile Include="ConnectionContoller\RateDataController.cs" />
     <Compile Include="CSVLogFormater.cs" />
     <Compile Include="DatabaseConnector.cs" />
+    <Compile Include="RateCollectController.cs" />
     <Compile Include="RequestObject\BasicData.cs" />
     <Compile Include="RequestObject\RateByCountRequest.cs" />
     <Compile Include="RequestObject\RateDataIndicateRequest.cs" />
