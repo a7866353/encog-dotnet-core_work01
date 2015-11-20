@@ -46,6 +46,8 @@ namespace MyProject01.DataSources.DataSourceParams
             get { return 0; }
         }
     }
+
+    [Serializable]
     class RateDataSourceParam: IDataSourceParam
     {
         private int _timeFrame;
@@ -99,15 +101,18 @@ namespace MyProject01.DataSources.DataSourceParams
         private int _m1 = 3;
         private int _m2 = 3;
 
-        public KDJDataSource(IDataSource rateDataSource) 
+        public KDJDataSource(DataLoader loader, int aveRange, int m1, int m2) 
         {
-            _totalLength = rateDataSource.TotalLength;
+            _totalLength = loader.Count;
             _skipCount = _aveRange - 1;
+            _aveRange = aveRange;
+            _m1 = m1;
+            _m2 = m2;
 
             _rateArr = new RateSet[_totalLength];
             for (int i = 0; i < _rateArr.Length; i++)
             {
-                _rateArr[i] = rateDataSource[i];
+                _rateArr[i] = loader[i];
             }
 
             _kArr = new double[_rateArr.Length];
@@ -171,6 +176,36 @@ namespace MyProject01.DataSources.DataSourceParams
             get { return _skipCount; }
         }
 
+        public void CopyK(int index, DataBlock buffer, int offset, int length)
+        {
+            CopyData(_kArr, index, buffer, offset, length);
+        }
+        public void CopyD(int index, DataBlock buffer, int offset, int length)
+        {
+            CopyData(_dArr, index, buffer, offset, length);
+        }
+        public void CopyJ(int index, DataBlock buffer, int offset, int length)
+        {
+            CopyData(_jArr, index, buffer, offset, length);
+        }
+
+        public double[] KArr
+        {
+            get { return _kArr; }
+        }
+        public double[] DArr
+        {
+            get { return _dArr; }
+        }
+        public double[] JArr
+        {
+            get { return _jArr; }
+        }
+        private void CopyData(double[] data, int index, DataBlock buffer, int offset, int length)
+        {
+            Array.Copy(data, index, buffer.Data, offset, length);
+        }
+
         private void FindMaxMin(int index, out double maxValue, out double minValue)
         {
             maxValue = this[index].High;
@@ -187,18 +222,28 @@ namespace MyProject01.DataSources.DataSourceParams
 
     }
 
-        class KDJDataSourceParam: IDataSourceParam
+    [Serializable]
+    class KDJDataSourceParam : IDataSourceParam
+    {
+        public int AveRange = 9;
+        public int M1 = 3;
+        public int M2 = 3;
+
+        public KDJDataSourceParam()
         {
 
-            public bool CompareTo(IDataSourceParam param)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDataSource Create(DataSourceCtrl ctrl)
-            {
-                throw new NotImplementedException();
-            }
         }
+
+        public bool CompareTo(IDataSourceParam param)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDataSource Create(DataSourceCtrl ctrl)
+        {
+            KDJDataSource src = new KDJDataSource(ctrl.SourceLoader, AveRange, M1, M2);
+            return src;
+        }
+    }
 
 }

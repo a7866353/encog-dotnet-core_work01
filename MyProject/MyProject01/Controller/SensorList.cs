@@ -105,6 +105,7 @@ namespace MyProject01.Controller
             }
         }
     }
+
     [Serializable]
     class RateSensor : ISensor
     {
@@ -321,5 +322,133 @@ namespace MyProject01.Controller
             }
         }
     }
+
+    //===========================================
+    [Serializable]
+    abstract class BasicKDJSensor : ISensor
+    {
+        [NonSerialized]
+        protected KDJDataSource _dataSource;
+        private int _blockLength;
+
+        public BasicKDJSensor(int blockLength)
+        {
+            _blockLength = blockLength;
+        }
+
+        public int SkipCount
+        {
+            get { return _dataSource.SkipCount + _blockLength - 1; }
+        }
+
+        public int TotalLength
+        {
+            get
+            {
+                if (_dataSource == null)
+                    return 0;
+                else
+                    return _dataSource.TotalLength;
+            }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _blockLength; }
+        }
+
+        public IDataSource DataSource
+        {
+            get { return _dataSource; }
+        }
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set
+            {
+                this.DataSourceCtrl = value;
+                KDJDataSourceParam param = new KDJDataSourceParam();
+                _dataSource = value.Get(param) as KDJDataSource;
+            }
+        }
+
+        abstract public int Copy(int index, DataBlock buffer, int offset);
+
+        public void Init()
+        {
+            // Todo nothing.
+            return;
+        }
+    }
+
+    [Serializable]
+    class KDJ_KSensor : BasicKDJSensor
+    {
+        public KDJ_KSensor(int blockLength): base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            _dataSource.CopyK(index, buffer, offset, this.DataBlockLength);
+            return this.DataBlockLength;
+        }
+    }
+
+    [Serializable]
+    class KDJ_DSensor : BasicKDJSensor
+    {
+        public KDJ_DSensor(int blockLength): base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            _dataSource.CopyD(index, buffer, offset, this.DataBlockLength);
+            return this.DataBlockLength;
+        }
+    }
+
+    [Serializable]
+    class KDJ_JSensor : BasicKDJSensor
+    {
+        public KDJ_JSensor(int blockLength): base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            _dataSource.CopyJ(index, buffer, offset, this.DataBlockLength);
+            return this.DataBlockLength;
+        }
+    }
+
+    [Serializable]
+    class KDJ_CrossSensor : BasicKDJSensor
+    {
+        public KDJ_CrossSensor(int blockLength)
+            : base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            for (int i = 0; i < DataBlockLength; i++)
+            {
+                int idx = index+i;
+                double value = 0;
+                value += Math.Abs(_dataSource.KArr[idx] - _dataSource.DArr[idx]);
+                value += Math.Abs(_dataSource.DArr[idx] - _dataSource.JArr[idx]);
+                value += Math.Abs(_dataSource.JArr[idx] - _dataSource.KArr[idx]);
+                buffer[offset + i] = value;
+            }
+            return this.DataBlockLength;
+        }
+    }
+
 
 }

@@ -213,6 +213,10 @@ namespace MyProject01.Controller
             SensorGroup senGroup = new SensorGroup();
             senGroup.Add(new RateSensor(16));
             senGroup.Add(new RateSensor(32));
+            senGroup.Add(new KDJ_KSensor(32));
+            senGroup.Add(new KDJ_DSensor(32));
+            senGroup.Add(new KDJ_JSensor(32));
+            senGroup.Add(new KDJ_CrossSensor(32));
 
             BasicActor actor = new BasicActor();
 
