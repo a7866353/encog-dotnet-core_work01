@@ -163,7 +163,7 @@ namespace MyProject01.DataSources.DataSourceParams
 
         public int TotalLength
         {
-            get { throw new NotImplementedException(); }
+            get { return _totalLength; }
         }
 
         public RateSet this[int index]
@@ -203,7 +203,7 @@ namespace MyProject01.DataSources.DataSourceParams
         }
         private void CopyData(double[] data, int index, DataBlock buffer, int offset, int length)
         {
-            Array.Copy(data, index, buffer.Data, offset, length);
+            Array.Copy(data, index - length + 1, buffer.Data, offset, length);
         }
 
         private void FindMaxMin(int index, out double maxValue, out double minValue)
@@ -236,7 +236,22 @@ namespace MyProject01.DataSources.DataSourceParams
 
         public bool CompareTo(IDataSourceParam param)
         {
-            throw new NotImplementedException();
+            if (this.GetType() != param.GetType())
+                return false;
+
+            KDJDataSourceParam inParam = (KDJDataSourceParam)param;
+            do
+            {
+                if (inParam.AveRange != this.AveRange)
+                    return false;
+                if (inParam.M1 != this.M1)
+                    return false;
+                if (inParam.M2 != this.M2)
+                    return false;
+
+            } while (false);
+
+            return true;
         }
 
         public IDataSource Create(DataSourceCtrl ctrl)

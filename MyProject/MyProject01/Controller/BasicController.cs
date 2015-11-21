@@ -58,7 +58,7 @@ namespace MyProject01.Controller
         {
             _sensor = sensor;
             _actor = actor;
-            _currentPosition = _sensor.SkipCount;
+            _currentPosition = 0;
         }
 
         public void Init()

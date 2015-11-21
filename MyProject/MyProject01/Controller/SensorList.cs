@@ -366,7 +366,6 @@ namespace MyProject01.Controller
         {
             set
             {
-                this.DataSourceCtrl = value;
                 KDJDataSourceParam param = new KDJDataSourceParam();
                 _dataSource = value.Get(param) as KDJDataSource;
             }
@@ -439,7 +438,7 @@ namespace MyProject01.Controller
         {
             for (int i = 0; i < DataBlockLength; i++)
             {
-                int idx = index+i;
+                int idx = index+i - DataBlockLength + 1;
                 double value = 0;
                 value += Math.Abs(_dataSource.KArr[idx] - _dataSource.DArr[idx]);
                 value += Math.Abs(_dataSource.DArr[idx] - _dataSource.JArr[idx]);
