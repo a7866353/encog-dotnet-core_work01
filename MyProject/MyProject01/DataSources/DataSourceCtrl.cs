@@ -1,4 +1,5 @@
-﻿using MyProject01.Util;
+﻿using MyProject01.DataSources.DataSourceParams;
+using MyProject01.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,19 +35,25 @@ namespace MyProject01.DataSources
 
 
     }
+
     public class DataSourceCtrl
     {
         private List<DataSourcePack> _packList;
-        private DataLoader _loader;
+        private RateSet[] _rateArr;
 
-        public DataLoader SourceLoader
+        public RateSet[] SourceLoader
         {
-            get { return _loader; }
+            get { return _rateArr; }
         }
 
-        public DataSourceCtrl(DataLoader loader)
+        public DataSourceCtrl(DataLoader loader, double lengthLimit = 1.0)
         {
-            _loader = loader;
+            int len = (int)(loader.Count * lengthLimit);
+            _rateArr = new RateSet[len];
+            for (int i = 0; i < _rateArr.Length; i++)
+            {
+                _rateArr[i] = loader[i];
+            }
             _packList = new List<DataSourcePack>();
         }
 

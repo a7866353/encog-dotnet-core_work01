@@ -208,6 +208,7 @@ namespace MyProject01.Controller
         public string TestCaseName = "NewTest" + DateTime.Now;
         private ControllerFactory _ctrlFac;
         private BasicController _testCtrl;
+        private DataLoader _loader;
         public void Run()
         {
             SensorGroup senGroup = new SensorGroup();
@@ -220,15 +221,15 @@ namespace MyProject01.Controller
 
             BasicActor actor = new BasicActor();
 
-            DataLoader loader = new MTDataLoader("USDJPY", DataTimeType.M5);
+            _loader = new MTDataLoader("USDJPY", DataTimeType.M5);
 
             _testCtrl = new BasicController(senGroup, actor);
-            _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(loader);
+            _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
             _testCtrl.Init();
             _testCtrl.Normilize(0, 0.5);
 
             BasicController trainCtrl = (BasicController)_testCtrl.Clone();
-            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(loader); // TODO
+            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader, 0.5); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength, 
@@ -251,7 +252,7 @@ namespace MyProject01.Controller
             // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
             BasicController testCtrl = (BasicController)_ctrlFac.Get();
-            testCtrl.DataSourceCtrl = _testCtrl.DataSourceCtrl;
+            testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
             mainCheckCtrl.Add(new NewUpdateTestCaseJob()
             {
                 TestName = TestCaseName,

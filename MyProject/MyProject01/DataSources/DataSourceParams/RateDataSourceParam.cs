@@ -9,18 +9,17 @@ namespace MyProject01.DataSources.DataSourceParams
 {
     class FixDataSource : IDataSource
     {
-        private DataLoader _loader;
+        private RateSet[] _rateSet;
         private DataBlock _dataBuffer;
         private double _lengthLimit;
 
-        public FixDataSource(DataLoader loader, double lengthLimit = 1.0)
+        public FixDataSource(DataSourceCtrl ctrl, double lengthLimit = 1.0)
         {
-            _loader = loader;
-
-            _dataBuffer = new DataBlock((int)(_loader.Count * lengthLimit));
+            _rateSet = ctrl.SourceLoader;
+            _dataBuffer = new DataBlock((int)(_rateSet.Length * lengthLimit));
             for (int i = 0; i < _dataBuffer.Length; i++)
             {
-                _dataBuffer[i] = _loader[i].Close;
+                _dataBuffer[i] = _rateSet[i].Close;
             }
         }
 
@@ -37,7 +36,14 @@ namespace MyProject01.DataSources.DataSourceParams
         }
         public RateSet this[int index]
         {
-            get { return _loader[index]; }
+            get 
+            {
+                if (index>=_rateSet.Length)
+                {
+                    index = index;
+                }
+                return _rateSet[index]; 
+            }
         }
 
 
@@ -82,7 +88,7 @@ namespace MyProject01.DataSources.DataSourceParams
      
         public IDataSource Create(DataSourceCtrl ctrl)
         {
-            return new FixDataSource(ctrl.SourceLoader, _lengthLimit);
+            return new FixDataSource(ctrl, _lengthLimit);
         }
 
     }
@@ -90,7 +96,6 @@ namespace MyProject01.DataSources.DataSourceParams
 
     class KDJDataSource : IDataSource
     {
-        private int _totalLength;
         private int _skipCount;
         private RateSet[] _rateArr;
         private double[] _kArr;
@@ -101,19 +106,15 @@ namespace MyProject01.DataSources.DataSourceParams
         private int _m1 = 3;
         private int _m2 = 3;
 
-        public KDJDataSource(DataLoader loader, int aveRange, int m1, int m2) 
+        public KDJDataSource(DataSourceCtrl loader, int aveRange, int m1, int m2) 
         {
-            _totalLength = loader.Count;
+            _rateArr = loader.SourceLoader;
+
             _skipCount = _aveRange - 1;
             _aveRange = aveRange;
             _m1 = m1;
             _m2 = m2;
 
-            _rateArr = new RateSet[_totalLength];
-            for (int i = 0; i < _rateArr.Length; i++)
-            {
-                _rateArr[i] = loader[i];
-            }
 
             _kArr = new double[_rateArr.Length];
             _dArr = new double[_rateArr.Length];
@@ -163,7 +164,7 @@ namespace MyProject01.DataSources.DataSourceParams
 
         public int TotalLength
         {
-            get { return _totalLength; }
+            get { return _rateArr.Length; }
         }
 
         public RateSet this[int index]
@@ -256,7 +257,7 @@ namespace MyProject01.DataSources.DataSourceParams
 
         public IDataSource Create(DataSourceCtrl ctrl)
         {
-            KDJDataSource src = new KDJDataSource(ctrl.SourceLoader, AveRange, M1, M2);
+            KDJDataSource src = new KDJDataSource(ctrl, AveRange, M1, M2);
             return src;
         }
     }
