@@ -160,14 +160,14 @@ namespace MyProject01.Controller
             return packer;
         }
 
-        public void Normilize(double middleValue, double margin)
+        public void Normilize(double middleValue, double limit)
         {
             FwtDataNormalizer norm = new FwtDataNormalizer();
             DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
 
             _sensor.Copy(SkipCount, buffer, 0);
-            norm.Init(buffer.Data, middleValue, margin);
+            norm.Init(buffer.Data, middleValue, limit);
 
             for (int i = SkipCount+1; i < TotalLength;i++ )
             {

@@ -12,14 +12,14 @@ namespace MyProject01.Util
         private NormalizeAnalyzer[] _normAnlzArr;
         private int _length;
 
-        public void Init(double[] firstDataArray, double middleValue, double margin)
+        public void Init(double[] firstDataArray, double middleValue, double limit)
         {
             _length = firstDataArray.Length;
             _normAnlzArr = new NormalizeAnalyzer[_length];
             for (int i = 0; i < _length; i++)
             {
                 NormalizeAnalyzer na = new NormalizeAnalyzer();
-                na.SetTarget(middleValue, margin);
+                na.SetTarget(middleValue, limit / 2, limit);
                 na.Init(firstDataArray[i]);
                 _normAnlzArr[i] = na;
             }
@@ -52,7 +52,7 @@ namespace MyProject01.Util
         private double _scale = 1;
         private double _offset = 0;
 
-        private const double _targetDataMargin = 0.25;
+        private const double _targetDataLimit = 0.5;
         private const double _targetDataMiddleValue = 0.5;
 
         public double Scacle
@@ -70,7 +70,7 @@ namespace MyProject01.Util
 
             dataBlock.Copy(buffer);
             NormalizeAnalyzer norm = new NormalizeAnalyzer();
-            norm.SetTarget(_targetDataMiddleValue, _targetDataMargin);
+            norm.SetTarget(_targetDataMiddleValue, _targetDataLimit / 2, _targetDataLimit);
             norm.Init(buffer[0]);
 
             while(true)
@@ -92,6 +92,7 @@ namespace MyProject01.Util
 
     class NormalizeAnalyzer
     {
+        private double _limit = 0.5;
         private double _targetDataMargin = 0.25;
         private double _targetDataMid = 0;
 
@@ -117,10 +118,11 @@ namespace MyProject01.Util
             }
         }
 
-        public void SetTarget(double middleValue, double margin)
+        public void SetTarget(double middleValue, double margin, double limit)
         {
             _targetDataMid = middleValue;
             _targetDataMargin = margin;
+            _limit = limit;
 
             _targDataMax = _targetDataMid + _targetDataMargin;
             _targDataMin = _targetDataMid - _targetDataMargin;
@@ -143,7 +145,7 @@ namespace MyProject01.Util
 
         public Normalizer Normalizer
         {
-            get { return new NormalizerWithTrim(Offset, Scale, 1, 0) { SourceMaxValue = _dataMaxValue, SourceMinValue = _dataMinValue}; }
+            get { return new NormalizerWithTrim(Offset, Scale, _targetDataMid + _limit, _targetDataMid - _limit) { SourceMaxValue = _dataMaxValue, SourceMinValue = _dataMinValue }; }
         }
 /*
         public NormalizerWithTrim NormalizeWithTrim

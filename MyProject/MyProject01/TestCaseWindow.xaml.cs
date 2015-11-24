@@ -573,6 +573,9 @@ namespace MyProject01
         {
             NewTestCase newtest = new NewTestCase();
             group.Add(new TestCaseObject(newtest.TestCaseName, "", new TestCaseObject.TestFucntion(newtest.Run)));
+            NewTestCase2 newtest2 = new NewTestCase2();
+            group.Add(new TestCaseObject(newtest2.TestCaseName, "", new TestCaseObject.TestFucntion(newtest2.Run)));
+ 
         }
         private void AddTestCase()
         {
