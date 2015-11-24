@@ -186,6 +186,93 @@ namespace MyProject01.Controller
         }
     }
 
+    [Serializable]
+    class RateFWTSensor : ISensor
+    {
+        private int _dataCount;
+        private int _index;
+        [NonSerialized]
+        private IDataSource _dataSource;
+        [NonSerialized]
+        private DataBlock _dataBuffer;
+        [NonSerialized]
+        private double[] _tmpBuffer;
+        [NonSerialized]
+        private DataBlock _outputBuffer;
+        public RateFWTSensor(int dataCount)
+        {
+            _dataCount = dataCount;
+            _index = 0;
+            Init();
+        }
+        public int CurrentPosition
+        {
+            get
+            {
+                return _index;
+            }
+            set
+            {
+                _index = value;
+            }
+        }
+
+        public int SkipCount
+        {
+            get { return _dataCount - 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _dataSource.TotalLength - SkipCount; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _dataCount; }
+        }
+
+        public int Copy(int index, DataBlock buffer, int startIndex)
+        {
+            _dataSource.Copy(index, _dataBuffer, 0, _dataBuffer.Length);
+            DllTools.FTW_4(_dataBuffer.Data, _outputBuffer.Data, _tmpBuffer);
+            DataBlock.Copy(_outputBuffer, 0, buffer, startIndex, _outputBuffer.Length);
+            return 1;
+        }
+        public void Init()
+        {
+            _dataBuffer = new DataBlock(DataBlockLength);
+            _tmpBuffer = new double[DataBlockLength];
+            _outputBuffer = new DataBlock(DataBlockLength);
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return _dataSource;
+            }
+        }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set
+            {
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                this._dataSource = value.Get(param);
+            }
+        }
+
+
+        public ISensor Clone()
+        {
+            ISensor sen = MemberwiseClone() as ISensor;
+            sen.Init();
+            return sen;
+        }
+    }
 
 
     //===========================================

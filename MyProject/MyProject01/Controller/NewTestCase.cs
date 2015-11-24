@@ -203,101 +203,22 @@ namespace MyProject01.Controller
 
     }
 
-
-    class NewTestCase
+    abstract class BasicNewTestCase
     {
-        public string TestCaseName = "NewTest" + DateTime.Now;
         private ControllerFactory _ctrlFac;
         private BasicController _testCtrl;
         private DataLoader _loader;
         public void Run()
         {
-            SensorGroup senGroup = new SensorGroup();
-            senGroup.Add(new RateSensor(16));
-            senGroup.Add(new RateSensor(32));
-            senGroup.Add(new KDJ_KSensor(32));
-            senGroup.Add(new KDJ_DSensor(32));
-            senGroup.Add(new KDJ_JSensor(32));
-            senGroup.Add(new KDJ_CrossSensor(32));
+            _loader = GetDataLoader();
 
-            BasicActor actor = new BasicActor();
-
-            _loader = new MTDataLoader("USDJPY", DataTimeType.M5);
-
-            _testCtrl = new BasicController(senGroup, actor);
+            _testCtrl = new BasicController(GetSensor(), GetActor());
             _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
             _testCtrl.Init();
             _testCtrl.Normilize(0, 1.0);
 
             BasicController trainCtrl = (BasicController)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader, 0.5); // TODO
-            _ctrlFac = new ControllerFactory(trainCtrl);
-
-            NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength, 
-                _testCtrl.NetworkOutputVectorLenth);
-
-            trainer.CheckCtrl = CreateCheckCtrl();
-            trainer.TestName = "";
-            trainer.PopulationFacotry = new NormalPopulationFactory();
-            trainer.ScoreCtrl = new NewNormalScore(_ctrlFac);
-
-            trainer.RunTestCase();
-        }
-
-        private ICheckJob CreateCheckCtrl()
-        {
-            TrainResultCheckSyncController mainCheckCtrl = new TrainResultCheckSyncController();
-            mainCheckCtrl.Add(new CheckNetworkChangeJob());
-            mainCheckCtrl.Add(new NewUpdateControllerJob(TestCaseName, _testCtrl.GetPacker()));
-            
-            // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
-            // subCheckCtrl.Add(new UpdateTestCaseJob() 
-            BasicController testCtrl = (BasicController)_ctrlFac.Get();
-            testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
-            mainCheckCtrl.Add(new NewUpdateTestCaseJob()
-            {
-                TestName = TestCaseName,
-                TestDescription = "",
-                Controller = testCtrl,
-            });
-
-            // mainCheckCtrl.Add(subCheckCtrl);
-
-            return mainCheckCtrl;
-
-        }
-    }
-    class NewTestCase2
-    {
-        public string TestCaseName = "NewTest2" + DateTime.Now;
-        public double TestDataRate = 0.7;
-        public DateTime StartDateTime = new DateTime(2013, 10, 31);
-        public DateTime EndDateTime = new DateTime(2014, 10, 31);
-
-        private ControllerFactory _ctrlFac;
-        private BasicController _testCtrl;
-        private BasicTestDataLoader _loader;
-        public void Run()
-        {
-            SensorGroup senGroup = new SensorGroup();
-            senGroup.Add(new RateSensor(64));
-            senGroup.Add(new KDJ_KSensor(64));
-            senGroup.Add(new KDJ_DSensor(64));
-            senGroup.Add(new KDJ_JSensor(64));
-            senGroup.Add(new KDJ_CrossSensor(64));
-
-            BasicActor actor = new BasicActor();
-
-            _loader = new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
-            _loader.Load();
-
-            _testCtrl = new BasicController(senGroup, actor);
-            _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
-            _testCtrl.Init();
-            _testCtrl.Normilize(0, 0.5);
-
-            BasicController trainCtrl = (BasicController)_testCtrl.Clone();
-            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader, TestDataRate); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength,
@@ -326,7 +247,6 @@ namespace MyProject01.Controller
                 TestName = TestCaseName,
                 TestDescription = "",
                 Controller = testCtrl,
-                TestRate = TestDataRate,
             });
 
             // mainCheckCtrl.Add(subCheckCtrl);
@@ -334,5 +254,123 @@ namespace MyProject01.Controller
             return mainCheckCtrl;
 
         }
+
+        abstract protected ISensor GetSensor();
+        abstract protected IActor GetActor();
+        abstract protected DataLoader GetDataLoader();
+        abstract public string TestCaseName
+        {
+            get;
+        }
     }
+
+    class NewTestCase : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            senGroup.Add(new RateSensor(16));
+            senGroup.Add(new RateSensor(32));
+            senGroup.Add(new KDJ_KSensor(32));
+            senGroup.Add(new KDJ_DSensor(32));
+            senGroup.Add(new KDJ_JSensor(32));
+            senGroup.Add(new KDJ_CrossSensor(32));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return  new MTDataLoader("USDJPY", DataTimeType.M5);
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTest" + DateTime.Now; }
+        }
+    }
+    class NewTestCase2 : BasicNewTestCase
+    {
+        public DateTime StartDateTime = new DateTime(2013, 10, 31);
+        public DateTime EndDateTime = new DateTime(2014, 10, 31);
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            senGroup.Add(new RateSensor(64));
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(64));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            BasicTestDataLoader loader = 
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+            loader.Load();
+
+            return loader;
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTest" + DateTime.Now; }
+        }
+    }
+
+    class NewTestCase_FWT : BasicNewTestCase
+    {
+        public DateTime StartDateTime = new DateTime(2013, 10, 31);
+        public DateTime EndDateTime = new DateTime(2014, 10, 31);
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            senGroup.Add(new RateSensor(64));
+            senGroup.Add(new RateFWTSensor(64));
+            /*
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(64));
+            */
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+            loader.Load();
+
+            return loader;
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestFWT" + DateTime.Now; }
+        }
+    }
+
+
 }

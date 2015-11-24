@@ -63,6 +63,11 @@ namespace MyProject01
             TestCaseObject obj = new TestCaseObject(testCase.TestName, testCase.TestDescription, new TestCaseObject.TestFucntion(testCase.RunTest));
             Add(obj);
         }
+        public void Add(BasicNewTestCase testCase)
+        {
+            TestCaseObject obj = new TestCaseObject(testCase.TestCaseName, "", new TestCaseObject.TestFucntion(testCase.Run));
+            Add(obj);
+        }
 
     }
     /// <summary>
@@ -571,10 +576,10 @@ namespace MyProject01
         }   
         private void AddNewTestCase(TestCaseGroup group)
         {
-            NewTestCase newtest = new NewTestCase();
-            group.Add(new TestCaseObject(newtest.TestCaseName, "", new TestCaseObject.TestFucntion(newtest.Run)));
-            NewTestCase2 newtest2 = new NewTestCase2();
-            group.Add(new TestCaseObject(newtest2.TestCaseName, "", new TestCaseObject.TestFucntion(newtest2.Run)));
+            group.Add(new NewTestCase());
+            group.Add(new NewTestCase2());
+            group.Add(new NewTestCase_FWT());
+           
  
         }
         private void AddTestCase()
