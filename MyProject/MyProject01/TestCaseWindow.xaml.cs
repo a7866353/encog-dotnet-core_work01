@@ -576,11 +576,16 @@ namespace MyProject01
         }   
         private void AddNewTestCase(TestCaseGroup group)
         {
-            group.Add(new NewTestCase());
-            group.Add(new NewTestCase2());
-            group.Add(new NewTestCase_FWT());
-           
- 
+            TestCaseGroup g = new TestCaseGroup()
+            {
+                new NewTestCase2Short(),
+                new NewTestCase(),
+                new NewTestCase2(),
+                new NewTestCase_FWT(),
+                new NewTestCase_All(),
+            };
+
+            group.Add(g);
         }
         private void AddTestCase()
         {

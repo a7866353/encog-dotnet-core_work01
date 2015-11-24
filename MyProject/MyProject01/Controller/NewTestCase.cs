@@ -14,6 +14,27 @@ using System.Threading.Tasks;
 
 namespace MyProject01.Controller
 {
+    class NewTestDataPacket
+    {
+        static public DataLoader GetOneMonth()
+        {
+            DateTime StartDateTime = new DateTime(2013, 11, 1);
+            DateTime EndDateTime = new DateTime(2013, 11, 30);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+            loader.Load();
+            return loader;
+        }
+        static public DataLoader GetOneYear()
+        {
+            DateTime StartDateTime = new DateTime(2013, 10, 31);
+            DateTime EndDateTime = new DateTime(2014, 10, 31);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+            loader.Load();
+            return loader;
+        }
+    }
     public class NewNormalScore : ICalculateScore
     {
         public ControllerFactory _ctrlFactory;
@@ -208,6 +229,7 @@ namespace MyProject01.Controller
         private ControllerFactory _ctrlFac;
         private BasicController _testCtrl;
         private DataLoader _loader;
+        private double _testRate = 0.7;
         public void Run()
         {
             _loader = GetDataLoader();
@@ -218,7 +240,7 @@ namespace MyProject01.Controller
             _testCtrl.Normilize(0, 1.0);
 
             BasicController trainCtrl = (BasicController)_testCtrl.Clone();
-            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader, 0.5); // TODO
+            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader, _testRate); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength,
@@ -247,6 +269,7 @@ namespace MyProject01.Controller
                 TestName = TestCaseName,
                 TestDescription = "",
                 Controller = testCtrl,
+                TestRate = _testRate,
             });
 
             // mainCheckCtrl.Add(subCheckCtrl);
@@ -297,8 +320,6 @@ namespace MyProject01.Controller
     }
     class NewTestCase2 : BasicNewTestCase
     {
-        public DateTime StartDateTime = new DateTime(2013, 10, 31);
-        public DateTime EndDateTime = new DateTime(2014, 10, 31);
         protected override ISensor GetSensor()
         {
             SensorGroup senGroup = new SensorGroup();
@@ -319,28 +340,51 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            BasicTestDataLoader loader = 
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
-            loader.Load();
-
-            return loader;
+            return NewTestDataPacket.GetOneYear();
         }
 
         public override string TestCaseName
         {
-            get { return "NewTest" + DateTime.Now; }
+            get { return "NewTest2" + DateTime.Now; }
         }
     }
-
-    class NewTestCase_FWT : BasicNewTestCase
+    class NewTestCase2Short : BasicNewTestCase
     {
-        public DateTime StartDateTime = new DateTime(2013, 10, 31);
-        public DateTime EndDateTime = new DateTime(2014, 10, 31);
         protected override ISensor GetSensor()
         {
             SensorGroup senGroup = new SensorGroup();
             senGroup.Add(new RateSensor(64));
-            senGroup.Add(new RateFWTSensor(64));
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(64));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetOneMonth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTest2Short" + DateTime.Now; }
+        }
+    }
+    class NewTestCase_FWT : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            // senGroup.Add(new RateSensor(64));
+            senGroup.Add(new RateFWTSensor(512));
             /*
             senGroup.Add(new KDJ_KSensor(64));
             senGroup.Add(new KDJ_DSensor(64));
@@ -359,11 +403,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
-            loader.Load();
-
-            return loader;
+            return NewTestDataPacket.GetOneMonth();
         }
 
         public override string TestCaseName
@@ -372,5 +412,35 @@ namespace MyProject01.Controller
         }
     }
 
+    class NewTestCase_All : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            senGroup.Add(new RateSensor(64));
+            senGroup.Add(new RateFWTSensor(128));
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(128));
 
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetOneMonth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestAll" + DateTime.Now; }
+        }
+    }
 }
