@@ -10,6 +10,7 @@ namespace MyProject01.Controller
     public interface IActor
     {
         MarketActions GetAction(IMLData output);
+        IActor Clone();
         int DataLength { get; }
     }
     [Serializable]
@@ -64,6 +65,12 @@ namespace MyProject01.Controller
             {
                 return 3;
             }
+        }
+
+
+        public IActor Clone()
+        {
+            return new BasicActor();
         }
     }
 }

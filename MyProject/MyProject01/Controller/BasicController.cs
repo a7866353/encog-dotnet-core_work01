@@ -48,11 +48,13 @@ namespace MyProject01.Controller
         private ISensor _sensor;
         private IActor _actor;
         private Normalizer[] _normalizerArray;
+
         private BasicMLData _inData;
         private DataBlock _inDataArr;
-        private IMLRegression _neuroNetwork;
         private int _currentPosition;
+
         private DataSourceCtrl _dataSourceCtrl;
+        private IMLRegression _neuroNetwork;
         private IDataSource _dataSource;
         public BasicController(ISensor sensor, IActor actor)
         {
@@ -126,7 +128,10 @@ namespace MyProject01.Controller
 
         public IController Clone()
         {
-            IController ctrl = (IController)MemberwiseClone();
+            BasicController ctrl = (BasicController)MemberwiseClone();
+            ctrl._sensor = _sensor.Clone();
+            ctrl._actor = _actor.Clone();
+            // ctrl._normalizerArray = _normalizerArray.Clone() as Normalizer[];
             ctrl.Init();
             return ctrl;
         }
