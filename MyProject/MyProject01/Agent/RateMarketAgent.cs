@@ -82,7 +82,7 @@ namespace MyProject01.Agent
 
     class Order
     {
-#if true
+#if false
         public double BuyOffset = 0.0;
         public double SellOffset = 0.0;
 #else

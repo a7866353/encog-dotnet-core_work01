@@ -16,6 +16,15 @@ namespace MyProject01.Controller
 {
     class NewTestDataPacket
     {
+        static public DataLoader GetOneWeek()
+        {
+            DateTime StartDateTime = new DateTime(2013, 11, 1);
+            DateTime EndDateTime = new DateTime(2013, 11, 7);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+            loader.Load();
+            return loader;
+        }
         static public DataLoader GetOneMonth()
         {
             DateTime StartDateTime = new DateTime(2013, 11, 1);
@@ -31,6 +40,24 @@ namespace MyProject01.Controller
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
                 new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+            loader.Load();
+            return loader;
+        }
+        static public DataLoader Get1DayOneYear()
+        {
+            DateTime StartDateTime = new DateTime(2011, 10, 31);
+            DateTime EndDateTime = new DateTime(2014, 10, 31);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 0);
+            loader.Load();
+            return loader;
+        }
+        static public DataLoader Get1Day10Year()
+        {
+            DateTime StartDateTime = new DateTime(2004, 10, 31);
+            DateTime EndDateTime = new DateTime(2014, 10, 31);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 0);
             loader.Load();
             return loader;
         }
@@ -443,4 +470,98 @@ namespace MyProject01.Controller
             get { return "NewTestAll" + DateTime.Now; }
         }
     }
+    class NewTestCase_All_5Min_Short : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            // senGroup.Add(new RateSensor(64));
+            senGroup.Add(new RateFWTSensor(256));
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(64));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetOneMonth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestCase_All_5Min_Short" + DateTime.Now; }
+        }
+    }
+    class NewTestCase_All_1Day_Long : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            senGroup.Add(new RateSensor(64));
+            senGroup.Add(new RateFWTSensor(128));
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(128));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.Get1Day10Year();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestCase_All_1Day_Long" + DateTime.Now; }
+        }
+    }
+    class NewTestCase_All_1Day_Short : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            senGroup.Add(new RateSensor(64));
+            senGroup.Add(new RateFWTSensor(128));
+            senGroup.Add(new KDJ_KSensor(64));
+            senGroup.Add(new KDJ_DSensor(64));
+            senGroup.Add(new KDJ_JSensor(64));
+            senGroup.Add(new KDJ_CrossSensor(128));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.Get1DayOneYear();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestCase_All_1Day_Short" + DateTime.Now; }
+        }
+    }
+
 }

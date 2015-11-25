@@ -583,6 +583,10 @@ namespace MyProject01
                 new NewTestCase2(),
                 new NewTestCase_FWT(),
                 new NewTestCase_All(),
+                new NewTestCase_All_5Min_Short(),
+                new NewTestCase_All_1Day_Short(),
+                new NewTestCase_All_1Day_Long(),
+
             };
 
             group.Add(g);
