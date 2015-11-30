@@ -584,6 +584,8 @@ namespace MyProject01
                 new NewTestCase_FWT(),
                 new NewTestCase_All(),
                 new NewTestCase_All_5Min_Short(),
+                new NewTestCase_All_Switch_5Min_Short(),
+                new NewTestCase_All_SwitchClose_5Min_Short(),
                 new NewTestCase_All_1Day_Short(),
                 new NewTestCase_All_1Day_Long(),
 

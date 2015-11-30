@@ -21,16 +21,16 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 11, 1);
             DateTime EndDateTime = new DateTime(2013, 11, 7);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 0);
             loader.Load();
             return loader;
         }
         static public DataLoader GetOneMonth()
         {
             DateTime StartDateTime = new DateTime(2013, 11, 1);
-            DateTime EndDateTime = new DateTime(2013, 11, 30);
+            DateTime EndDateTime = new DateTime(2013, 12, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 0);
             loader.Load();
             return loader;
         }
@@ -39,7 +39,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 0);
             loader.Load();
             return loader;
         }
@@ -474,14 +474,18 @@ namespace MyProject01.Controller
     {
         protected override ISensor GetSensor()
         {
-            SensorGroup senGroup = new SensorGroup();
-            // senGroup.Add(new RateSensor(64));
-            senGroup.Add(new RateFWTSensor(256));
-            senGroup.Add(new KDJ_KSensor(64));
-            senGroup.Add(new KDJ_DSensor(64));
-            senGroup.Add(new KDJ_JSensor(64));
-            senGroup.Add(new KDJ_CrossSensor(64));
-
+            SensorGroup senGroup = new SensorGroup()
+            {
+                // new RateSensor(64),
+                new RateFWTSensor(256),
+                new KDJ_KSensor(64),
+                new KDJ_DSensor(64),
+                new KDJ_JSensor(64),
+                new KDJ_KDCrossSensor(64),
+                new KDJ_DJCrossSensor(64),
+                new KDJ_KJCrossSensor(64),
+                new KDJ_CrossSensor(64)
+            };
             return senGroup;
         }
 
@@ -498,7 +502,77 @@ namespace MyProject01.Controller
 
         public override string TestCaseName
         {
-            get { return "NewTestCase_All_5Min_Short" + DateTime.Now; }
+            get { return "NewTestCase_All_30Min_Year" + DateTime.Now; }
+        }
+    }
+    class NewTestCase_All_Switch_5Min_Short : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup()
+            {
+                // new RateSensor(64),
+                // new RateFWTSensor(256),
+                new KDJ_KSensor(8),
+                new KDJ_DSensor(8),
+                new KDJ_JSensor(8),
+                new KDJ_KDCrossSensor(8),
+                new KDJ_DJCrossSensor(8),
+                new KDJ_KJCrossSensor(8),
+                new KDJ_CrossSensor(8)
+            };
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            IActor actor = new StateSwitchActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetOneMonth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestCase_All_Switch_5Min_Short" + DateTime.Now; }
+        }
+    }
+    class NewTestCase_All_SwitchClose_5Min_Short : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup()
+            {
+                // new RateSensor(64),
+                new RateFWTSensor(256),
+                new KDJ_KSensor(64),
+                new KDJ_DSensor(64),
+                new KDJ_JSensor(64),
+                new KDJ_KDCrossSensor(64),
+                new KDJ_DJCrossSensor(64),
+                new KDJ_KJCrossSensor(64),
+                new KDJ_CrossSensor(64)
+            };
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            IActor actor = new StateSwitchWithCloseActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetOneMonth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestCase_All_SwitchClose_5Min_Short" + DateTime.Now; }
         }
     }
     class NewTestCase_All_1Day_Long : BasicNewTestCase
@@ -506,12 +580,11 @@ namespace MyProject01.Controller
         protected override ISensor GetSensor()
         {
             SensorGroup senGroup = new SensorGroup();
-            senGroup.Add(new RateSensor(64));
             senGroup.Add(new RateFWTSensor(128));
             senGroup.Add(new KDJ_KSensor(64));
             senGroup.Add(new KDJ_DSensor(64));
             senGroup.Add(new KDJ_JSensor(64));
-            senGroup.Add(new KDJ_CrossSensor(128));
+            senGroup.Add(new KDJ_CrossSensor(64));
 
             return senGroup;
         }
@@ -537,12 +610,11 @@ namespace MyProject01.Controller
         protected override ISensor GetSensor()
         {
             SensorGroup senGroup = new SensorGroup();
-            senGroup.Add(new RateSensor(64));
             senGroup.Add(new RateFWTSensor(128));
             senGroup.Add(new KDJ_KSensor(64));
             senGroup.Add(new KDJ_DSensor(64));
             senGroup.Add(new KDJ_JSensor(64));
-            senGroup.Add(new KDJ_CrossSensor(128));
+            senGroup.Add(new KDJ_CrossSensor(64));
 
             return senGroup;
         }

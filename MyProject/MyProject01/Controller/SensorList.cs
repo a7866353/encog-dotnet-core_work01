@@ -237,6 +237,8 @@ namespace MyProject01.Controller
             _dataSource.Copy(index, _dataBuffer, 0, _dataBuffer.Length);
             DllTools.FTW_4(_dataBuffer.Data, _outputBuffer.Data, _tmpBuffer);
             DataBlock.Copy(_outputBuffer, 0, buffer, startIndex, _outputBuffer.Length);
+
+            // buffer[startIndex] = 0;
             return 1;
         }
         public void Init()
@@ -379,6 +381,63 @@ namespace MyProject01.Controller
         public override int Copy(int index, DataBlock buffer, int offset)
         {
             _dataSource.CopyJ(index, buffer, offset, this.DataBlockLength);
+            return this.DataBlockLength;
+        }
+    }
+    [Serializable]
+    class KDJ_KDCrossSensor : BasicKDJSensor
+    {
+        public KDJ_KDCrossSensor(int blockLength)
+            : base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            for (int i = 0; i < DataBlockLength; i++)
+            {
+                int idx = index + i - DataBlockLength + 1;
+                buffer[offset + i] = _dataSource.KArr[idx] - _dataSource.DArr[idx];
+            } 
+            return this.DataBlockLength;
+        }
+    }
+    [Serializable]
+    class KDJ_DJCrossSensor : BasicKDJSensor
+    {
+        public KDJ_DJCrossSensor(int blockLength)
+            : base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            for (int i = 0; i < DataBlockLength; i++)
+            {
+                int idx = index + i - DataBlockLength + 1;
+                buffer[offset + i] = _dataSource.DArr[idx] - _dataSource.JArr[idx];
+            }
+            return this.DataBlockLength;
+        }
+    }
+    [Serializable]
+    class KDJ_KJCrossSensor : BasicKDJSensor
+    {
+        public KDJ_KJCrossSensor(int blockLength)
+            : base(blockLength)
+        {
+
+        }
+
+        public override int Copy(int index, DataBlock buffer, int offset)
+        {
+            for (int i = 0; i < DataBlockLength; i++)
+            {
+                int idx = index + i - DataBlockLength + 1;
+                buffer[offset + i] = _dataSource.KArr[idx] - _dataSource.JArr[idx];
+            }
             return this.DataBlockLength;
         }
     }
