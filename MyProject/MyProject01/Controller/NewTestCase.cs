@@ -21,16 +21,16 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 11, 1);
             DateTime EndDateTime = new DateTime(2013, 11, 7);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 2000);
             loader.Load();
             return loader;
         }
-        static public DataLoader GetOneMonth()
+        static public DataLoader GetM30OneMonth()
         {
             DateTime StartDateTime = new DateTime(2013, 11, 1);
             DateTime EndDateTime = new DateTime(2013, 12, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 2000);
             loader.Load();
             return loader;
         }
@@ -39,7 +39,16 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 2000);
+            loader.Load();
+            return loader;
+        }
+        static public DataLoader GetD1OneMounth()
+        {
+            DateTime StartDateTime = new DateTime(2013, 11, 1);
+            DateTime EndDateTime = new DateTime(2013, 12, 31);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 2000);
             loader.Load();
             return loader;
         }
@@ -48,7 +57,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2011, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 2000);
             loader.Load();
             return loader;
         }
@@ -57,7 +66,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2004, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 0);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 2000);
             loader.Load();
             return loader;
         }
@@ -65,10 +74,13 @@ namespace MyProject01.Controller
     public class NewNormalScore : ICalculateScore
     {
         public ControllerFactory _ctrlFactory;
+        public double _testRate = 1.0;
+        public int _startPosition = 2000;
 
-        public NewNormalScore(ControllerFactory ctrlFactory)
+        public NewNormalScore(ControllerFactory ctrlFactory, double testRate = 1.0)
         {
             _ctrlFactory = ctrlFactory;
+            _testRate = testRate;
         }
 
         public bool ShouldMinimize
@@ -85,7 +97,10 @@ namespace MyProject01.Controller
             BasicController ctrl = (BasicController)_ctrlFactory.Get();
             ctrl.UpdateNetwork((IMLRegression)network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(ctrl);
-            
+            int testCount = ctrl.TotalLength - _startPosition;
+            testCount = (int)(testCount * _testRate);
+            agent.SetRange(_startPosition, _startPosition + testCount);
+
             while (true)
             {
                 if (agent.IsEnd == true)
@@ -145,6 +160,7 @@ namespace MyProject01.Controller
         private int _trainDataLength;
         private long _epoch;
         private LogFormater _log;
+        private int _startPosition = 2000;
 
         public NewUpdateTestCaseJob()
         {
@@ -163,13 +179,13 @@ namespace MyProject01.Controller
                 _testCaseDAO.TestDescription = TestDescription;
                 // _testCaseDAO.TestDataStartIndex = context._trainDataBlock.BlockCount;
                 // TODO
-                _testCaseDAO.TestDataStartIndex = (int)(Controller.TotalLength * TestRate);
-                _testCaseDAO.TotalDataCount = Controller.TotalLength;
+                _testCaseDAO.TotalDataCount = Controller.TotalLength - _startPosition;
+                _testCaseDAO.TestDataStartIndex =  (int)(_testCaseDAO.TotalDataCount * TestRate);
 
             }
 
             _epoch = context.Epoch;
-            _trainDataLength = _testCaseDAO.TestDataStartIndex;
+            _trainDataLength = _startPosition + _testCaseDAO.TestDataStartIndex;
             TestResult(context.BestNetwork, _testCaseDAO);
 
             _testCaseDAO.NetworkData = null;
@@ -184,6 +200,7 @@ namespace MyProject01.Controller
             Controller.UpdateNetwork(network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(Controller);
             agent.Reset();
+            agent.SetRange(_startPosition, Controller.TotalLength);
 
             RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
             DealLogList logList = new DealLogList();
@@ -263,11 +280,10 @@ namespace MyProject01.Controller
 
             _testCtrl = new BasicController(GetSensor(), GetActor());
             _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
-            _testCtrl.Init();
             _testCtrl.Normilize(0, 1.0);
 
             BasicController trainCtrl = (BasicController)_testCtrl.Clone();
-            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader, _testRate); // TODO
+            trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength,
@@ -276,8 +292,8 @@ namespace MyProject01.Controller
             trainer.CheckCtrl = CreateCheckCtrl();
             trainer.TestName = "";
             trainer.PopulationFacotry = new NormalPopulationFactory();
-            trainer.ScoreCtrl = new NewNormalScore(_ctrlFac);
-
+            trainer.ScoreCtrl = new NewNormalScore(_ctrlFac, _testRate);
+           
             trainer.RunTestCase();
         }
 
@@ -397,7 +413,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneMonth();
+            return NewTestDataPacket.GetM30OneMonth();
         }
 
         public override string TestCaseName
@@ -430,7 +446,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneMonth();
+            return NewTestDataPacket.GetM30OneMonth();
         }
 
         public override string TestCaseName
@@ -462,7 +478,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneMonth();
+            return NewTestDataPacket.GetM30OneMonth();
         }
 
         public override string TestCaseName
@@ -497,7 +513,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneMonth();
+            return NewTestDataPacket.GetM30OneMonth();
         }
 
         public override string TestCaseName
@@ -532,12 +548,47 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneMonth();
+            return NewTestDataPacket.GetM30OneMonth();
         }
 
         public override string TestCaseName
         {
             get { return "NewTestCase_All_Switch_5Min_Short" + DateTime.Now; }
+        }
+    }
+    class NewTestCase_All_Switch_1Day_Short : BasicNewTestCase
+    {
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup()
+            {
+                // new RateSensor(64),
+                // new RateFWTSensor(256),
+                new KDJ_KSensor(8),
+                new KDJ_DSensor(8),
+                new KDJ_JSensor(8),
+                new KDJ_KDCrossSensor(8),
+                new KDJ_DJCrossSensor(8),
+                new KDJ_KJCrossSensor(8),
+                new KDJ_CrossSensor(8)
+            };
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            IActor actor = new StateSwitchActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetD1OneMounth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "NewTestCase_All_Switch_1Day_Short" + DateTime.Now; }
         }
     }
     class NewTestCase_All_SwitchClose_5Min_Short : BasicNewTestCase
@@ -567,7 +618,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneMonth();
+            return NewTestDataPacket.GetM30OneMonth();
         }
 
         public override string TestCaseName

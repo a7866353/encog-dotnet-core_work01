@@ -16,7 +16,6 @@ namespace MyProject01.Controller
     {
         int TotalLength { get; }
         int CurrentPosition { get; set; }
-        void Init();
         MarketActions GetAction();
         IController Clone();
 
@@ -61,14 +60,10 @@ namespace MyProject01.Controller
             _sensor = sensor;
             _actor = actor;
             _currentPosition = 0;
-        }
-
-        public void Init()
-        {
             _inDataArr = new DataBlock(NetworkInputVectorLength);
             _inData = new BasicMLData(_inDataArr.Data, false);
-            _currentPosition = _sensor.SkipCount;
         }
+
         public int SkipCount
         {
             get { return _sensor.SkipCount; }
@@ -132,7 +127,10 @@ namespace MyProject01.Controller
             ctrl._sensor = _sensor.Clone();
             ctrl._actor = _actor.Clone();
             // ctrl._normalizerArray = _normalizerArray.Clone() as Normalizer[];
-            ctrl.Init();
+
+            _inDataArr = new DataBlock(NetworkInputVectorLength);
+            _inData = new BasicMLData(_inDataArr.Data, false);
+            _currentPosition = _sensor.SkipCount;
             return ctrl;
         }
         public DataSourceCtrl DataSourceCtrl
@@ -144,6 +142,7 @@ namespace MyProject01.Controller
 
                 RateDataSourceParam param = new RateDataSourceParam(5);
                 _dataSource = _dataSourceCtrl.Get(param);
+                _currentPosition = _sensor.SkipCount;
             }
             get
             {
@@ -176,6 +175,11 @@ namespace MyProject01.Controller
             }
 
             _normalizerArray = norm.NromalizerArray;
+        }
+
+        public int GetIndexByTime(DateTime time)
+        {
+            return _dataSourceCtrl.GetIndexByTime(time);
         }
 
     }

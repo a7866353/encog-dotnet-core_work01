@@ -250,7 +250,8 @@ namespace MyProject01.Util
             curst.BatchSize = 1000;
             curst.SetSortOrder(sd);
             // curst.SetLimit(count);  // set limit
-            return curst;        }
+            return curst;       
+        }
 
         protected override bool CheckEnd(RateSet obj)
         {

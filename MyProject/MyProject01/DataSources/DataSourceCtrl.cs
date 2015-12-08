@@ -73,5 +73,17 @@ namespace MyProject01.DataSources
 
             return newPack.Get();
         }
+
+        public int GetIndexByTime(DateTime time)
+        {
+            int idx;
+            for(idx=0;idx<_rateArr.Length;idx++)
+            {
+                if (_rateArr[idx].Time >= time)
+                    break;
+            }
+
+            return idx;
+        }
     }
 }

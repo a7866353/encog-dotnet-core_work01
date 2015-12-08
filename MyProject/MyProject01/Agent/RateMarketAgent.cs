@@ -332,9 +332,8 @@ namespace MyProject01.Agent
         private long _step;
         private RateMarketAgentData _stateData;
         private TradeAnalzeLog _tradeLog;
-
         private BasicController _ctrl;
-
+        private int _endPosition;
         public long CurrentIndex
         {
             get
@@ -371,7 +370,17 @@ namespace MyProject01.Agent
         {
             get { return _tradeLog; }
         }
+        public bool SetRange(int startPos, int endPos)
+        {
+            int sta = Math.Max(startPos, _ctrl.SkipCount);
+            int end = Math.Min(endPos+1, _ctrl.TotalLength);
+            if (end <= sta)
+                return false;
 
+            _ctrl.CurrentPosition = sta;
+            _endPosition = end;
+            return true;
+        }
         public LearnRateMarketAgent(BasicController ctrl)
         {
             _ctrl = ctrl;
@@ -379,6 +388,7 @@ namespace MyProject01.Agent
             _stateData = new RateMarketAgentData();
             _order = new Order(InitMoney);
             _tradeLog = new TradeAnalzeLog();
+            _endPosition = _ctrl.TotalLength;
 
             Reset();
         }
@@ -387,7 +397,7 @@ namespace MyProject01.Agent
         {
             if (IsEnd == true)
                 return false;
-            if ((_ctrl.CurrentPosition + 1) >= _ctrl.TotalLength) 
+            if ((_ctrl.CurrentPosition + 1) >= _endPosition) 
             {
                 IsEnd = true;
                 return false;
@@ -435,7 +445,7 @@ namespace MyProject01.Agent
             _stateData.CurrentMoney = InitMoney;
             _stateData.TotalBenifit = 0;
 
-            _ctrl.Init();
+            _ctrl.CurrentPosition = _ctrl.SkipCount;
 
             return _stateData;
         }
