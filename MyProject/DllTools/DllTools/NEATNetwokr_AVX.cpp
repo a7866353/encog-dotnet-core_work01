@@ -136,7 +136,7 @@ EXTERN_C
 			for (int j = 0; j < cntBlockLen; j++)
 			{
 				postActArr[j] = parm->postActivation[pLink->fromNeuron];
-				weightArr[j] = parm->postActivation[pLink->fromNeuron] * pLink->weight;
+				weightArr[j] = pLink->weight;
 				pLink++;
 			}
 			__m256 post = _mm256_load_ps(postActArr);

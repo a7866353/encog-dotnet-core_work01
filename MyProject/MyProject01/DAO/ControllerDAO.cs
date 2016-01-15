@@ -294,6 +294,12 @@ namespace MyProject01.DAO
             var query = new QueryDocument { { "_id ", _id } };
             Collection.Remove(query);
         }
+
+        public IController GetController()
+        {
+            IController ctrl = ControllerPacker.FromBinary(ControllerData).GetController();
+            return ctrl;
+        }
         #endregion
         // =============================
         // Data for saving into database.

@@ -1,5 +1,6 @@
 ﻿using MyProject01.Controller;
 using MyProject01.DAO;
+using MyProject01.DataSources;
 using MyProject01.Util;
 using MyProject01.Util.DataObject;
 using SocketTestClient.RequestObject;
@@ -15,15 +16,12 @@ namespace SocketTestClient.ConnectionContoller
     abstract class BasicTradeOrder
     {
         protected RateDataControlDAO _dataController;
-        protected ITradeDesisoin _decisionCtrl;
         protected DateTime _lastTradeTime;
         protected int _magicNumber;
 
         public BasicTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
-            NetworkController _networkController = NetworkController.Open(networkControllerName);
-            _decisionCtrl = _networkController.GetDecisionController();
             // For Debug at first run
             _lastTradeTime = DateTime.Now.AddDays(-10);
             _magicNumber = magicNumber;
@@ -46,25 +44,28 @@ namespace SocketTestClient.ConnectionContoller
             if (_dataController.LastItemTime > _lastTradeTime)
             {
                 _lastTradeTime = _dataController.LastItemTime;
-                return GetNextCommand(_dataController, _decisionCtrl);
+                return GetNextCommand(_dataController, _lastTradeTime);
             }
             return MarketActions.Nothing;
         }
 
-        abstract protected MarketActions GetNextCommand(RateDataControlDAO dataController, ITradeDesisoin decisionCtrl);
+        abstract protected MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime);
     }
 
     class RateTradeOrder : BasicTradeOrder
     {
+        protected ITradeDesisoin _decisionCtrl;
         public RateTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
             :base(rateDataControllerName, networkControllerName, magicNumber)
         {
+            NetworkController _networkController = NetworkController.Open(networkControllerName);
+            _decisionCtrl = _networkController.GetDecisionController();
 
         }
-        protected override MarketActions GetNextCommand(RateDataControlDAO dataController, ITradeDesisoin decisionCtrl)
+        protected override MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime)
         {
             DateTime lastTradeTime = dataController.LastItemTime;
-            RateData[] rateDataArr = dataController.GetByEndTime(lastTradeTime, decisionCtrl.InputDataLength);
+            RateData[] rateDataArr = dataController.GetByEndTime(lastTradeTime, _decisionCtrl.InputDataLength);
             return Calculte(rateDataArr);
         }
         private MarketActions Calculte(RateData[] rateDataArr)
@@ -82,26 +83,52 @@ namespace SocketTestClient.ConnectionContoller
     // TODO
     class KDJTradeOrder : BasicTradeOrder
     {
+        protected ITradeDesisoin _decisionCtrl;
         public KDJTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
             : base(rateDataControllerName, networkControllerName, magicNumber)
         {
-              
+            NetworkController _networkController = NetworkController.Open(networkControllerName);
+            _decisionCtrl = _networkController.GetDecisionController();
+             
         }
-        protected override MarketActions GetNextCommand(RateDataControlDAO dataController, ITradeDesisoin decisionCtrl)
+        protected override MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime)
         {
             DateTime lastTradeTime = dataController.LastItemTime;
             TestDataDateRangeLoader loader = new TestDataDateRangeLoader(dataController.CollectiongName, DataTimeType.M5, lastTradeTime.AddDays(-10), lastTradeTime, 1024);
             loader.Load();
-            KDJDataBlock dataBlock = new KDJDataBlock(loader, 0, loader.Count, decisionCtrl.InputDataLength);
+            KDJDataBlock dataBlock = new KDJDataBlock(loader, 0, loader.Count, _decisionCtrl.InputDataLength);
 
-            double[] buffer = new double[decisionCtrl.InputDataLength * 4];
+            double[] buffer = new double[_decisionCtrl.InputDataLength * 4];
             dataBlock.Copy(buffer, dataBlock.BlockCount - 1);
 
             MarketActions res = _decisionCtrl.GetAction(buffer);
             return res;
         }
     }
+    class NewTradeOrder : BasicTradeOrder
+    {
+        protected ITradeDesisoin _decisionCtrl;
+        private IController _ctrl;
+        public NewTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
+            : base(rateDataControllerName, networkControllerName, magicNumber)
+        {
+            ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName(networkControllerName);
+            _ctrl = dao.GetController();
+        }
+        protected override MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime)
+        {
+            DateTime lastTradeTime = dataController.LastItemTime;
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, lastTradeTime.AddMinutes(-1*dataController.TimeFrame*1000), lastTradeTime, 2000);
+            loader.Load();
 
+            _ctrl.DataSourceCtrl = new DataSourceCtrl(loader);
+            _ctrl.CurrentPosition = _ctrl.TotalLength;
+
+            return _ctrl.GetAction();
+        }
+
+    }
     class OrderSendController : IRequestController
     {
         private List<BasicTradeOrder> _tradeOrderList;

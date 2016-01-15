@@ -11,7 +11,7 @@ namespace MyProject01.Factorys.PopulationFactorys
     {
         protected override NEATPopulation Create(int inputVectoryNumber, int outputVectoryNumber)
         {
-            NEATPopulation population = new NEATPopulation(inputVectoryNumber, outputVectoryNumber, PopulationNumber);
+            NEATPopulation population = new NEATPopulation(inputVectoryNumber, outputVectoryNumber, 1024);
             population.InitialConnectionDensity = 1.0;
             population.WeightRange = 1;
             population.Reset();

@@ -11,9 +11,13 @@ using System.Threading.Tasks;
 namespace MyProject01.Controller
 {
 
+    public interface IControllerPacker
+    {
+        IController GetController();
+    }
 
     [Serializable]
-    class ControllerPacker
+    class ControllerPacker : IControllerPacker
     {
         private ISensor _sensor;
         private IActor _actor;
@@ -50,7 +54,7 @@ namespace MyProject01.Controller
             return data;
         }
 
-        public BasicController GetController()
+        public IController GetController()
         {
             BasicController ctrl = new BasicController(_sensor, _actor);
             ctrl.UpdateNetwork(_neuroNetwork);

@@ -9,7 +9,8 @@ namespace MyProject01.DAO
 {
     public class DataBaseAddress
     {
-        static public string ConnectionString = @"mongodb://192.168.1.15";
+        // static public string ConnectionString = @"mongodb://192.168.1.15";
+        static public string ConnectionString = @"mongodb://127.0.0.1";
     }
     class MarketRateDatabaseConnector
     {
