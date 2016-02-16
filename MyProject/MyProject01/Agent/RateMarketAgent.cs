@@ -327,12 +327,11 @@ namespace MyProject01.Agent
     {
         public double InitMoney = 10000;
 
-        private IDataSource _dataSource;
         private Order _order;
         private long _step;
         private RateMarketAgentData _stateData;
         private TradeAnalzeLog _tradeLog;
-        private BasicController _ctrl;
+        private IController _ctrl;
         private int _endPosition;
         public long CurrentIndex
         {
@@ -346,7 +345,7 @@ namespace MyProject01.Agent
 
         public double CurrentRateValue
         {
-            get { return _dataSource[_ctrl.CurrentPosition].Close; }
+            get { return _ctrl.CurrentRateSet.Close; }
         }
         public double CurrentValue
         {
@@ -381,10 +380,9 @@ namespace MyProject01.Agent
             _endPosition = end;
             return true;
         }
-        public LearnRateMarketAgent(BasicController ctrl)
+        public LearnRateMarketAgent(IController ctrl)
         {
             _ctrl = ctrl;
-            _dataSource = ctrl.DataSource;
             _stateData = new RateMarketAgentData();
             _order = new Order(InitMoney);
             _tradeLog = new TradeAnalzeLog();

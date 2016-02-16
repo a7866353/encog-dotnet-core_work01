@@ -94,7 +94,7 @@ namespace MyProject01.Controller
 
         public double CalculateScore(IMLMethod network)
         {
-            BasicController ctrl = (BasicController)_ctrlFactory.Get();
+            IController ctrl = _ctrlFactory.Get();
             ctrl.UpdateNetwork((IMLRegression)network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(ctrl);
             int testCount = ctrl.TotalLength - _startPosition;
@@ -153,7 +153,7 @@ namespace MyProject01.Controller
         public string TestName;
         public string TestDescription;
         public double TestRate;
-        public BasicController Controller;
+        public IController Controller;
 
         private RateMarketTestDAO _testCaseDAO;
 
@@ -271,18 +271,18 @@ namespace MyProject01.Controller
     abstract class BasicNewTestCase
     {
         private ControllerFactory _ctrlFac;
-        private BasicController _testCtrl;
+        private BasicControllerWithCache _testCtrl;
         private DataLoader _loader;
         private double _testRate = 0.7;
         public void Run()
         {
             _loader = GetDataLoader();
 
-            _testCtrl = new BasicController(GetSensor(), GetActor());
+            _testCtrl = new BasicControllerWithCache(GetSensor(), GetActor());
             _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
             _testCtrl.Normilize(0, 1.0);
 
-            BasicController trainCtrl = (BasicController)_testCtrl.Clone();
+            BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
 
@@ -305,7 +305,7 @@ namespace MyProject01.Controller
 
             // TrainResultCheckAsyncController subCheckCtrl = new TrainResultCheckAsyncController();
             // subCheckCtrl.Add(new UpdateTestCaseJob() 
-            BasicController testCtrl = (BasicController)_ctrlFac.Get();
+            IController testCtrl = _ctrlFac.Get();
             testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
             mainCheckCtrl.Add(new NewUpdateTestCaseJob()
             {
