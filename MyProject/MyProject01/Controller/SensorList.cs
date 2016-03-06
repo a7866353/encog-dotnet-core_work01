@@ -466,5 +466,259 @@ namespace MyProject01.Controller
         }
     }
 
+    //========================================================================================
+
+    [Serializable]
+    class FirstDerivative : ISensor
+    {
+        private ISensor _source;
+        public FirstDerivative(ISensor source)
+        {
+            _source = source;
+        }
+
+        public int SkipCount
+        {
+            get { return _source.SkipCount + DataBlockLength - 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _source.TotalLength; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _source.DataBlockLength - 1; }
+        }
+
+        public IDataSource DataSource
+        {
+            get { return _source.DataSource; }
+        }
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set { _source.DataSourceCtrl = value; }
+        }
+
+        public int Copy(int index, DataBlock buffer, int offset)
+        {
+            DataBlock data = new DataBlock(_source.DataBlockLength);
+            _source.Copy(index, data, 0);
+            for(int i=0;i<DataBlockLength;i++)
+            {
+                buffer[offset + i] = data[i + 1] - data[i];
+            }
+            return DataBlockLength;
+        }
+
+
+        public void Init()
+        {
+            // Todo nothing
+        }
+
+        public ISensor Clone()
+        {
+            return new FirstDerivative(_source);
+        }
+    }
+
+
+    [Serializable]
+    class SecondDerivative : ISensor
+    {
+        private ISensor _source;
+        public SecondDerivative(ISensor source)
+        {
+            _source = source;
+        }
+
+        public int SkipCount
+        {
+            get { return _source.SkipCount + DataBlockLength - 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _source.TotalLength; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _source.DataBlockLength - 2; }
+        }
+
+        public IDataSource DataSource
+        {
+            get { return _source.DataSource; }
+        }
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set { _source.DataSourceCtrl = value; }
+        }
+
+        public int Copy(int index, DataBlock buffer, int offset)
+        {
+            DataBlock data = new DataBlock(_source.DataBlockLength);
+            _source.Copy(index, data, 0);
+
+            for (int i = 0; i < data.Length-1; i++)
+            {
+                data[i] = data[i + 1] - data[i];
+            }
+
+            for (int i = 0; i < data.Length -2; i++)
+            {
+                buffer[offset + i] = data[i + 1] - data[i];
+            }
+
+            return data.Length - 2;
+        }
+
+        public void Init()
+        {
+            // Todo Nothing
+        }
+
+        public ISensor Clone()
+        {
+            return new SecondDerivative(_source);
+        }
+    }
+
+    [Serializable]
+    class SensorCross : ISensor
+    {
+        private ISensor _sen1;
+        private ISensor _sen2;
+        private int _outputLen;
+        public SensorCross(ISensor sen1, ISensor sen2, int outputLen)
+        {
+            _sen1 = sen1;
+            _sen2 = sen2;
+            _outputLen = outputLen;
+             // TODO
+        }
+        public int SkipCount
+        {
+            get { return _sen1.SkipCount + _outputLen - 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _sen1.TotalLength; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _outputLen; }
+        }
+
+        public IDataSource DataSource
+        {
+            get { return _sen1.DataSource; }
+        }
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set 
+            {
+                _sen1.DataSourceCtrl = value;
+                _sen2.DataSourceCtrl = value;
+            }
+        }
+
+        public int Copy(int index, DataBlock buffer, int offset)
+        {
+            DataBlock data1 = new DataBlock(_sen1.DataBlockLength);
+            DataBlock data2 = new DataBlock(_sen1.DataBlockLength);
+            _sen1.Copy(index, data1, 0);
+            _sen2.Copy(index, data2, 0);
+
+            int dstOffset = _sen1.DataBlockLength - this.DataBlockLength;
+            for (int i = 0; i < this.DataBlockLength; i++)
+            {
+                buffer[offset + i] = data1[i + dstOffset] - data2[i + dstOffset];
+            }
+            return DataBlockLength;
+        }
+
+        public void Init()
+        {
+            // Todo nothing
+        }
+
+        public ISensor Clone()
+        {
+            return new SensorCross(_sen1, _sen2, _outputLen);
+        }
+    }
+
+    class SensorUtility
+    {
+        public static ISensor GetPartten01(ISensor[] sensorArr)
+        {
+            SensorGroup senGroup = new SensorGroup();
+
+            // For single data line;
+            foreach(ISensor sen in sensorArr)
+            {
+                senGroup.Add(new FirstDerivative(sen));
+                senGroup.Add(new SecondDerivative(sen));
+            }
+
+            // For two data line
+            for (int i = 0; i < sensorArr.Length-1;i++ )
+            {
+                for (int j=i+1;j<sensorArr.Length;j++)
+                {
+                    ISensor sen1 = sensorArr[i];
+                    ISensor sen2 = sensorArr[j];
+
+                    senGroup.Add(new SensorCross(sen1, sen2, 1));
+
+                    senGroup.Add(new FirstDerivative(new SensorCross(sen1, sen2, 2)));
+                    senGroup.Add(new SecondDerivative(new SensorCross(sen1, sen2, 2)));
+
+                    senGroup.Add(new SensorCross(new FirstDerivative(sen1), new FirstDerivative(sen2), 1));
+                    senGroup.Add(new SensorCross(new SecondDerivative(sen1), new SecondDerivative(sen2), 1));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2), 
+                            2)
+                        ));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new SecondDerivative(sen1),
+                            new SecondDerivative(sen2),
+                            2)
+                        ));
+
+                    senGroup.Add(new SecondDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2),
+                            2)
+                        ));
+
+                    senGroup.Add(new SecondDerivative(
+                            new SensorCross(
+                            new SecondDerivative(sen1),
+                            new SecondDerivative(sen2),
+                            2)
+                        ));
+
+                }
+            }
+            return senGroup;
+        }
+    }
+
 
 }

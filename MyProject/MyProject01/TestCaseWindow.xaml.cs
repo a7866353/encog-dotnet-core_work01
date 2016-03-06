@@ -578,6 +578,9 @@ namespace MyProject01
         {
             TestCaseGroup g = new TestCaseGroup()
             {
+                new NewTestCase_StateTest_01(),
+                new NewTestCase_StateTest_02(),
+                //------------------------------------
                 new NewTestCase2Short(),
                 new NewTestCase(),
                 new NewTestCase2(),

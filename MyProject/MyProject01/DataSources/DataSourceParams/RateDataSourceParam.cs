@@ -262,4 +262,122 @@ namespace MyProject01.DataSources.DataSourceParams
         }
     }
 
+    class MADataSource : IDataSource
+    {
+        private int _aveCount;
+        private int _skipCount;
+        private RateSet[] _rateArr;
+        private double[] _kArr;
+        private double[] _dArr;
+        private double[] _jArr;
+
+        private int _aveRange = 9;
+        private int _m1 = 3;
+        private int _m2 = 3;
+
+        public MADataSource(DataSourceCtrl loader, int aveCount)
+        {
+            _aveCount = aveCount;
+        }
+
+        public void Copy(int index, DataBlock buffer, int offset, int length)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int TotalLength
+        {
+            get { return _rateArr.Length; }
+        }
+
+        public RateSet this[int index]
+        {
+            get { return _rateArr[index]; }
+        }
+
+        public int SkipCount
+        {
+            get { return _skipCount; }
+        }
+
+        public void CopyK(int index, DataBlock buffer, int offset, int length)
+        {
+            CopyData(_kArr, index, buffer, offset, length);
+        }
+        public void CopyD(int index, DataBlock buffer, int offset, int length)
+        {
+            CopyData(_dArr, index, buffer, offset, length);
+        }
+        public void CopyJ(int index, DataBlock buffer, int offset, int length)
+        {
+            CopyData(_jArr, index, buffer, offset, length);
+        }
+
+        public double[] KArr
+        {
+            get { return _kArr; }
+        }
+        public double[] DArr
+        {
+            get { return _dArr; }
+        }
+        public double[] JArr
+        {
+            get { return _jArr; }
+        }
+        private void CopyData(double[] data, int index, DataBlock buffer, int offset, int length)
+        {
+            Array.Copy(data, index - length + 1, buffer.Data, offset, length);
+        }
+
+        private void FindMaxMin(int index, out double maxValue, out double minValue)
+        {
+            maxValue = this[index].High;
+            minValue = this[index].Low;
+            for (int i = 1; i < _aveRange; i++)
+            {
+                if (this[index - i].High > maxValue)
+                    maxValue = this[index - i].High;
+                if (this[index - i].Low < minValue)
+                    minValue = this[index - i].Low;
+            }
+        }
+
+
+    }
+
+
+    [Serializable]
+    class MADataSourceParam : IDataSourceParam
+    {
+        public int Count = 30;
+
+        public MADataSourceParam()
+        {
+
+        }
+
+        public bool CompareTo(IDataSourceParam param)
+        {
+            if (this.GetType() != param.GetType())
+                return false;
+
+            MADataSourceParam inParam = (MADataSourceParam)param;
+            do
+            {
+                if (inParam.Count != this.Count)
+                    return false;
+
+            } while (false);
+
+            return true;
+        }
+
+        public IDataSource Create(DataSourceCtrl ctrl)
+        {
+            MADataSource src = new MADataSource(ctrl, Count);
+            return src;
+        }
+    }
+
 }

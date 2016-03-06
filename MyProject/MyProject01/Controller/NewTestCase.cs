@@ -687,4 +687,82 @@ namespace MyProject01.Controller
         }
     }
 
+    class NewTestCase_StateTest_01 : BasicNewTestCase
+    {
+
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            int dataLen = 4;
+            ISensor[] sensorArr = new ISensor[]
+            {
+                new KDJ_KSensor(dataLen),
+                new KDJ_JSensor(dataLen),
+                new KDJ_DSensor(dataLen),
+                new RateSensor(dataLen),
+            };
+            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+            senGroup.Add(new KDJ_KSensor(2));
+            senGroup.Add(new KDJ_DSensor(2));
+            senGroup.Add(new KDJ_JSensor(2));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.Get1DayOneYear();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "CrossTest_01_1DayOneYear " + DateTime.Now; }
+        }
+    }
+
+    class NewTestCase_StateTest_02 : BasicNewTestCase
+    {
+
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            int dataLen = 4;
+            ISensor[] sensorArr = new ISensor[]
+            {
+                new KDJ_KSensor(dataLen),
+                new KDJ_JSensor(dataLen),
+                new KDJ_DSensor(dataLen),
+                new RateSensor(dataLen),
+            };
+            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+            senGroup.Add(new KDJ_KSensor(2));
+            senGroup.Add(new KDJ_DSensor(2));
+            senGroup.Add(new KDJ_JSensor(2));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetM30OneMonth();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "CrossTest_01_M30OneMonth " + DateTime.Now; }
+        }
+    }
+
 }
