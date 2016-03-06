@@ -34,7 +34,7 @@ namespace MyProject01.Controller
             loader.Load();
             return loader;
         }
-        static public DataLoader GetOneYear()
+        static public DataLoader GetM30OneYear()
         {
             DateTime StartDateTime = new DateTime(2013, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
@@ -383,7 +383,7 @@ namespace MyProject01.Controller
 
         protected override DataLoader GetDataLoader()
         {
-            return NewTestDataPacket.GetOneYear();
+            return NewTestDataPacket.GetM30OneYear();
         }
 
         public override string TestCaseName
@@ -764,5 +764,42 @@ namespace MyProject01.Controller
             get { return "CrossTest_01_M30OneMonth " + DateTime.Now; }
         }
     }
+    class NewTestCase_StateTest_03 : BasicNewTestCase
+    {
 
+        protected override ISensor GetSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            int dataLen = 4;
+            ISensor[] sensorArr = new ISensor[]
+            {
+                new KDJ_KSensor(dataLen),
+                new KDJ_JSensor(dataLen),
+                new KDJ_DSensor(dataLen),
+                new RateSensor(dataLen),
+            };
+            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+            senGroup.Add(new KDJ_KSensor(2));
+            senGroup.Add(new KDJ_DSensor(2));
+            senGroup.Add(new KDJ_JSensor(2));
+
+            return senGroup;
+        }
+
+        protected override IActor GetActor()
+        {
+            BasicActor actor = new BasicActor();
+            return actor;
+        }
+
+        protected override DataLoader GetDataLoader()
+        {
+            return NewTestDataPacket.GetM30OneYear();
+        }
+
+        public override string TestCaseName
+        {
+            get { return "CrossTest_01_M30OneYear " + DateTime.Now; }
+        }
+    }
 }

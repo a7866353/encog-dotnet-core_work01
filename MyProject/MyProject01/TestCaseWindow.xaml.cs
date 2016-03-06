@@ -580,6 +580,7 @@ namespace MyProject01
             {
                 new NewTestCase_StateTest_01(),
                 new NewTestCase_StateTest_02(),
+                new NewTestCase_StateTest_03(),
                 //------------------------------------
                 new NewTestCase2Short(),
                 new NewTestCase(),
