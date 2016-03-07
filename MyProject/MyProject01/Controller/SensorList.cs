@@ -718,7 +718,26 @@ namespace MyProject01.Controller
             }
             return senGroup;
         }
+        public static ISensor GetKDJCrossSensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            int dataLen = 4;
+            ISensor[] sensorArr = new ISensor[]
+            {
+                new KDJ_KSensor(dataLen),
+                new KDJ_JSensor(dataLen),
+                new KDJ_DSensor(dataLen),
+                new RateSensor(dataLen),
+            };
+            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+            senGroup.Add(new KDJ_KSensor(2));
+            senGroup.Add(new KDJ_DSensor(2));
+            senGroup.Add(new KDJ_JSensor(2));
+
+            return senGroup;
+        }
     }
+
 
 
 }

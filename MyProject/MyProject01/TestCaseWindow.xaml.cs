@@ -576,14 +576,15 @@ namespace MyProject01
         }   
         private void AddNewTestCase(TestCaseGroup group)
         {
-            TestCaseGroup g = new TestCaseGroup()
+            BasicNewTestCase[] testCaseArr = NewTestCollecor.GetTest();
+            foreach( BasicNewTestCase ca in testCaseArr)
+                group.Add(ca);
+
+            TestCaseGroup g = new TestCaseGroup
             {
-                new NewTestCase_StateTest_01(),
-                new NewTestCase_StateTest_02(),
-                new NewTestCase_StateTest_03(),
                 //------------------------------------
                 new NewTestCase2Short(),
-                new NewTestCase(),
+                // new NewTestCase(),
                 new NewTestCase2(),
                 new NewTestCase_FWT(),
                 new NewTestCase_All(),
