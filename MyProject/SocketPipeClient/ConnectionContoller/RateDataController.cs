@@ -135,7 +135,11 @@ namespace SocketTestClient.ConnectionContoller
             // dao.Update(); // error
             DateTime tartgetTime = _dao.LastGetTime + _getDuration;
             if (tartgetTime > DateTime.Now.AddMinutes(_dao.TimeFrame*-1))
+            {
+                _dao.LastGetTime = DateTime.Now;
+                _dao.Save();
                 return null;
+            }
 
             RateByTimeRequest req = new RateByTimeRequest();
             req.SymbolName = _dao.SymbolName;
@@ -214,7 +218,7 @@ namespace SocketTestClient.ConnectionContoller
 
         private void Printf(string str)
         {
-            System.Console.WriteLine("[RateDataController]" + str);
+            System.Console.WriteLine("[RateData]" + str);
         }
 
     }
@@ -313,6 +317,7 @@ namespace SocketTestClient.ConnectionContoller
 
         private List<IRequestController> _watchList;
 
+        private string[] _interalSymbols;
 
         private int[] _timeFrameArray = new int[]
         {
@@ -333,11 +338,54 @@ namespace SocketTestClient.ConnectionContoller
             _watchList = new List<IRequestController>();
             _isSymbolListUpdated = false;
             _watchListIndex = -1;
+
+            //-----------------
+            _interalSymbols = new string[]
+            {
+                "AUDJPY",
+                "AUDJPYpro",
+                "AUDUSD",
+                "AUDUSDpro",
+                "CHFJPY",
+                "CHFJPYpro",
+                "EURCAD",
+                "EURCADpro",
+                "EURCHF",
+                "EURCHFpro",
+                "EURGBP",
+                "EURGBPpro",
+                "EURJPY",
+                "EURJPYpro",
+                "EURUSD",
+                "EURUSDpro",
+                "GBPCHF",
+                "GBPCHFpro",
+                "GBPJPY",
+                "GBPJPYpro",
+                "GBPUSD",
+                "GBPUSDpro",
+                "NZDJPY",
+                "NZDJPYpro",
+                "NZDUSD",
+                "NZDUSDpro",
+                "USDCAD",
+                "USDCADpro",
+                "USDJPY",
+                "USDJPYpro",
+                "USDCHF",
+                "USDCHFpro",
+                "XAGUSD",
+                "XAGUSDpro",
+                "XAUUSD",
+                "XAUUSDpro",
+            };
+            UpdateSymbolList(_interalSymbols);
         }
 
         public IRequest GetRequest()
         {
-            if (_isSymbolListUpdated == false)
+            // if (_isSymbolListUpdated == false)
+            if (false)
             {
                 SymbolNameListRequest req = new SymbolNameListRequest();
                 req.ReqCtrl = this;
@@ -377,7 +425,7 @@ namespace SocketTestClient.ConnectionContoller
             {
                 foreach( int timeFrame in _timeFrameArray)
                 {
-                    string name = symbol + timeFrame;
+                    string name = symbol + "_" + timeFrame;
                     if (_rateDataList.Get(name) == null)
                     {
                         _rateDataList.Add(name, symbol, timeFrame, new DateTime(1988, 1, 1, 0, 0, 0));

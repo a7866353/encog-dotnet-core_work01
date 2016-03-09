@@ -15,6 +15,9 @@ namespace SocketTestClient
     {
         static void Main(string[] args)
         {
+            
+            System.Console.WindowWidth = (int)(System.Console.LargestWindowWidth * 0.7);
+            System.Console.WindowHeight = (int)(System.Console.LargestWindowHeight * 0.7);
             System.Console.WriteLine("Test Started!");
 
             TestClientDeamon();

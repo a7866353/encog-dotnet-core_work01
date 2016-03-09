@@ -61,7 +61,7 @@ namespace MyProject01.DAO
     }
     public class RateDataControlDAO
     {
-        static private string _controlCollectionName = "RateDataControl";
+        static private string _controlCollectionName = "_RateDataControl";
         static public RateDataControlDAO[] GetList()
         {
             RateDataControlDAO[] retDaoArr = null;
@@ -161,7 +161,7 @@ namespace MyProject01.DAO
             this.LastItemTime = this.LastGetTime = startTime;
             this.Count = 0;
 
-            this.CollectiongName = symbolName + "_" + timeFrame + "_" + name;
+            this.CollectiongName = name;
 
             Remove();
             this.Save();
