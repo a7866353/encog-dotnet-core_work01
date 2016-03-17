@@ -30,12 +30,12 @@ namespace SocketTestClient.RequestObject
         }
 
 
-        public RateByCountRequestController ReqCtrl;
+        public RateInfo[] RateInfoArray;
         public void FromBytes(byte[] data, int length)
         {
             RateDataIndicateRequest idc = new RateDataIndicateRequest();
             idc.FromBytes(data, length);
-            ReqCtrl.SetResult(idc);
+            RateInfoArray = idc.RateInfoArray;
         }
     }
 }

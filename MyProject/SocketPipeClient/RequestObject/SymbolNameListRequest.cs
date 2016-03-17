@@ -19,18 +19,17 @@ namespace SocketTestClient.RequestObject
             return sb.GetBytes();
         }
 
-        public RateDataController ReqCtrl;
+        public string[] symbols;
         public void FromBytes(byte[] data, int length)
         {
             DataRcvBuffer rb = new DataRcvBuffer(data, length);
             rb.GetInt(); // Get type
             int count = rb.GetInt();
-            string[] symbols = new string[count];
+            symbols = new string[count];
             for (int i = 0; i < count; i++)
             {
                 symbols[i] = rb.GetString();
             }
-            ReqCtrl.UpdateSymbolList(symbols);
             return;
         }
     }
