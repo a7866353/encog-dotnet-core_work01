@@ -148,6 +148,7 @@ namespace SocketTestClient.ConnectionContoller
             _rateDataCtrl = RateDataCtrl;
             foreach (BasicTradeOrder trader in _tradeOrderList)
             {
+                _rateDataCtrl.FindByName(trader.SymbolName).OnChange += 
                 _rateDataCtrl.AddWatchSymbol(trader.Name, 0.5);
             }
 

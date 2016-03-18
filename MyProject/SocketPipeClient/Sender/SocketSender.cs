@@ -33,5 +33,11 @@ namespace SocketTestClient.Sender
 
             return 0;
         }
+
+
+        public DeamonState State
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

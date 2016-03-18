@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
 using MyProject01.DAO;
+using System.Threading;
 
 namespace SocketTestClient.ConnectionContoller
 {
@@ -16,13 +17,40 @@ namespace SocketTestClient.ConnectionContoller
         public string SymbolName;
         public int Timeframe;
     }
-    interface IRataDataCollectTask
+    class CollectArgs : EventArgs
     {
-        int Update();
-        string Symbole { get; }
-        double InvervalCount { set; get; }
+        public string CollectionTableName;
+        public int UpdatedCount;
     }
-    class RateDataRequestController : IRataDataCollectTask
+
+    abstract class RataDataCollectTask
+    {
+        protected ISender _sender;
+        protected double _updateInterval;
+
+        public delegate void ChangeHandler(object sender, CollectArgs e);
+        public event ChangeHandler OnChange;
+
+        public double UpdateInterval
+        {
+            set { _updateInterval = value; }
+            get { return _updateInterval; }
+        }
+        public int Update()
+        {
+            int cnt = InternalUpdate();
+            OnChange(this, new CollectArgs() 
+            { 
+                CollectionTableName = this.CollectionTableName, 
+                UpdatedCount = cnt,
+            });
+            return cnt;
+        }
+        protected abstract int InternalUpdate();
+        public abstract string CollectionTableName { get; }
+    }
+
+    class RateDataRequestController : RataDataCollectTask
     {
         private RateDataControlDAO _dao;
         private double _updateInterval;
@@ -39,7 +67,7 @@ namespace SocketTestClient.ConnectionContoller
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
         }
 
-        public IRequest GetRequest()
+        private IRequest GetRequest()
         {
             // dao.Update(); // error
             TimeSpan timeDulation = new TimeSpan(0, 0, (int)(_updateInterval * _dao.TimeFrame));
@@ -58,7 +86,6 @@ namespace SocketTestClient.ConnectionContoller
             req.StopTime = _dao.LastGetTime + nextDulation;
             if (req.StopTime > DateTime.Now)
                 req.StopTime = DateTime.Now;
-            req.ReqCtrl = this;
 
             _lastRequest = req;
             return req;
@@ -109,32 +136,19 @@ namespace SocketTestClient.ConnectionContoller
             System.Console.WriteLine("[RateDataController]" + str);
         }
 
-
-        public int Update()
+        protected override int InternalUpdate()
         {
             throw new NotImplementedException();
         }
 
-        public string Symbole
+        public override string CollectionTableName
         {
-            get { throw new NotImplementedException(); }
-        }
-
-        public int InvervalCount
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return _dao.CollectiongName; }
         }
     }
 
 
-    class RateByTimeRequestController : IRataDataCollectTask
+    class RateByTimeRequestController : RataDataCollectTask
     {
         private RateDataControlDAO _dao;
         private double _updateInterval;
@@ -142,7 +156,6 @@ namespace SocketTestClient.ConnectionContoller
         private RateByTimeRequest _lastRequest;
         private TimeSpan _getDataBlockDuration;
         private TimeSpan _getDuration;
-        private ISender _sender;
 
         public RateByTimeRequestController(RateDataControlDAO dao, double updateInterval)
         {
@@ -159,7 +172,7 @@ namespace SocketTestClient.ConnectionContoller
             _getDuration = _getDataBlockDuration;
         }
 
-        public RateByTimeRequest GetRequest()
+        private RateByTimeRequest GetRequest()
         {
             // dao.Update(); // error
             DateTime tartgetTime = _dao.LastGetTime + _getDuration;
@@ -184,7 +197,7 @@ namespace SocketTestClient.ConnectionContoller
             return req;
         }
 
-        public void SetResult(RateInfo[] infoArr)
+        private void SetResult(RateInfo[] infoArr)
         {
             List<RateData> dataList = new List<RateData>();
 
@@ -251,12 +264,11 @@ namespace SocketTestClient.ConnectionContoller
             System.Console.WriteLine("[RateData]" + str);
         }
 
-
-        public int Update()
+        protected override int InternalUpdate()
         {
             RateByTimeRequest req = GetRequest();
             _sender.Send(req);
-            if (req .RateInfoArray != null && req.RateInfoArray.Length> 0)
+            if (req.RateInfoArray != null && req.RateInfoArray.Length > 0)
             {
                 SetResult(req.RateInfoArray);
                 return req.RateInfoArray.Length;
@@ -267,25 +279,13 @@ namespace SocketTestClient.ConnectionContoller
             }
         }
 
-        public string Symbole
+        public override string CollectionTableName
         {
             get { return _dao.CollectiongName; }
         }
-
-        public double InvervalCount
-        {
-            get
-            {
-                return _updateInterval ;
-            }
-            set
-            {
-                _updateInterval = value; ;
-            }
-        }
     }
 
-    class RateByCountRequestController
+    class RateByCountRequestController : RataDataCollectTask
     {
         private int _getCount = 1024;
         private RateDataControlDAO _dao;
@@ -304,19 +304,7 @@ namespace SocketTestClient.ConnectionContoller
             _dtFormat = new DateTimeFormatInfo();
             _dtFormat.ShortDatePattern = "yyyy.mm.dd hh:mm:ss";
         }
-        public bool Update()
-        {
-            RateByCountRequest req = GetRequest();
-            if (_sender.Send(req) >= 0)
-            {
-                SetResult(req.RateInfoArray);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+
         public RateByCountRequest GetRequest()
         {
             // dao.Update(); // error
@@ -378,6 +366,25 @@ namespace SocketTestClient.ConnectionContoller
             System.Console.WriteLine("[RateDataController]" + str);
         }
 
+        protected override int InternalUpdate()
+        {
+            RateByCountRequest req = GetRequest();
+            _sender.Send(req);
+            if (req.RateInfoArray != null && req.RateInfoArray.Length > 0)
+            {
+                SetResult(req.RateInfoArray);
+                return req.RateInfoArray.Length;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public override string CollectionTableName
+        {
+            get { return _dao.CollectiongName; }
+        }
     }
 
     class RateDataController
@@ -387,9 +394,10 @@ namespace SocketTestClient.ConnectionContoller
         private TimeSpan _sendingBlockDuration = new TimeSpan(24, 0, 0);
         private bool _isSymbolListUpdated;
 
-        private List<IRequestController> _watchList;
+        private List<RataDataCollectTask> _watchList;
 
         private string[] _interalSymbols;
+        private ISender _sender;
 
         private int[] _timeFrameArray = new int[]
         {
@@ -406,13 +414,13 @@ namespace SocketTestClient.ConnectionContoller
 #endif
         };
 
-        public RateDataController()
+        public RateDataController(ISender sender)
         {
             _rateDataList = new RateDataDAOList();
-            _watchList = new List<IRequestController>();
+            _watchList = new List<RataDataCollectTask>();
             _isSymbolListUpdated = false;
             _watchListIndex = -1;
-
+            _sender = sender;
             //-----------------
 #if false
             _interalSymbols = new string[]
@@ -461,46 +469,42 @@ namespace SocketTestClient.ConnectionContoller
             };
 
 #endif
-            UpdateSymbolList(_interalSymbols);
+            AddSymbol(_interalSymbols);
         }
 
-        public IRequest GetRequest()
+        public void Start()
         {
-            // if (_isSymbolListUpdated == false)
-            if (false)
+            int checkCount = 0;
+            while (true)
             {
-                SymbolNameListRequest req = new SymbolNameListRequest();
-                req.ReqCtrl = this;
-                return req;
-            }
-            else
-            {
-                IRequest rateReq = null;
-                int checkCount = 0;
-                while (true)
+                // Check network state
+                if (_sender.State != DeamonState.Connected)
                 {
-                    _watchListIndex++;
-                    if (_watchListIndex >= _watchList.Count)
-                        _watchListIndex = 0;
-
-                    IRequestController rateReqCtrl = _watchList[_watchListIndex];
-                    rateReq = rateReqCtrl.GetRequest();
-                    if (rateReq != null)
-                    {
-                        break;
-                    }
-
-                    checkCount++;
-                    if (checkCount >= _watchList.Count)
-                        break;
+                    Thread.Sleep(1000);
                 }
 
-                return rateReq;
+                _watchListIndex++;
+                if (_watchListIndex >= _watchList.Count)
+                    _watchListIndex = 0;
+
+                RataDataCollectTask rateReqCtrl = _watchList[_watchListIndex];
+                int cnt = rateReqCtrl.Update();
+                if (cnt > 0)
+                {
+                    checkCount = 0;
+                }
+                else
+                {
+                    checkCount++;
+                    if (checkCount >= _watchList.Count)
+                        Thread.Sleep(1000*10);
+                }
             }
+
         }
 
 
-        public void UpdateSymbolList(string[] symbols)
+        public void AddSymbol(string[] symbols)
         {
             // Add all Symbol
             foreach( string symbol in symbols)
@@ -525,18 +529,18 @@ namespace SocketTestClient.ConnectionContoller
             }
         }
 
-        public bool AddWatchSymbol(string name, double updateInterval)
+        public RataDataCollectTask FindByName(string collectionName)
         {
-            RateDataControlDAO dao = _rateDataList.Get(name);
-            if (dao == null)
-                return false;
-            _watchList.Add(new RateByTimeRequestController(dao, updateInterval));
-            return true;
+            RataDataCollectTask targetTask = null;
+            foreach (RataDataCollectTask task in _watchList)
+            {
+                if (task.CollectionTableName.CompareTo(collectionName) != 0)
+                    continue;
+
+                targetTask = task;
+            }
+            return targetTask;
         }
 
-        public void SetResult(IRequest req)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

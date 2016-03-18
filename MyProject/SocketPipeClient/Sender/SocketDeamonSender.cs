@@ -10,14 +10,6 @@ using SocketTestClient.RequestObject;
 
 namespace SocketTestClient.Sender
 {
-    enum DeamonState
-    {
-        Disconnected,
-        Connected,
-        Receiving,
-        Sending,
-        Disconnecting,
-    }
     class SocketDeamonSender : ISender
     {
         private IPAddress _ipAddress = IPAddress.Parse("127.0.0.1");
