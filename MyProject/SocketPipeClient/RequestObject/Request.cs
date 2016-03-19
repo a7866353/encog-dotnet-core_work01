@@ -19,6 +19,7 @@ namespace SocketTestClient.RequestObject
         SymbolNameListResult,
         RateByCount,
         RateByCount_Result,
+        RateByTime,
     }
     class Request
     {

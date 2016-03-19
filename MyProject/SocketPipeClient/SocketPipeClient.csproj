@@ -76,8 +76,9 @@
     <Compile Include="DatabaseConnector.cs" />
     <Compile Include="RequestObject\BasicData.cs" />
     <Compile Include="RequestObject\RateByCountRequest.cs" />
+    <Compile Include="RequestObject\RateByTimeRequest2.cs" />
     <Compile Include="RequestObject\RateDataIndicateRequest.cs" />
-    <Compile Include="RequestObject\RateRequest.cs" />
+    <Compile Include="RequestObject\RateByTimeRequest.cs" />
     <Compile Include="RequestObject\Request.cs" />
     <Compile Include="RequestObject\SendOrderRequest.cs" />
     <Compile Include="Program.cs" />
