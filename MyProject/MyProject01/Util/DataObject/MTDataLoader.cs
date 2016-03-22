@@ -107,15 +107,14 @@ namespace MyProject01.Util
             // add last
             Add(checker.GetRateSet());
         }
-
-
-
     }
     public abstract class BasicTestDataLoader : DataLoader
     {
         private string _tickerName;
         private DataTimeType _type;
         protected int _dir = 1;
+
+        public bool NeedTimeFrameConver = true;
         public string TickerName
         {
             get { return _tickerName; }
@@ -160,6 +159,26 @@ namespace MyProject01.Util
             }
         }
 
+        private void AddAll(MongoCursor<RateData> buffer)
+        {
+            foreach (RateData mtData in buffer)
+            {
+                RateSet rateSet = new RateSet()
+                {
+                    Close = mtData.close,
+                    Open = mtData.open,
+                    High = mtData.high,
+                    Low = mtData.low,
+                    RealVolume = mtData.real_volume,
+                    TickVolume = mtData.tick_volume,
+                    Time = mtData.time,
+                };
+                if (CheckEnd(rateSet) == true)
+                    break;
+            }
+
+        }
+
         public void Load()
         {
             MarketRateDatabaseConnector connector = new MarketRateDatabaseConnector();
@@ -167,7 +186,14 @@ namespace MyProject01.Util
             MongoCollection collection = db.GetCollection(_tickerName);
             MongoCursor<RateData> curs = GetData(collection);
 
-            AddByTime(curs, (int)_type);
+            if (NeedTimeFrameConver == true)
+            {
+                AddByTime(curs, (int)_type);
+            }
+            else
+            {
+                AddAll(curs);
+            }
 
             connector.Close();
 
