@@ -43,8 +43,12 @@ namespace SocketTestClient.ConnectionContoller
         }
         public int Update()
         {
+            if (_sender.State != DeamonState.Connected)
+                return 0;
+
             int cnt = InternalUpdate();
-            OnChange();
+            if (OnChange!=null)
+                OnChange();
             return cnt;
         }
         protected abstract int InternalUpdate();
@@ -356,7 +360,14 @@ namespace SocketTestClient.ConnectionContoller
                     _dao.Add(dataList.ToArray());
             }
 
-            _dao.LastGetTime = DateTime.Now;
+            if (dataList.Count > 0)
+            {
+                _dao.LastGetTime = _dao.LastItemTime;
+            }
+            else
+            {
+                _dao.LastGetTime = DateTime.Now;
+            }
             _dao.Save();
 
             if (infoArr == null || infoArr.Length == 0)
@@ -378,30 +389,30 @@ namespace SocketTestClient.ConnectionContoller
             if (dataList.Count > 0)
             {
                 Printf("Get:" + _dao.SymbolName + "_" + _dao.TimeFrame + " From" +
-                    _lastRequest.StartTime + " Count:" + dataList.Count);
-            }
-            if (dataList.Count == 0)
-            {
-                _getDuration += _getDataBlockDuration;
-            }
-            else
-            {
-                _getDuration = _getDataBlockDuration;
+                    _lastRequest.StartTime + " To" + _dao.LastItemTime + " Count:" + dataList.Count);
             }
         }
 
         protected override int InternalUpdate()
         {
-            RateByTimeRequest2 req = GetRequest();
-            _sender.Send(req);
-            if (req.RateInfoArray != null && req.RateInfoArray.Length > 0)
+            int GetSum = 0;
+            while (true)
             {
-                SetResult(req.RateInfoArray);
-                return req.RateInfoArray.Length;
-            }
-            else
-            {
-                return 0;
+                RateByTimeRequest2 req = GetRequest();
+                if (req == null)
+                    return GetSum;
+
+
+                _sender.Send(req);
+                if (req.RateInfoArray != null && req.RateInfoArray.Length > 0)
+                {
+                    SetResult(req.RateInfoArray);
+                    GetSum += req.RateInfoArray.Length;
+                }
+                else
+                {
+                    return GetSum;
+                }
             }
         }
 
@@ -603,6 +614,7 @@ namespace SocketTestClient.ConnectionContoller
                 if (_sender.State != DeamonState.Connected)
                 {
                     Thread.Sleep(1000);
+                    continue;
                 }
 
                 _watchListIndex++;
@@ -619,7 +631,10 @@ namespace SocketTestClient.ConnectionContoller
                 {
                     checkCount++;
                     if (checkCount >= _watchList.Count)
-                        Thread.Sleep(1000*10);
+                    {
+                        checkCount = 0;
+                        Thread.Sleep(1000 * 10);
+                    }
                 }
             }
 
@@ -647,7 +662,8 @@ namespace SocketTestClient.ConnectionContoller
             foreach(RateDataControlDAO dao in _rateDataList)
             {
                 // _watchList.Add(new RateDataRequestController(dao, 512));
-                _watchList.Add(new RateByTimeRequestController(dao, 512, _sender));
+                // _watchList.Add(new RateByTimeRequestController(dao, 512, _sender));
+                _watchList.Add(new RateByTimeRequestController2(dao, 512, _sender));
             }
         }
 

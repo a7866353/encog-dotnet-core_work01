@@ -16,6 +16,7 @@ namespace SocketTestClient.ConnectionContoller
         public ClientControl()
         {
             _tradeOrderList = new List<BasicTradeOrder>();
+#if false
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 2));
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172656__283", 3));
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__064758__749", 4));
@@ -23,7 +24,7 @@ namespace SocketTestClient.ConnectionContoller
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150623__074144__028", 6));
             _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150625__231317__582", 7));
             _tradeOrderList.Add(new KDJTradeOrder("USDJPYpro1", "20150716__210730__425", 8));
-
+#endif
         }
 
         public void StartListen()
