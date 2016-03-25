@@ -285,6 +285,8 @@ namespace MyProject01.Controller
         protected KDJDataSource _dataSource;
         private int _blockLength;
 
+        public int AverageRange = 9;
+
         public BasicKDJSensor(int blockLength)
         {
             _blockLength = blockLength;
@@ -320,7 +322,7 @@ namespace MyProject01.Controller
         {
             set
             {
-                KDJDataSourceParam param = new KDJDataSourceParam();
+                KDJDataSourceParam param = new KDJDataSourceParam() { AveRange = AverageRange };
                 _dataSource = value.Get(param) as KDJDataSource;
             }
         }
@@ -730,6 +732,42 @@ namespace MyProject01.Controller
                 new RateSensor(dataLen),
             };
             senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+            senGroup.Add(new KDJ_KSensor(2));
+            senGroup.Add(new KDJ_DSensor(2));
+            senGroup.Add(new KDJ_JSensor(2));
+
+            return senGroup;
+        }
+        public static ISensor GetKDJCrossLine5Sensor()
+        {
+            SensorGroup senGroup = new SensorGroup();
+            int dataLen = 4;
+            ISensor[] sensorArr = new ISensor[]
+            {
+                new KDJ_KSensor(dataLen){ AverageRange = 9 },
+                new KDJ_JSensor(dataLen){ AverageRange = 9 },
+                new KDJ_DSensor(dataLen){ AverageRange = 9 },
+  
+                new KDJ_KSensor(dataLen){ AverageRange = 29 },
+                new KDJ_JSensor(dataLen){ AverageRange = 29 },
+                new KDJ_DSensor(dataLen){ AverageRange = 29 },
+
+                new KDJ_KSensor(dataLen){ AverageRange = 59 },
+                new KDJ_JSensor(dataLen){ AverageRange = 59 },
+                new KDJ_DSensor(dataLen){ AverageRange = 59 },
+               
+                new KDJ_KSensor(dataLen){ AverageRange = 287 },
+                new KDJ_JSensor(dataLen){ AverageRange = 287 },
+                new KDJ_DSensor(dataLen){ AverageRange = 287 },
+               
+                new KDJ_KSensor(dataLen){ AverageRange = 863 },
+                new KDJ_JSensor(dataLen){ AverageRange = 863 },
+                new KDJ_DSensor(dataLen){ AverageRange = 863 },
+
+                new RateSensor(dataLen),
+            };
+            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+
             senGroup.Add(new KDJ_KSensor(2));
             senGroup.Add(new KDJ_DSensor(2));
             senGroup.Add(new KDJ_JSensor(2));

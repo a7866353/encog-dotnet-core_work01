@@ -756,6 +756,9 @@ namespace MyProject01.Controller
         {
             _testArr = new NewTestContainer[]
             {
+ 
+                new NewTestContainer(){ Name="CrossTest5Line_M30_Month", Sensor = SensorUtility.GetKDJCrossLine5Sensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneMonth()},
+
                 new NewTestContainer(){ Name="CrossTest_M5_Year",   Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM5_1Year()},
                 new NewTestContainer(){ Name="CrossTest_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneMonth()},
                 new NewTestContainer(){ Name="CrossTest_M30_Year",  Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneYear()},
