@@ -6,6 +6,7 @@ using MyProject01.Controller.Jobs;
 using MyProject01.DAO;
 using MyProject01.Factorys.PopulationFactorys;
 using MyProject01.Util;
+using MyProject01.Util.DllTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,25 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 11, 1);
             DateTime EndDateTime = new DateTime(2013, 11, 7);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
+            // loader.Load();
+            return loader;
+        }
+        static public BasicTestDataLoader GetRecentM5_1Month()
+        {
+            DateTime StartDateTime = new DateTime(2016, 2, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M5, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = true };
+            // loader.Load();
+            return loader;
+        }
+        static public BasicTestDataLoader GetRecentM5_3Month()
+        {
+            DateTime StartDateTime = new DateTime(2015, 12, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13); 
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_5", DataTimeType.M5, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
             // loader.Load();
             return loader;
         }
@@ -30,7 +49,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M5, StartDateTime, EndDateTime, 50000);
             // loader.Load();
             return loader;
         }
@@ -39,7 +58,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 11, 1);
             DateTime EndDateTime = new DateTime(2013, 12, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
             // loader.Load();
             return loader;
         }
@@ -48,7 +67,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
             // loader.Load();
             return loader;
         }
@@ -57,7 +76,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2013, 11, 1);
             DateTime EndDateTime = new DateTime(2013, 12, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 50000);
             // loader.Load();
             return loader;
         }
@@ -66,7 +85,7 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2011, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 50000);
             // loader.Load();
             return loader;
         }
@@ -75,7 +94,26 @@ namespace MyProject01.Controller
             DateTime StartDateTime = new DateTime(2004, 10, 31);
             DateTime EndDateTime = new DateTime(2014, 10, 31);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 2000);
+                new TestDataDateRangeLoader("USDJPY", DataTimeType.D1, StartDateTime, EndDateTime, 50000);
+            // loader.Load();
+            return loader;
+        }
+
+        static public BasicTestDataLoader GetRecnetM30OneMonth()
+        {
+            DateTime StartDateTime = new DateTime(2016, 2, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
+            // loader.Load();
+            return loader;
+        }
+        static public BasicTestDataLoader GetRecnetM30_3Month()
+        {
+            DateTime StartDateTime = new DateTime(2015, 12, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
             // loader.Load();
             return loader;
         }
@@ -84,7 +122,7 @@ namespace MyProject01.Controller
     {
         public ControllerFactory _ctrlFactory;
         public double _testRate = 1.0;
-        public int _startPosition = 2000;
+        public int StartPosition = 50000;
 
         public NewNormalScore(ControllerFactory ctrlFactory, double testRate = 1.0)
         {
@@ -106,9 +144,9 @@ namespace MyProject01.Controller
             IController ctrl = _ctrlFactory.Get();
             ctrl.UpdateNetwork((IMLRegression)network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(ctrl);
-            int testCount = ctrl.TotalLength - _startPosition;
+            int testCount = ctrl.TotalLength - StartPosition;
             testCount = (int)(testCount * _testRate);
-            agent.SetRange(_startPosition, _startPosition + testCount);
+            agent.SetRange(StartPosition, StartPosition + testCount);
 
             while (true)
             {
@@ -144,6 +182,9 @@ namespace MyProject01.Controller
 
         public bool Do(TrainerContex context)
         {
+            if (context.IsChanged == false)
+                return true;
+
             // ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName("Controller"+DateTime.Now);
             ControllerDAOV2 dao = new ControllerDAOV2();
             dao.Name = "Controller" + DateTime.Now;
@@ -152,8 +193,9 @@ namespace MyProject01.Controller
             dao.UpdateTime = DateTime.Now;
             _packer.NeuroNetwork = context.BestNetwork;
             dao.ControllerData = _packer.GetData();
-
             dao.Save();
+            context.ControllerName = dao.Name;
+
             return true;
         }
     }
@@ -161,16 +203,18 @@ namespace MyProject01.Controller
     {
         public string TestName;
         public string TestDescription;
-        public double TestRate;
         public IController Controller;
+        public int StartPosition = 50000;
+        public int TrainDataLength;
+        public int TestDataLength;
 
         private RateMarketTestDAO _testCaseDAO;
 
         private int _trainDataLength;
         private long _epoch;
         private LogFormater _log;
-        private int _startPosition = 2000;
 
+        private TrainerContex _context;
         public NewUpdateTestCaseJob()
         {
             _log = new LogFormater();
@@ -182,19 +226,20 @@ namespace MyProject01.Controller
             if (context.IsChanged == false)
                 return true;
 
+            _context = context;
             if (_testCaseDAO == null)
             {
                 _testCaseDAO = RateMarketTestDAO.GetDAO<RateMarketTestDAO>(TestName, true);
                 _testCaseDAO.TestDescription = TestDescription;
-                // _testCaseDAO.TestDataStartIndex = context._trainDataBlock.BlockCount;
                 // TODO
-                _testCaseDAO.TotalDataCount = Controller.TotalLength - _startPosition;
-                _testCaseDAO.TestDataStartIndex =  (int)(_testCaseDAO.TotalDataCount * TestRate);
+                _testCaseDAO.TotalDataCount = TrainDataLength + TestDataLength;
+                _testCaseDAO.TestDataStartIndex = TrainDataLength;
+                _testCaseDAO.Time = _context.StartDate;
 
             }
 
             _epoch = context.Epoch;
-            _trainDataLength = _startPosition + _testCaseDAO.TestDataStartIndex;
+            _trainDataLength = StartPosition + _testCaseDAO.TestDataStartIndex;
             TestResult(context.BestNetwork, _testCaseDAO);
 
             _testCaseDAO.NetworkData = null;
@@ -209,7 +254,7 @@ namespace MyProject01.Controller
             Controller.UpdateNetwork(network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(Controller);
             agent.Reset();
-            agent.SetRange(_startPosition, Controller.TotalLength);
+            agent.SetRange(StartPosition, Controller.TotalLength);
 
             RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
             DealLogList logList = new DealLogList();
@@ -258,6 +303,8 @@ namespace MyProject01.Controller
             epsodeLog.HidenNodeCount = network.Links.Length;
             epsodeLog.ResultMoney = endMoney;
             epsodeLog.Step = _epoch;
+            epsodeLog.ControllerName = _context.ControllerName;
+            epsodeLog.Time = _context.CurrentDate;
             epsodeLog.Save();
             epsodeLog.SaveDealLogs(logList);
 
@@ -283,6 +330,10 @@ namespace MyProject01.Controller
         private BasicControllerWithCache _testCtrl;
         private BasicTestDataLoader _loader;
         private double _testRate = 0.7;
+        private int _startPosition = 50000;
+
+        private int _trainDataLength;
+        private int _testDataLength;
         public void Run()
         {
             _loader = GetDataLoader();
@@ -290,6 +341,11 @@ namespace MyProject01.Controller
             
             _testCtrl = new BasicControllerWithCache(GetSensor(), GetActor());
             _testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
+
+            int totalDataLength = _testCtrl.TotalLength - _startPosition;
+            _trainDataLength = (int)(totalDataLength * _testRate);
+            _testDataLength = totalDataLength - _trainDataLength;
+
             _testCtrl.Normilize(0, 1.0);
 
             BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
@@ -322,7 +378,9 @@ namespace MyProject01.Controller
                 TestName = TestCaseName,
                 TestDescription = "",
                 Controller = testCtrl,
-                TestRate = _testRate,
+                TrainDataLength = _trainDataLength,
+                TestDataLength = _testDataLength,
+                StartPosition = _startPosition,
             });
 
             // mainCheckCtrl.Add(subCheckCtrl);
@@ -756,10 +814,105 @@ namespace MyProject01.Controller
         {
             _testArr = new NewTestContainer[]
             {
-                new NewTestContainer(){ Name="CrossTest_M5_Year",   Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM5_1Year()},
-                new NewTestContainer(){ Name="CrossTest_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneMonth()},
-                new NewTestContainer(){ Name="CrossTest_M30_Year",  Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneYear()},
-                new NewTestContainer(){ Name="CrossTest_D1_Year",   Sensor = SensorUtility.GetKDJCrossSensor(),     Actor = new BasicActor(),   Loader=NewTestDataPacket.Get1DayOneYear()},
+                new NewTestContainer(){ Name="FWT2-1024-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(1024){ DataCollectLength = 4}, 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="FWT2-4096-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(4096){ DataCollectLength = 4}, 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="FWT2-16384-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(16384){ DataCollectLength = 4}, 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="FWT2-32768-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(32768){ DataCollectLength = 4}, 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+
+                new NewTestContainer(){ Name="FWT2-4096-4-Recent-M30-1Month", Sensor = new RateFWT2Sensor(4096){ DataCollectLength = 4}, 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+
+                new NewTestContainer(){ Name="FWT2-1024-4-Recent-M30-1Month", Sensor = new RateFWT2Sensor(1024){ DataCollectLength = 4}, 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+
+
+                new NewTestContainer(){ Name="Haar-64-4-Recent-M30-1Month", 
+                    Sensor = new RateWaveletSensor(64, new HaarWavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                },
+                new NewTestContainer(){ Name="Daubechies8-64-4-Recent-M30-1Month", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies8Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                },
+
+                new NewTestContainer(){ Name="Daubechies4-64-4-Recent-M30-1Month", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies4Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                },
+
+                new NewTestContainer(){ Name="Legendre6-64-4-Recent-M30-1Month", 
+                    Sensor = new RateWaveletSensor(64, new Legendre6Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                },
+
+
+                new NewTestContainer(){ Name="Haar-1024-4-Recent-M5-1Month", 
+                    Sensor = new RateWaveletSensor(1024, new HaarWavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                },
+                new NewTestContainer(){ Name="Daubechies8-1024-4-Recent-M5-1Month", 
+                    Sensor = new RateWaveletSensor(1024, new Daubechies8Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                },
+
+                new NewTestContainer(){ Name="Daubechies4-1024-4-Recent-M5-1Month", 
+                    Sensor = new RateWaveletSensor(1024, new Daubechies4Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                },
+
+                new NewTestContainer(){ Name="Legendre6-1024-4-Recent-M5-1Month", 
+                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                },
+
+                new NewTestContainer(){ Name="Legendre6-1024-16-Recent-M5-1Month", 
+                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),16), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                },
+
+
+
+                new NewTestContainer(){ Name="CrossTest2-16,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(16, new int[] {9}, new CrossPartten02()),
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                new NewTestContainer(){ Name="CrossTest2-16,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(16, new int[] {9, 89}, new CrossPartten02()),     
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+//--------------------------
+
+
+                new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                new NewTestContainer(){ Name="CrossTest3-4,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten03()),     
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+
+                new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="CrossTest3-4,9,89-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten03()),     
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+//--------------------------
+                new NewTestContainer(){ Name="CrossTest-4,59-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {59}, new CrossPartten01()),     
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+
+                new NewTestContainer(){ Name="CrossTest-4,9,89-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten01()),     
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="CrossTest-4,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten01()),     
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+
+                new NewTestContainer(){ Name="CrossTest5Line_Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 299}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="CrossTest5Line_Recent_M5_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 299}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_3Month()},
+
+                new NewTestContainer(){ Name="CrossTest_Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                new NewTestContainer(){ Name="CrossTest_Recent_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                new NewTestContainer(){ Name="CrossTest_Recent_M30_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_3Month()},
+
+                
+                new NewTestContainer(){ Name="CrossTest_M5_Year",   Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM5_1Year()},
+                new NewTestContainer(){ Name="CrossTest_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneMonth()},
+                new NewTestContainer(){ Name="CrossTest_M30_Year",  Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneYear()},
+                new NewTestContainer(){ Name="CrossTest_D1_Year",   Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.Get1DayOneYear()},
 
             };
         }

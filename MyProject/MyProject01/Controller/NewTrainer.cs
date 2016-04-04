@@ -28,6 +28,7 @@ namespace MyProject01.Controller
         protected override void PostItration()
         {
             _context.Epoch = Epoch;
+            _context.CurrentDate = DateTime.Now;
             CheckCtrl.Do(_context);
         }
 

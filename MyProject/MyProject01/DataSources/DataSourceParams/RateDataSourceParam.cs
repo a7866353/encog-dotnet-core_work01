@@ -110,8 +110,8 @@ namespace MyProject01.DataSources.DataSourceParams
         {
             _rateArr = loader.SourceLoader;
 
-            _skipCount = _aveRange - 1;
             _aveRange = aveRange;
+            _skipCount = aveRange - 1;
             _m1 = m1;
             _m2 = m2;
 

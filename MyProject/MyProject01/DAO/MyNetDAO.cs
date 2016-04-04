@@ -1,5 +1,6 @@
 ﻿using Encog.Neural.NEAT;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MyProject01.Agent;
 using MyProject01.Controller;
@@ -35,6 +36,8 @@ namespace MyProject01.DAO
     }
     class RateMarketTestEpisodeDAO : BasicTestEpisodeDAO
     {
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        public DateTime Time { set; get; }
         public double ResultMoney { set; get; }
         public int TrainedDealCount { set; get; }
         public int UntrainedDealCount { set; get; }
@@ -45,6 +48,7 @@ namespace MyProject01.DAO
 
         // ================
         // Network
+        public string ControllerName { set; get; }
         public int HidenNodeCount { set; get; }
 
         // ====================

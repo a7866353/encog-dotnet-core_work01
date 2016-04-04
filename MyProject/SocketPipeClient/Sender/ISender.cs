@@ -6,9 +6,20 @@ using System.Threading.Tasks;
 
 namespace SocketTestClient.Sender
 {
+    enum DeamonState
+    {
+        Disconnected,
+        Connected,
+        Receiving,
+        Sending,
+        Disconnecting,
+    }
+
     interface ISender
     {
         int Send(IRequest req);
+        DeamonState State { get; }
+        
     }
 
     interface IRequest

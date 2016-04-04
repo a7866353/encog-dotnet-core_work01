@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MyProject01.Agent;
@@ -282,6 +283,9 @@ namespace MyProject01.DAO
         public ObjectId _id;
         public string TestCaseName { set; get; }
         public string TestDescription { set; get; }
+
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        public DateTime Time { set; get; }
 
         #endregion
 

@@ -1,21 +1,21 @@
-﻿using SocketTestClient.ConnectionContoller;
-using SocketTestClient.Sender;
+﻿using SocketTestClient.Sender;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SocketTestClient.ConnectionContoller;
 
 namespace SocketTestClient.RequestObject
 {
-    class RateByCountRequest : IRequest
+    class RateByTimeRequest : IRequest
     {
-        public RequestType OrderType = RequestType.RateByCount;
+        public RequestType OrderType = RequestType.RateDataRequest;
 
         public string SymbolName;
         public int TimeFrame;
         public DateTime StartTime;
-        public int Count;
+        public DateTime StopTime;
 
         public byte[] GetBytes()
         {
@@ -24,7 +24,7 @@ namespace SocketTestClient.RequestObject
             sb.Add(SymbolName);
             sb.Add(TimeFrame);
             sb.Add(StartTime);
-            sb.Add(Count);
+            sb.Add(StopTime);
 
             return sb.GetBytes();
         }

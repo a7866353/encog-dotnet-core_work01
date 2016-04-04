@@ -10,81 +10,43 @@ using SocketTestClient.RequestObject;
 namespace SocketTestClient.ConnectionContoller
 {
     class ClientControl
-    {
-        private List<IRequestController> _ctrlList;
-        
+    {        
         SocketDeamonSender _sender;
+        List<BasicTradeOrder> _tradeOrderList = new List<BasicTradeOrder>();
         public ClientControl()
         {
-
-        }
-
-
-        public void Add(IRequestController ctrl)
-        {
-            _ctrlList.Add(ctrl);
+            _tradeOrderList = new List<BasicTradeOrder>();
+#if false
+            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 2));
+            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172656__283", 3));
+            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__064758__749", 4));
+            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 5));
+            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150623__074144__028", 6));
+            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150625__231317__582", 7));
+            _tradeOrderList.Add(new KDJTradeOrder("USDJPYpro1", "20150716__210730__425", 8));
+#endif
         }
 
         public void StartListen()
         {
-            IRequest rcvReq, sendReq;
-            bool isDoSend;
-            bool isNeedInit = true;
-
-
             _sender = new SocketDeamonSender();
-            while (true)
+
+            RateDataController rateDataCtrl = new RateDataController(_sender);
+
+
+            // rateDataCtrl.AddSymbol();
+
+            foreach(BasicTradeOrder order in _tradeOrderList)
             {
-                if (_sender.State == DeamonState.Disconnected)
-                {
-                    Thread.Sleep(500);
-                    isNeedInit = true;
+                RataDataCollectTask collector = rateDataCtrl.FindByName(order.SymbolName);
+                if (collector == null)
                     continue;
-                }
 
-                if (isNeedInit == true)
-                {
-                    Init();
-                    isNeedInit = false;
-                }
-
-                rcvReq = _sender.Get();
-                if (rcvReq == null)
-                {
-                    // DealWithSend
-                    isDoSend = false;
-                    foreach (IRequestController ctrl in _ctrlList)
-                    {
-                        sendReq = ctrl.GetRequest();
-                        if (sendReq != null)
-                        {
-                            isDoSend = true;
-                            _sender.Send(sendReq);
-                            break;
-                        }
-                    }
-                    
-                    
-                    if (isDoSend == false)
-                        Thread.Sleep(100);
-                }
-                else
-                {
-                    // Todo Nothing
-                }
-
+                collector.OnChange += new RataDataCollectTask.ChangeHandler(order.DoTrade);
+                collector.UpdateInterval = 0.2;
             }
+
+            rateDataCtrl.Start();
         }
-
-        private void Init()
-        {
-            _ctrlList = new List<IRequestController>();
-            RateDataController rateDataCtrl = new RateDataController();
-            // OrderSendController orderCtrl = new OrderSendController(rateDataCtrl);
-           //  _ctrlList.Add(orderCtrl);
-            _ctrlList.Add(rateDataCtrl);
-        }
-
-
     }
 }

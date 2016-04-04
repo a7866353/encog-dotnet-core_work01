@@ -417,7 +417,12 @@ namespace MyProject01
                     input[i] = Math.Sin(i * 2 * Math.PI * f2 / f0);
                 }
             }
-            DllTools.FTW(input, output, temp);
+            DllTools.FTW_2(input, output, temp);
+
+            double[] output2 = new double[input.Length*2];
+            DllTools.FTW_5(input, output2);
+
+
         }
         private void FWT_5min_Simple()
         {
@@ -627,7 +632,7 @@ namespace MyProject01
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
 
-
+            newTestList.Add(new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)));
             // New test case
             AddNewTestCase(newTestList);
 

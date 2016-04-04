@@ -136,7 +136,10 @@ namespace MyProject01.Util
         // out = (in + Offset) * Scale;
         public double Scale
         {
-            get { return (_targDataMax - _targDataMin) / (_dataMaxValue - _dataMinValue); }
+            get 
+            {
+                return (_targDataMax - _targDataMin) / (_dataMaxValue - _dataMinValue); 
+            }
         }
         public double Offset
         {

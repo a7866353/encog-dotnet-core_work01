@@ -19,6 +19,8 @@ namespace SocketTestClient.ConnectionContoller
         protected DateTime _lastTradeTime;
         protected int _magicNumber;
 
+        private ISender _sender;
+
         public BasicTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
@@ -38,19 +40,53 @@ namespace SocketTestClient.ConnectionContoller
         {
             get { return _magicNumber; }
         }
-        public MarketActions GetNextCommand()
+        public void DoTrade()
         {
             _dataController.Update();
             if (_dataController.LastItemTime > _lastTradeTime)
             {
                 _lastTradeTime = _dataController.LastItemTime;
-                return GetNextCommand(_dataController, _lastTradeTime);
+                MarketActions cmd = GetNextCommand(_dataController, _lastTradeTime);
+                if (cmd == MarketActions.Nothing)
+                    return;
+
+                SendOrderRequest req = new SendOrderRequest();
+                req.SymbolName = SymbolName;
+                req.MagicNumber = MagicNumber;
+                if (cmd == MarketActions.Buy)
+                {
+                    req.OrderCmd = SendOrderRequest.Cmd.Buy;
+                    Printf(MagicNumber + ": Buy");
+                }
+                else if (cmd == MarketActions.Sell)
+                {
+                    req.OrderCmd = SendOrderRequest.Cmd.Sell;
+                    Printf(MagicNumber + ": Sell");
+                }
+                else if (cmd == MarketActions.Close)
+                {
+                    req.OrderCmd = SendOrderRequest.Cmd.Close;
+                    Printf(MagicNumber + ": Close");
+                }
+                else
+                    throw (new Exception("Parm error!"));
+
+                // ===============
+                // Send
+                _sender.Send(req);
+                if( req.Result != 0)
+                    Printf(MagicNumber + "Order Error!");
             }
-            return MarketActions.Nothing;
+            return;
         }
 
         abstract protected MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime);
-    }
+         private void Printf(string str)
+        {
+            System.Console.WriteLine("OrderSendController: " + str);
+        }
+    
+   }
 
     class RateTradeOrder : BasicTradeOrder
     {
@@ -128,70 +164,5 @@ namespace SocketTestClient.ConnectionContoller
             return _ctrl.GetAction();
         }
 
-    }
-    class OrderSendController : IRequestController
-    {
-        private List<BasicTradeOrder> _tradeOrderList;
-        private RateDataController _rateDataCtrl;
-
-        public OrderSendController(RateDataController RateDataCtrl)
-        {
-            _tradeOrderList = new List<BasicTradeOrder>();
-            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 2));
-            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172656__283", 3));
-            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__064758__749", 4));
-            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150622__172651__151", 5));
-            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150623__074144__028", 6));
-            _tradeOrderList.Add(new RateTradeOrder("USDJPYpro30", "20150625__231317__582", 7));
-            _tradeOrderList.Add(new KDJTradeOrder("USDJPYpro1", "20150716__210730__425", 8));
-
-            _rateDataCtrl = RateDataCtrl;
-            foreach (BasicTradeOrder trader in _tradeOrderList)
-            {
-                _rateDataCtrl.AddWatchSymbol(trader.Name, 0.5);
-            }
-
-        }
-        public IRequest GetRequest()
-        {
-            foreach (BasicTradeOrder order in _tradeOrderList)
-            {
-                MarketActions cmd = order.GetNextCommand();
-                if (cmd == MarketActions.Nothing)
-                    continue;
-                SendOrderRequest req = new SendOrderRequest();
-                req.SymbolName = order.SymbolName;
-                req.MagicNumber = order.MagicNumber;
-                if (cmd == MarketActions.Buy)
-                {
-                    req.OrderCmd = SendOrderRequest.Cmd.Buy;
-                    Printf(order.MagicNumber + ": Buy");
-                }
-                else if (cmd == MarketActions.Sell)
-                {
-                    req.OrderCmd = SendOrderRequest.Cmd.Sell;
-                    Printf(order.MagicNumber + ": Sell");
-                }
-                else if (cmd == MarketActions.Close)
-                {
-                    req.OrderCmd = SendOrderRequest.Cmd.Close;
-                    Printf(order.MagicNumber + ": Close");
-                }
-                else
-                    throw (new Exception("Parm error!"));
-
-                return req;
-            }
-            return null;
-        }
-        public void SetResult(IRequest req)
-        {
-            // Nothing to do.
-        }
-
-        private void Printf(string str)
-        {
-            System.Console.WriteLine("OrderSendController: " + str);
-        }
     }
 }

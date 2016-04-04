@@ -329,7 +329,7 @@ namespace MyProject01.Controller
 
             // Create cache data
             _inDataCache = new DataBlock[TotalLength];
-            for (int i = SkipCount + 1; i < TotalLength; i++)
+            for (int i = SkipCount; i < TotalLength; i++)
             {
                 buffer = new DataBlock(NetworkInputVectorLength);
                 _sensor.Copy(i, buffer, 0);
