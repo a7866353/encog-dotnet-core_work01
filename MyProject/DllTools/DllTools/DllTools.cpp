@@ -1,9 +1,11 @@
 // DllTools.cpp : 定义 DLL 应用程序的导出函数。
 //
-
+#include <stdio.h>  
+#include <stdlib.h>  
 #include "stdafx.h"
 #include "math.h"
 #include "DllTools.h"
+#include <malloc.h>
 
 
 // 这是导出变量的一个示例
@@ -105,6 +107,26 @@ EXTERN_C
 			}
 		}
 
+	}
+
+	DLLTOOLS_API void __stdcall DllTools_DWT1D_V3(FWTParam param)
+	{
+		int level = param.inputLength;
+		double *in = param.input;
+		double *out = param.output;
+		double *temp = (double *)malloc(param.inputLength*sizeof(double));
+		while (1)
+		{
+			if (level == 1)
+				break;
+			DWT1D(in, out, temp, param.h, param.g, level, param.filterLength);
+
+			in = out;
+			out += level;
+			level /= 2;
+		}
+
+		free(temp);
 	}
 
 }

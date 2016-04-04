@@ -23,7 +23,137 @@ namespace MyProject01.Util.DllTools
         public IntPtr h;
         public IntPtr g;
         public int filterLength;
-	};   
+	};
+
+     [Serializable]
+     abstract class BasicWavelet
+    {
+        public abstract double[] Scaling { get; }
+        public abstract double[] Wavelet { get; }
+        public int Digital { get { return Scaling.Length; } }
+    }
+
+    abstract class BasicDaubechiesWavelet : BasicWavelet
+    {
+        public override double[] Wavelet
+        {
+            get 
+            {
+                double[] wavelet = new double[Scaling.Length];
+                double dir = -1;
+                for(int i=0;i<wavelet.Length;i++)
+                {
+
+                    wavelet[i] = Scaling[Scaling.Length - 1 - i] * dir;
+                    dir *= -1;
+                }
+
+                return wavelet;
+            }
+        }
+    }
+    [Serializable]
+    class WaveletFunction : BasicWavelet
+    {
+        private double[] _scaling;
+        private double[] _wavelet;
+
+        public WaveletFunction(BasicWavelet wavelet)
+        {
+            _scaling = wavelet.Scaling;
+            _wavelet = wavelet.Wavelet;
+        }
+        public override double[] Scaling
+        {
+            get { return _scaling; }
+        }
+
+        public override double[] Wavelet
+        {
+            get { return _wavelet; }
+        }
+    }
+        class HaarWavelet : BasicWavelet
+        {
+
+            public override double[] Scaling
+            {
+                get
+                {
+                    return new double[] 
+                    { 
+                        1, 
+                        1, 
+                     };
+                }
+            }
+
+            public override double[] Wavelet
+            {
+                get
+                {
+                    return new double[] 
+                    { 
+                        -1, 
+                        1, 
+                     };
+                }
+            }
+        }
+    class Daubechies8Wavelet : BasicDaubechiesWavelet
+    {
+        public override double[] Scaling
+        {
+            get 
+            { 
+                return new double[] 
+                { 
+                    0.32580343, 
+                    1.01094572, 
+                    0.89220014,
+                    -0.03957503,
+                    -0.26450717,
+                    0.0436163,
+                    0.0465036,
+                    -0.01498699
+                }; 
+            }
+        }
+    }
+    class Daubechies4Wavelet : BasicDaubechiesWavelet
+    {
+        public override double[] Scaling
+        {
+            get
+            {
+                return new double[] 
+                { 
+                    0.6830127, 
+                    1.1830127, 
+                    0.3169873,
+                    -0.1830127
+                };
+            }
+        }
+    }
+    class Legendre6Wavelet : BasicDaubechiesWavelet
+    {
+        public override double[] Scaling
+        {
+            get
+            {
+                return new double[] 
+                { 
+                    0.348029119, 
+                    0.19334951,
+                    0.165728152,
+                    0.165728152, 
+                    0.19334951,
+                    0.348029119
+                };
+            }
+        }
+    }
     class DllTools
     {
         private static double[] h = new double[]{.332670552950, .806891509311, .459877502118, -.135011020010,   
@@ -31,6 +161,9 @@ namespace MyProject01.Util.DllTools
         private static double[] g = new double[]{.035226291882, .085441273882, -.135011020010, -.459877502118,  
                     .806891509311, -.332670552950};
 
+
+        private static double[] haar_h = new double[] { 1,  1 };
+        private static double[] haar_g = new double[] { -1, 1 };
         private static DllMemoryPoolCtrl _poolCtrl;
         
         static DllTools()
@@ -127,7 +260,64 @@ namespace MyProject01.Util.DllTools
 #endif
 
         }
+        public static void FTW_5(double[] input, double[] output)
+        {
+            FWTParam param;
+            param.temp = IntPtr.Zero;
+            param.h = IntPtr.Zero;
+            param.g = IntPtr.Zero;
+            param.filterLength = haar_h.Length;
 
+            if(output.Length < input.Length*2)
+            {
+                throw (new Exception("Parameter error!"));
+            }
+
+            param.inputLength = input.Length;
+            param.input = CreateBuffer(input);
+            param.output = CreateBuffer(output);
+            param.h = CreateBuffer(haar_h);
+            param.g = CreateBuffer(haar_g);
+
+
+            DllTools_DWT1D_V3(ref param);
+
+            CopyBuffer(output, param.output);
+
+            FreeBuffer(param.input);
+            FreeBuffer(param.output);
+            FreeBuffer(param.h);
+            FreeBuffer(param.g);
+        }
+        public static void CalculateWavelet(double[] input, double[] output, BasicWavelet wavelet)
+        {
+            FWTParam param;
+            param.temp = IntPtr.Zero;
+            param.h = IntPtr.Zero;
+            param.g = IntPtr.Zero;
+            param.filterLength = wavelet.Digital;
+
+            if (output.Length < input.Length * 2)
+            {
+                throw (new Exception("Parameter error!"));
+            }
+
+            param.inputLength = input.Length;
+            param.input = CreateBuffer(input);
+            param.output = CreateBuffer(output);
+            param.h = CreateBuffer(wavelet.Scaling);
+            param.g = CreateBuffer(wavelet.Wavelet);
+
+
+            DllTools_DWT1D_V3(ref param);
+
+            CopyBuffer(output, param.output);
+
+            FreeBuffer(param.input);
+            FreeBuffer(param.output);
+            FreeBuffer(param.h);
+            FreeBuffer(param.g);
+        }
         public static void FTW_4(double[] input, double[] output, double[] temp)
         {
             FWTParam param;
@@ -180,8 +370,28 @@ namespace MyProject01.Util.DllTools
         [DllImport("DllTools.dll", EntryPoint = "DllTools_DWT1D_V2")]
         public static extern void DllTools_DWT1D_V2(ref FWTParam param);
 
+        [DllImport("DllTools.dll", EntryPoint = "DllTools_DWT1D_V3")]
+        public static extern void DllTools_DWT1D_V3(ref FWTParam param);
+
         [DllImport("dwtHaar1D.dll", EntryPoint = "OneDFwt")]
         private static extern void OneDFwt(IntPtr signal, uint slength, IntPtr output);
+
+        private static IntPtr CreateBuffer(double[] buffer)
+        {
+            int len = Marshal.SizeOf(typeof(double)) * buffer.Length;
+            IntPtr buf = Marshal.AllocHGlobal(len);
+            Marshal.Copy(buffer, 0, buf, buffer.Length);
+            return buf;
+        }
+        private static void CopyBuffer(double[] buffer, IntPtr ptr)
+        {
+            Marshal.Copy(ptr, buffer, 0, buffer.Length);
+        }
+        private static void FreeBuffer(IntPtr ptr)
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+
     }
 
     class FWTCalculator

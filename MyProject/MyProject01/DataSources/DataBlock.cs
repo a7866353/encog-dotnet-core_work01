@@ -12,6 +12,7 @@ namespace MyProject01.DataSources
         {
             Array.Copy(src.Data, srcOffset, dst.Data, dstOffset, length);
         }
+
         public double[] Data;
         public DataBlock(int length)
         {
@@ -25,6 +26,16 @@ namespace MyProject01.DataSources
         {
             set { Data[index] = value; }
             get { return Data[index]; }
+        }
+        public int CopyToFromEndIndex(int srcOffest, DataBlock dst, int dstOffset, int length)
+        {
+            Copy(this, srcOffest - length + 1, dst, dstOffset - length + 1, length);
+            return length;
+        }
+        public int CopyTo(int srcOffest, DataBlock dst, int dstOffset, int length)
+        {
+            Copy(this, srcOffest, dst, dstOffset, length);
+            return length;
         }
     }
 }

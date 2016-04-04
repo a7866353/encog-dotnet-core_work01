@@ -13,6 +13,8 @@ namespace MyProject01.Controller.Jobs
     class TrainerContex
     {
         public long Epoch;
+        public DateTime StartDate;
+        public DateTime CurrentDate;
 
         public Trainer Trainer;
         public bool IsEnd;
@@ -27,6 +29,10 @@ namespace MyProject01.Controller.Jobs
 
         public NEATNetwork BestNetwork;
 
+        public TrainerContex()
+        {
+            StartDate = DateTime.Now;
+        }
         public void SetDataLength(BasicDataBlock dataBlock, int trainLength)
         {
             _testDataBlock = dataBlock;
@@ -36,6 +42,8 @@ namespace MyProject01.Controller.Jobs
 
         }
 
+        // Controller
+        public string ControllerName;
 
 
         public TrainerContex Clone()

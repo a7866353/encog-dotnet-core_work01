@@ -38,11 +38,12 @@ EXTERN_C
 			{
 				cov[i] += data[k - (m / 2 - j)] * core[k];//k针对core[k]  
 			}
-
+#if 1
 			for (k = n - m / 2 + j; k < n; k++)
 			{
 				cov[i] += data[k] * core[k - (n - m / 2 + j)];//k针对data[k]  
 			}
+#endif
 		}
 
 		//中间的n-m行  
@@ -62,11 +63,12 @@ EXTERN_C
 			{
 				cov[i] += data[k] * core[m - j - k];//k针对data[k]  
 			}
-
+#if 1
 			for (k = 0; k < m - j; k++)
 			{
 				cov[i] += core[k] * data[n - (m - j) + k];//k针对core[k]  
 			}
+#endif
 		}
 
 	}
@@ -123,7 +125,6 @@ EXTERN_C
 		}
 
 	}
-
 	void main()
 	{
 

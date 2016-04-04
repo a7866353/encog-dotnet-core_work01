@@ -224,7 +224,7 @@ namespace MyProject01.Controller
 
         public int TotalLength
         {
-            get { return _dataSource.TotalLength - SkipCount; }
+            get { return _dataSource.TotalLength; }
         }
 
         public int DataBlockLength
@@ -275,7 +275,267 @@ namespace MyProject01.Controller
             return sen;
         }
     }
+    [Serializable]
+    class RateFWT2Sensor : ISensor
+    {
+        private int _dataCount;
+        private int _index;
+        private int _outputCount;
+        [NonSerialized]
+        private IDataSource _dataSource;
+        [NonSerialized]
+        private DataBlock _dataBuffer;
+        [NonSerialized]
+        private DataBlock _outputBuffer;
 
+        public int DataCollectLength = 4;
+        private int CopyResult(DataBlock resultBuf, DataBlock outBuf, int len)
+        {
+            int blockLength = _dataCount;
+            int outPos = 0;
+            int copyOffset = 0;
+            int copyLen;
+            while(true)
+            {
+                if( blockLength == 1 )
+                    return outPos;
+                if( blockLength % 2 != 0)
+                {
+                    throw (new Exception("Param error!"));
+                }
+                blockLength /= 2;
+                if( blockLength < len)
+                {
+                    copyLen = blockLength;
+                }
+                else
+                {
+                    copyLen = len;
+                }
+                int staPos = blockLength - copyLen;
+
+                if (outBuf != null)
+                    resultBuf.CopyTo(copyOffset + staPos, outBuf, outPos, copyLen);
+                outPos += copyLen;
+
+                if (outBuf != null)
+                    resultBuf.CopyTo(copyOffset + blockLength + staPos, outBuf, outPos, copyLen);
+                outPos += copyLen;
+
+                copyOffset += blockLength * 2;
+            }
+        }
+        public RateFWT2Sensor(int dataCount)
+        {
+            _dataCount = dataCount;
+            _index = 0;
+            Init();
+        }
+        public int CurrentPosition
+        {
+            get
+            {
+                return _index;
+            }
+            set
+            {
+                _index = value;
+            }
+        }
+
+        public int SkipCount
+        {
+            get { return _dataCount - 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _dataSource.TotalLength; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _outputCount; }
+        }
+
+        public int Copy(int index, DataBlock buffer, int startIndex)
+        {
+            _dataSource.Copy(index, _dataBuffer, 0, _dataBuffer.Length);
+            DataBlock outTmp = new DataBlock(_dataBuffer.Length * 2);
+            DllTools.FTW_5(_dataBuffer.Data, outTmp.Data);
+
+            CopyResult(outTmp, _outputBuffer, DataCollectLength);
+            DataBlock.Copy(_outputBuffer, 0, buffer, startIndex, _outputBuffer.Length);
+
+            // buffer[startIndex] = 0;
+            return 1;
+        }
+        public void Init()
+        {
+            _dataBuffer = new DataBlock(_dataCount);
+            _outputCount = CopyResult(_dataBuffer, null, DataCollectLength);
+            _outputBuffer = new DataBlock(_outputCount);
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return _dataSource;
+            }
+        }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set
+            {
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                this._dataSource = value.Get(param);
+            }
+        }
+
+
+        public ISensor Clone()
+        {
+            ISensor sen = MemberwiseClone() as ISensor;
+            sen.Init();
+            return sen;
+        }
+    }
+    [Serializable]
+    class RateWaveletSensor : ISensor
+    {
+        private int _dataCount;
+        private int _index;
+        private int _outputCount;
+        [NonSerialized]
+        private IDataSource _dataSource;
+       
+        private int _dataCollectLength = 4;
+        private WaveletFunction _wavelet;
+
+        private int CopyResult(DataBlock resultBuf, DataBlock outBuf, int len)
+        {
+            int blockLength = _dataCount;
+            int outPos = 0;
+            int copyOffset = 0;
+            int copyLen;
+            while (true)
+            {
+                if (blockLength == 1)
+                    return outPos;
+                if (blockLength % 2 != 0)
+                {
+                    throw (new Exception("Param error!"));
+                }
+                blockLength /= 2;
+                if (blockLength < len)
+                {
+                    copyLen = blockLength;
+                }
+                else
+                {
+                    copyLen = len;
+                }
+                int staPos = blockLength - copyLen;
+
+                if (outBuf != null)
+                    resultBuf.CopyTo(copyOffset + staPos, outBuf, outPos, copyLen);
+                outPos += copyLen;
+
+                if (outBuf != null)
+                    resultBuf.CopyTo(copyOffset + blockLength + staPos, outBuf, outPos, copyLen);
+                outPos += copyLen;
+
+                copyOffset += blockLength * 2;
+            }
+        }
+        public RateWaveletSensor(int dataCount, BasicWavelet waveletFunc, int dataCollectLength=4)
+        {
+
+            _wavelet = new WaveletFunction(waveletFunc);
+            _dataCount = dataCount;
+            _dataCollectLength = dataCollectLength;
+            _index = 0;
+            Init();
+        }
+        public int CurrentPosition
+        {
+            get
+            {
+                return _index;
+            }
+            set
+            {
+                _index = value;
+            }
+        }
+
+        public int SkipCount
+        {
+            get { return _dataCount - 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _dataSource.TotalLength; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _outputCount; }
+        }
+
+        public int Copy(int index, DataBlock buffer, int startIndex)
+        {
+            DataBlock _dataBuffer = new DataBlock(_dataCount);
+            DataBlock _outputBuffer = new DataBlock(_outputCount);
+
+            _dataSource.Copy(index, _dataBuffer, 0, _dataBuffer.Length);
+            DataBlock outTmp = new DataBlock(_dataBuffer.Length * 2);
+            DllTools.CalculateWavelet(_dataBuffer.Data, outTmp.Data, _wavelet);
+
+            CopyResult(outTmp, _outputBuffer, _dataCollectLength);
+            DataBlock.Copy(_outputBuffer, 0, buffer, startIndex, _outputBuffer.Length);
+
+            // buffer[startIndex] = 0;
+            return 1;
+        }
+        public void Init()
+        {
+            DataBlock _dataBuffer = new DataBlock(_dataCount);
+            _outputCount = CopyResult(_dataBuffer, null, _dataCollectLength);
+        }
+
+
+        public IDataSource DataSource
+        {
+            get
+            {
+                return _dataSource;
+            }
+        }
+
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set
+            {
+                RateDataSourceParam param = new RateDataSourceParam(5);
+                this._dataSource = value.Get(param);
+            }
+        }
+
+
+        public ISensor Clone()
+        {
+            ISensor sen = MemberwiseClone() as ISensor;
+            sen.Init();
+            return sen;
+        }
+    }
 
     //===========================================
     [Serializable]
@@ -659,23 +919,27 @@ namespace MyProject01.Controller
         }
     }
 
-    class SensorUtility
+    abstract class BasicCrossPartten
     {
-        public static ISensor GetPartten01(ISensor[] sensorArr)
+        abstract public ISensor GetPartten(ISensor[] sensorArr);
+    }
+    class CrossPartten01 : BasicCrossPartten
+    {
+        public override ISensor GetPartten(ISensor[] sensorArr)
         {
             SensorGroup senGroup = new SensorGroup();
 
             // For single data line;
-            foreach(ISensor sen in sensorArr)
+            foreach (ISensor sen in sensorArr)
             {
                 senGroup.Add(new FirstDerivative(sen));
                 senGroup.Add(new SecondDerivative(sen));
             }
 
             // For two data line
-            for (int i = 0; i < sensorArr.Length-1;i++ )
+            for (int i = 0; i < sensorArr.Length - 1; i++)
             {
-                for (int j=i+1;j<sensorArr.Length;j++)
+                for (int j = i + 1; j < sensorArr.Length; j++)
                 {
                     ISensor sen1 = sensorArr[i];
                     ISensor sen2 = sensorArr[j];
@@ -691,7 +955,7 @@ namespace MyProject01.Controller
                     senGroup.Add(new FirstDerivative(
                             new SensorCross(
                             new FirstDerivative(sen1),
-                            new FirstDerivative(sen2), 
+                            new FirstDerivative(sen2),
                             2)
                         ));
 
@@ -720,57 +984,148 @@ namespace MyProject01.Controller
             }
             return senGroup;
         }
-        public static ISensor GetKDJCrossSensor()
+    }
+    class CrossPartten02 : BasicCrossPartten
+    {
+        public override ISensor GetPartten(ISensor[] sensorArr)
         {
             SensorGroup senGroup = new SensorGroup();
-            int dataLen = 4;
-            ISensor[] sensorArr = new ISensor[]
-            {
-                new KDJ_KSensor(dataLen),
-                new KDJ_JSensor(dataLen),
-                new KDJ_DSensor(dataLen),
-                new RateSensor(dataLen),
-            };
-            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
-            senGroup.Add(new KDJ_KSensor(2));
-            senGroup.Add(new KDJ_DSensor(2));
-            senGroup.Add(new KDJ_JSensor(2));
 
+            // For single data line;
+            foreach (ISensor sen in sensorArr)
+            {
+                senGroup.Add(new FirstDerivative(sen));
+                senGroup.Add(new SecondDerivative(sen));
+            }
+
+            // For two data line
+            for (int i = 0; i < sensorArr.Length - 1; i++)
+            {
+                for (int j = i + 1; j < sensorArr.Length; j++)
+                {
+                    ISensor sen1 = sensorArr[i];
+                    ISensor sen2 = sensorArr[j];
+
+                    senGroup.Add(new SensorCross(sen1, sen2, 4));
+
+                    senGroup.Add(new FirstDerivative(new SensorCross(sen1, sen2, 4)));
+                    senGroup.Add(new SecondDerivative(new SensorCross(sen1, sen2, 8)));
+
+                    senGroup.Add(new SensorCross(new FirstDerivative(sen1), new FirstDerivative(sen2), 4));
+                    senGroup.Add(new SensorCross(new SecondDerivative(sen1), new SecondDerivative(sen2), 4));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2),
+                            4)
+                        ));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new SecondDerivative(sen1),
+                            new SecondDerivative(sen2),
+                            4)
+                        ));
+
+                    senGroup.Add(new SecondDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2),
+                            8)
+                        ));
+
+                    senGroup.Add(new SecondDerivative(
+                            new SensorCross(
+                            new SecondDerivative(sen1),
+                            new SecondDerivative(sen2),
+                            8)
+                        ));
+
+                }
+            }
             return senGroup;
         }
-        public static ISensor GetKDJCrossLine5Sensor()
+    }
+    class CrossPartten03 : BasicCrossPartten
+    {
+        public override ISensor GetPartten(ISensor[] sensorArr)
         {
             SensorGroup senGroup = new SensorGroup();
-            int dataLen = 4;
+
+            // For single data line;
+            foreach (ISensor sen in sensorArr)
+            {
+                senGroup.Add(new FirstDerivative(sen));
+                senGroup.Add(new SecondDerivative(sen));
+            }
+
+            // For two data line
+            for (int i = 0; i < sensorArr.Length - 1; i++)
+            {
+                for (int j = i + 1; j < sensorArr.Length; j++)
+                {
+                    ISensor sen1 = sensorArr[i];
+                    ISensor sen2 = sensorArr[j];
+
+                    senGroup.Add(new SensorCross(sen1, sen2, 2));
+
+                    senGroup.Add(new FirstDerivative(new SensorCross(sen1, sen2, 2)));
+
+                    senGroup.Add(new SensorCross(new FirstDerivative(sen1), new FirstDerivative(sen2), 2));
+                    senGroup.Add(new SensorCross(new SecondDerivative(sen1), new SecondDerivative(sen2), 2));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2),
+                            2)
+                        ));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new SecondDerivative(sen1),
+                            new SecondDerivative(sen2),
+                            2)
+                        ));
+                }
+            }
+            return senGroup;
+        }
+    }
+    class SensorUtility
+    {
+
+        private static ISensor[] GetKDJSensor(int dataLen, int averageRange)
+        {
             ISensor[] sensorArr = new ISensor[]
             {
-                new KDJ_KSensor(dataLen){ AverageRange = 9 },
-                new KDJ_JSensor(dataLen){ AverageRange = 9 },
-                new KDJ_DSensor(dataLen){ AverageRange = 9 },
-  
-                new KDJ_KSensor(dataLen){ AverageRange = 29 },
-                new KDJ_JSensor(dataLen){ AverageRange = 29 },
-                new KDJ_DSensor(dataLen){ AverageRange = 29 },
 
-                new KDJ_KSensor(dataLen){ AverageRange = 59 },
-                new KDJ_JSensor(dataLen){ AverageRange = 59 },
-                new KDJ_DSensor(dataLen){ AverageRange = 59 },
-               
-                new KDJ_KSensor(dataLen){ AverageRange = 287 },
-                new KDJ_JSensor(dataLen){ AverageRange = 287 },
-                new KDJ_DSensor(dataLen){ AverageRange = 287 },
-               
-                new KDJ_KSensor(dataLen){ AverageRange = 863 },
-                new KDJ_JSensor(dataLen){ AverageRange = 863 },
-                new KDJ_DSensor(dataLen){ AverageRange = 863 },
-
-                new RateSensor(dataLen),
+                new KDJ_KSensor(dataLen){ AverageRange = averageRange },
+                new KDJ_JSensor(dataLen){ AverageRange = averageRange },
+                new KDJ_DSensor(dataLen){ AverageRange = averageRange },
             };
-            senGroup.Add(SensorUtility.GetPartten01(sensorArr));
+            return sensorArr;
+        }
+        public static ISensor GetKDJCrossSensor(int dataLen, int[] averageRangeArr, BasicCrossPartten parrten)
+        {
+            SensorGroup senGroup = new SensorGroup();
 
-            senGroup.Add(new KDJ_KSensor(2));
-            senGroup.Add(new KDJ_DSensor(2));
-            senGroup.Add(new KDJ_JSensor(2));
+            // Add KDJ Sensor
+            List<ISensor> crossSenList = new List<ISensor>();
+            foreach(int aveRng in averageRangeArr)
+            {
+                foreach (ISensor sen in GetKDJSensor(dataLen, aveRng))
+                    crossSenList.Add(sen);
+            }
+
+            // Add Rate for crossing
+            crossSenList.Add(new RateSensor(dataLen));
+
+            senGroup.Add(parrten.GetPartten(crossSenList.ToArray()));
+            senGroup.Add(new KDJ_KSensor(dataLen));
+            senGroup.Add(new KDJ_DSensor(dataLen));
+            senGroup.Add(new KDJ_JSensor(dataLen));
 
             return senGroup;
         }
