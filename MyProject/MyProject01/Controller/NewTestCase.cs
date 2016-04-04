@@ -44,6 +44,35 @@ namespace MyProject01.Controller
             // loader.Load();
             return loader;
         }
+        static public BasicTestDataLoader GetRecnetM30_1Month()
+        {
+            DateTime StartDateTime = new DateTime(2016, 2, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
+            // loader.Load();
+            return loader;
+        }
+        static public BasicTestDataLoader GetRecnetM30_3Month()
+        {
+            DateTime StartDateTime = new DateTime(2015, 12, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
+            // loader.Load();
+            return loader;
+        }
+
+        static public BasicTestDataLoader GetRecnetM30_2Year()
+        {
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            DateTime StartDateTime = EndDateTime.AddYears(-2);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
+            // loader.Load();
+            return loader;
+        }
+
         static public BasicTestDataLoader GetM5_1Year()
         {
             DateTime StartDateTime = new DateTime(2013, 10, 31);
@@ -98,36 +127,22 @@ namespace MyProject01.Controller
             // loader.Load();
             return loader;
         }
-
-        static public BasicTestDataLoader GetRecnetM30OneMonth()
-        {
-            DateTime StartDateTime = new DateTime(2016, 2, 13);
-            DateTime EndDateTime = new DateTime(2016, 3, 13);
-            BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
-            // loader.Load();
-            return loader;
-        }
-        static public BasicTestDataLoader GetRecnetM30_3Month()
-        {
-            DateTime StartDateTime = new DateTime(2015, 12, 13);
-            DateTime EndDateTime = new DateTime(2016, 3, 13);
-            BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
-            // loader.Load();
-            return loader;
-        }
     }
     public class NewNormalScore : ICalculateScore
     {
         public ControllerFactory _ctrlFactory;
-        public double _testRate = 1.0;
         public int StartPosition = 50000;
+        public int TrainDataLength
+        {
+            get { return _trainDataLength; }
+        }
 
-        public NewNormalScore(ControllerFactory ctrlFactory, double testRate = 1.0)
+        private int _trainDataLength;
+
+        public NewNormalScore(ControllerFactory ctrlFactory, int trainDataLength)
         {
             _ctrlFactory = ctrlFactory;
-            _testRate = testRate;
+            _trainDataLength = trainDataLength;
         }
 
         public bool ShouldMinimize
@@ -144,9 +159,7 @@ namespace MyProject01.Controller
             IController ctrl = _ctrlFactory.Get();
             ctrl.UpdateNetwork((IMLRegression)network);
             LearnRateMarketAgent agent = new LearnRateMarketAgent(ctrl);
-            int testCount = ctrl.TotalLength - StartPosition;
-            testCount = (int)(testCount * _testRate);
-            agent.SetRange(StartPosition, StartPosition + testCount);
+            agent.SetRange(StartPosition, StartPosition + _trainDataLength);
 
             while (true)
             {
@@ -170,7 +183,6 @@ namespace MyProject01.Controller
     }
     class NewUpdateControllerJob : ICheckJob
     {
-        private NewNetworkController _ctrl;
         private ControllerPacker _packer;
         private string _caseName;
         public NewUpdateControllerJob(string caseName, ControllerPacker packer)
@@ -210,7 +222,7 @@ namespace MyProject01.Controller
 
         private RateMarketTestDAO _testCaseDAO;
 
-        private int _trainDataLength;
+        private int _testStartIndex;
         private long _epoch;
         private LogFormater _log;
 
@@ -239,7 +251,7 @@ namespace MyProject01.Controller
             }
 
             _epoch = context.Epoch;
-            _trainDataLength = StartPosition + _testCaseDAO.TestDataStartIndex;
+            _testStartIndex = StartPosition + TrainDataLength;
             TestResult(context.BestNetwork, _testCaseDAO);
 
             _testCaseDAO.NetworkData = null;
@@ -259,7 +271,7 @@ namespace MyProject01.Controller
             RateMarketTestEpisodeDAO epsodeLog = (RateMarketTestEpisodeDAO)dao.CreateEpisode();
             DealLogList logList = new DealLogList();
             int trainDealCount = 0;
-            int trainedDataIndex = _trainDataLength;
+            int trainedDataIndex = _testStartIndex;
             double startMoney = agent.InitMoney;
             double trainedMoney = 0;
             double endMoney = 0;
@@ -329,8 +341,11 @@ namespace MyProject01.Controller
         private ControllerFactory _ctrlFac;
         private BasicControllerWithCache _testCtrl;
         private BasicTestDataLoader _loader;
+        private NewNormalScore _score;
+
         private double _testRate = 0.7;
         private int _startPosition = 50000;
+        private int _trainBlockLength = 1024;
 
         private int _trainDataLength;
         private int _testDataLength;
@@ -348,9 +363,15 @@ namespace MyProject01.Controller
 
             _testCtrl.Normilize(0, 1.0);
 
+
             BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO
             _ctrlFac = new ControllerFactory(trainCtrl);
+
+            _score = new NewNormalScore(_ctrlFac, Math.Min(_trainDataLength, _trainBlockLength))
+                {
+                    StartPosition = _startPosition
+                };
 
             NewTrainer trainer = new NewTrainer(_testCtrl.NetworkInputVectorLength,
                 _testCtrl.NetworkOutputVectorLenth);
@@ -358,7 +379,7 @@ namespace MyProject01.Controller
             trainer.CheckCtrl = CreateCheckCtrl();
             trainer.TestName = "";
             trainer.PopulationFacotry = new NormalPopulationFactory();
-            trainer.ScoreCtrl = new NewNormalScore(_ctrlFac, _testRate);
+            trainer.ScoreCtrl = _score;
            
             trainer.RunTestCase();
         }
@@ -384,7 +405,7 @@ namespace MyProject01.Controller
             });
 
             // mainCheckCtrl.Add(subCheckCtrl);
-
+            mainCheckCtrl.Add(new TrainDataChangeJob(_score, _startPosition, _trainDataLength, _score.TrainDataLength/2));
             return mainCheckCtrl;
 
         }
@@ -824,29 +845,29 @@ namespace MyProject01.Controller
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
 
                 new NewTestContainer(){ Name="FWT2-4096-4-Recent-M30-1Month", Sensor = new RateFWT2Sensor(4096){ DataCollectLength = 4}, 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
 
                 new NewTestContainer(){ Name="FWT2-1024-4-Recent-M30-1Month", Sensor = new RateFWT2Sensor(1024){ DataCollectLength = 4}, 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
 
 
                 new NewTestContainer(){ Name="Haar-64-4-Recent-M30-1Month", 
                     Sensor = new RateWaveletSensor(64, new HaarWavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
                 },
                 new NewTestContainer(){ Name="Daubechies8-64-4-Recent-M30-1Month", 
                     Sensor = new RateWaveletSensor(64, new Daubechies8Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
                 },
 
                 new NewTestContainer(){ Name="Daubechies4-64-4-Recent-M30-1Month", 
                     Sensor = new RateWaveletSensor(64, new Daubechies4Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
                 },
 
                 new NewTestContainer(){ Name="Legendre6-64-4-Recent-M30-1Month", 
                     Sensor = new RateWaveletSensor(64, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth() 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
                 },
 
 
@@ -877,16 +898,19 @@ namespace MyProject01.Controller
 
 
                 new NewTestContainer(){ Name="CrossTest2-16,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(16, new int[] {9}, new CrossPartten02()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
                 new NewTestContainer(){ Name="CrossTest2-16,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(16, new int[] {9, 89}, new CrossPartten02()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
 //--------------------------
 
 
                 new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
+                new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M30_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year()},
+
                 new NewTestContainer(){ Name="CrossTest3-4,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten03()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
 
                 new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
@@ -899,13 +923,13 @@ namespace MyProject01.Controller
                 new NewTestContainer(){ Name="CrossTest-4,9,89-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten01()),     
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
                 new NewTestContainer(){ Name="CrossTest-4,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten01()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
 
                 new NewTestContainer(){ Name="CrossTest5Line_Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 299}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
                 new NewTestContainer(){ Name="CrossTest5Line_Recent_M5_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 299}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_3Month()},
 
                 new NewTestContainer(){ Name="CrossTest_Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-                new NewTestContainer(){ Name="CrossTest_Recent_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30OneMonth()},
+                new NewTestContainer(){ Name="CrossTest_Recent_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
                 new NewTestContainer(){ Name="CrossTest_Recent_M30_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_3Month()},
 
                 

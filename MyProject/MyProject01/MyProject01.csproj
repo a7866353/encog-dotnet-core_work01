@@ -120,6 +120,7 @@
     <Compile Include="DataSources\IDataSource.cs" />
     <Compile Include="DataSources\IDataSourceParam.cs" />
     <Compile Include="OldController\DataUpdateJob.cs" />
+    <Compile Include="OldController\Jobs\TrainDataChangeJob.cs" />
     <Compile Include="OldController\KDJFromater.cs" />
     <Compile Include="DAO\RateDataControlDAO.cs" />
     <Compile Include="DAO\RateDataDAOList.cs" />
