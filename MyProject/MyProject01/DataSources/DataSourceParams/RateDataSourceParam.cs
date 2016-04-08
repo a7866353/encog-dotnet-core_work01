@@ -120,13 +120,18 @@ namespace MyProject01.DataSources.DataSourceParams
             _dArr = new double[_rateArr.Length];
             _jArr = new double[_rateArr.Length];
 
-
+            double lastRsv = 0.5;
             for (int i = _skipCount; i < _rateArr.Length; i++)
             {
                 double maxValue, minValue, rsv;
                 FindMaxMin(i, out maxValue, out minValue);
 
                 rsv = (_rateArr[i].Close - minValue) / (maxValue - minValue);
+                if (maxValue == minValue)
+                    rsv = lastRsv;
+
+                lastRsv = rsv;
+
                 if (i == 0)
                 {
                     _kArr[i] = rsv;
