@@ -12,7 +12,7 @@ namespace MyProject01.Controller.Jobs
         private int _startPosition;
         private int _stepOffset;
         private int _maxPos;
-        private int _trainCount = 200;
+        private int _trainCount = 2;
 
         private int _currentStartPos;
 
@@ -23,7 +23,7 @@ namespace MyProject01.Controller.Jobs
             _stepOffset = stepOffset;
 
             _currentStartPos = _startPosition;
-            _maxPos = _startPosition + len;
+            _maxPos = Math.Max(_startPosition + len - score.TrainDataLength, _startPosition);
         }
         public bool Do(TrainerContex context)
         {
