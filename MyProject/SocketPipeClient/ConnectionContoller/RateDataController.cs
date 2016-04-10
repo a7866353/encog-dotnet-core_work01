@@ -27,6 +27,7 @@ namespace SocketTestClient.ConnectionContoller
     {
         protected ISender _sender;
         protected double _updateInterval;
+        protected TimeSpan _getDuration;
 
         public delegate void ChangeHandler();
         public event ChangeHandler OnChange;
@@ -36,7 +37,7 @@ namespace SocketTestClient.ConnectionContoller
             _sender = sender;
         }
 
-        public double UpdateInterval
+        public virtual double UpdateInterval
         {
             set { _updateInterval = value; }
             get { return _updateInterval; }
@@ -288,11 +289,9 @@ namespace SocketTestClient.ConnectionContoller
     class RateByTimeRequestController2 : RataDataCollectTask
     {
         private RateDataControlDAO _dao;
-        private double _updateInterval;
         private DateTimeFormatInfo _dtFormat;
         private RateByTimeRequest2 _lastRequest;
         private TimeSpan _getDataBlockDuration;
-        private TimeSpan _getDuration;
 
         public RateByTimeRequestController2(RateDataControlDAO dao, double updateInterval, ISender sender)
             : base(sender)
@@ -310,6 +309,17 @@ namespace SocketTestClient.ConnectionContoller
             _getDuration = _getDataBlockDuration;
         }
 
+        public override double UpdateInterval
+        {
+            set
+            {
+                _updateInterval = value;
+                int min = (int)(_updateInterval * _dao.TimeFrame);
+                int sec = (int)(((_updateInterval * _dao.TimeFrame) - (int)(_updateInterval * _dao.TimeFrame)) * 60);
+                _getDataBlockDuration = new TimeSpan(0, min, sec);
+                _getDuration = _getDataBlockDuration;
+            }
+        }
         private RateByTimeRequest2 GetRequest()
         {
             // dao.Update(); // error
@@ -676,6 +686,7 @@ namespace SocketTestClient.ConnectionContoller
                     continue;
 
                 targetTask = task;
+                break;
             }
             return targetTask;
         }

@@ -21,12 +21,13 @@ namespace SocketTestClient.ConnectionContoller
 
         private ISender _sender;
 
-        public BasicTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
+        public BasicTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber, ISender sender)
         {
             _dataController = RateDataControlDAO.GetByName(rateDataControllerName);
             // For Debug at first run
             _lastTradeTime = DateTime.Now.AddDays(-10);
             _magicNumber = magicNumber;
+            _sender = sender;
         }
         public string SymbolName
         {
@@ -51,7 +52,7 @@ namespace SocketTestClient.ConnectionContoller
                     return;
 
                 SendOrderRequest req = new SendOrderRequest();
-                req.SymbolName = SymbolName;
+                req.SymbolName = SymbolName+"pro";
                 req.MagicNumber = MagicNumber;
                 if (cmd == MarketActions.Buy)
                 {
@@ -91,8 +92,8 @@ namespace SocketTestClient.ConnectionContoller
     class RateTradeOrder : BasicTradeOrder
     {
         protected ITradeDesisoin _decisionCtrl;
-        public RateTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
-            :base(rateDataControllerName, networkControllerName, magicNumber)
+        public RateTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber, ISender sender)
+            : base(rateDataControllerName, networkControllerName, magicNumber, sender)
         {
             NetworkController _networkController = NetworkController.Open(networkControllerName);
             _decisionCtrl = _networkController.GetDecisionController();
@@ -120,8 +121,8 @@ namespace SocketTestClient.ConnectionContoller
     class KDJTradeOrder : BasicTradeOrder
     {
         protected ITradeDesisoin _decisionCtrl;
-        public KDJTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
-            : base(rateDataControllerName, networkControllerName, magicNumber)
+        public KDJTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber, ISender sender)
+            : base(rateDataControllerName, networkControllerName, magicNumber, sender)
         {
             NetworkController _networkController = NetworkController.Open(networkControllerName);
             _decisionCtrl = _networkController.GetDecisionController();
@@ -145,8 +146,8 @@ namespace SocketTestClient.ConnectionContoller
     {
         protected ITradeDesisoin _decisionCtrl;
         private IController _ctrl;
-        public NewTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber)
-            : base(rateDataControllerName, networkControllerName, magicNumber)
+        public NewTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber, ISender sender)
+            : base(rateDataControllerName, networkControllerName, magicNumber, sender)
         {
             ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName(networkControllerName);
             _ctrl = dao.GetController();
@@ -155,11 +156,14 @@ namespace SocketTestClient.ConnectionContoller
         {
             DateTime lastTradeTime = dataController.LastItemTime;
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, lastTradeTime.AddMinutes(-1*dataController.TimeFrame*1000), lastTradeTime, 2000);
+                new TestDataDateRangeLoader(dataController.CollectiongName, (DataTimeType)dataController.TimeFrame, lastTradeTime.AddMinutes(-1 * dataController.TimeFrame * 1000), lastTradeTime, 2000)
+                {
+                    NeedTimeFrameConver = true,
+                };
             loader.Load();
 
             _ctrl.DataSourceCtrl = new DataSourceCtrl(loader);
-            _ctrl.CurrentPosition = _ctrl.TotalLength;
+            _ctrl.CurrentPosition = _ctrl.TotalLength-1;
 
             return _ctrl.GetAction();
         }
