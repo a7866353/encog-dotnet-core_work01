@@ -1093,6 +1093,67 @@ namespace MyProject01.Controller
             return senGroup;
         }
     }
+
+    class CrossPartten04 : BasicCrossPartten
+    {
+        public override ISensor GetPartten(ISensor[] sensorArr)
+        {
+            SensorGroup senGroup = new SensorGroup();
+
+            // For two data line
+            for (int i = 0; i < sensorArr.Length - 1; i++)
+            {
+                for (int j = i + 1; j < sensorArr.Length; j++)
+                {
+                    ISensor sen1 = sensorArr[i];
+                    ISensor sen2 = sensorArr[j];
+
+                    senGroup.Add(new SensorCross(sen1, sen2, 2));
+
+                    senGroup.Add(new FirstDerivative(new SensorCross(sen1, sen2, 2)));
+
+                    senGroup.Add(new SensorCross(new FirstDerivative(sen1), new FirstDerivative(sen2), 2));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2),
+                            2)
+                        ));
+                }
+            }
+            return senGroup;
+        }
+    }
+    class CrossPartten05 : BasicCrossPartten
+    {
+        public override ISensor GetPartten(ISensor[] sensorArr)
+        {
+            SensorGroup senGroup = new SensorGroup();
+
+            // For two data line
+            for (int i = 0; i < sensorArr.Length - 1; i++)
+            {
+                for (int j = i + 1; j < sensorArr.Length; j++)
+                {
+                    ISensor sen1 = sensorArr[i];
+                    ISensor sen2 = sensorArr[j];
+
+                    senGroup.Add(new SensorCross(sen1, sen2, 3));
+
+                    senGroup.Add(new SensorCross(new FirstDerivative(sen1), new FirstDerivative(sen2), 1));
+
+                    senGroup.Add(new FirstDerivative(
+                            new SensorCross(
+                            new FirstDerivative(sen1),
+                            new FirstDerivative(sen2),
+                            1)
+                        ));
+                }
+            }
+            return senGroup;
+        }
+    }
     class SensorUtility
     {
 
@@ -1130,7 +1191,5 @@ namespace MyProject01.Controller
             return senGroup;
         }
     }
-
-
 
 }
