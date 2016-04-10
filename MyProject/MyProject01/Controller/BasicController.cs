@@ -207,7 +207,7 @@ namespace MyProject01.Controller
         private ISensor _sensor;
         private IActor _actor;
         private Normalizer[] _normalizerArray;
-
+        
         private int _currentPosition;
 
         private DataSourceCtrl _dataSourceCtrl;
@@ -215,6 +215,8 @@ namespace MyProject01.Controller
         private IDataSource _dataSource;
 
         private DataBlock[] _inDataCache;
+
+        public int StartPosition = 0;
         public BasicControllerWithCache(ISensor sensor, IActor actor)
         {
             _sensor = sensor;
@@ -283,7 +285,7 @@ namespace MyProject01.Controller
             ctrl._actor = _actor.Clone();
             // ctrl._normalizerArray = _normalizerArray.Clone() as Normalizer[];
 
-            _currentPosition = _sensor.SkipCount;
+            _currentPosition = Math.Max(_sensor.SkipCount , StartPosition);
             return ctrl;
         }
         public DataSourceCtrl DataSourceCtrl
@@ -295,7 +297,7 @@ namespace MyProject01.Controller
 
                 RateDataSourceParam param = new RateDataSourceParam(5);
                 _dataSource = _dataSourceCtrl.Get(param);
-                _currentPosition = _sensor.SkipCount;
+                _currentPosition = Math.Max(_sensor.SkipCount, StartPosition);
             }
             get
             {
@@ -314,11 +316,12 @@ namespace MyProject01.Controller
             FwtDataNormalizer norm = new FwtDataNormalizer();
             DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
+            int startPos = Math.Max(_sensor.SkipCount, StartPosition);
 
-            _sensor.Copy(SkipCount, buffer, 0);
+            _sensor.Copy(startPos, buffer, 0);
             norm.Init(buffer.Data, middleValue, limit);
 
-            for (int i = SkipCount + 1; i < TotalLength; i++)
+            for (int i = startPos + 1; i < TotalLength; i++)
             {
                 _sensor.Copy(i, buffer, 0);
                 norm.Set(buffer.Data);
@@ -329,7 +332,7 @@ namespace MyProject01.Controller
 
             // Create cache data
             _inDataCache = new DataBlock[TotalLength];
-            for (int i = SkipCount; i < TotalLength; i++)
+            for (int i = startPos; i < TotalLength; i++)
             {
                 buffer = new DataBlock(NetworkInputVectorLength);
                 _sensor.Copy(i, buffer, 0);
