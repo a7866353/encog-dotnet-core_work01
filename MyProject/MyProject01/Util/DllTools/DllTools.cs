@@ -120,6 +120,7 @@ namespace MyProject01.Util.DllTools
             }
         }
     }
+#if true
     class Daubechies4Wavelet : BasicDaubechiesWavelet
     {
         public override double[] Scaling
@@ -136,6 +137,25 @@ namespace MyProject01.Util.DllTools
             }
         }
     }
+#else
+    class Daubechies4Wavelet : BasicDaubechiesWavelet
+    {
+        public override double[] Scaling
+        {
+            get
+            {
+                return new double[] 
+                { 
+                    -0.1830127,
+                    0.3169873,
+                    0.6830127, 
+                    1.1830127
+                };
+            }
+        }
+    }
+
+#endif
     class Legendre6Wavelet : BasicDaubechiesWavelet
     {
         public override double[] Scaling
