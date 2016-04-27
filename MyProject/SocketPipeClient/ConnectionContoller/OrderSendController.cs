@@ -146,21 +146,29 @@ namespace SocketTestClient.ConnectionContoller
     {
         protected ITradeDesisoin _decisionCtrl;
         private IController _ctrl;
-        public NewTradeOrder(string rateDataControllerName, string networkControllerName, int magicNumber, ISender sender)
+        private DataTimeType _timeFrame;
+        private DateTime _lastItemTime;
+        public NewTradeOrder(string rateDataControllerName, DataTimeType timeFrame, string networkControllerName, int magicNumber, ISender sender)
             : base(rateDataControllerName, networkControllerName, magicNumber, sender)
         {
             ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName(networkControllerName);
             _ctrl = dao.GetController();
+            _timeFrame = timeFrame;
+            _lastItemTime = DateTime.Now.AddMinutes(-2 * (int)_timeFrame);
         }
         protected override MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime)
         {
             DateTime lastTradeTime = dataController.LastItemTime;
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader(dataController.CollectiongName, (DataTimeType)dataController.TimeFrame, lastTradeTime.AddMinutes(-1 * dataController.TimeFrame * 1000), lastTradeTime, 2000)
+                new TestDataDateRangeLoader(dataController.CollectiongName, _timeFrame, lastTradeTime.AddMinutes(-1 * dataController.TimeFrame * 1000), lastTradeTime, 2000)
                 {
                     NeedTimeFrameConver = true,
                 };
             loader.Load();
+
+            if (_lastItemTime.AddMinutes((int)_timeFrame) > loader[loader.Count - 1].Time)
+                return MarketActions.Nothing;
+            _lastItemTime = loader[loader.Count - 1].Time;
 
             _ctrl.DataSourceCtrl = new DataSourceCtrl(loader);
             _ctrl.CurrentPosition = _ctrl.TotalLength-1;

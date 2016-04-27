@@ -35,12 +35,14 @@ namespace SocketTestClient.ConnectionContoller
             // _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/3/22 21:55:27", 1, _sender)); // 116
             // _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/3/22 21:56:32", 2, _sender)); // 112
             // _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/3/22 21:35:41", 3, _sender)); // 115
-            _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/4/4 18:34:04", 4, _sender)); // 115
-            _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/4/4 18:26:34", 5, _sender)); // 115
-            _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/4/4 18:53:45", 6, _sender)); // 115
-            _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/4/5 3:54:55", 7, _sender)); // 115
-            _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", "Controller2016/4/6 1:27:35", 8, _sender)); // 115
-            _tradeOrderList.Add(new NewTradeOrder("USDJPY_5", "Controller2016/4/6 19:07:07", 9, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/4 18:34:04", 4, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/4 18:26:34", 5, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/4 18:53:45", 6, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/5 3:54:55", 7, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/6 1:27:35", 8, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M5, "Controller2016/4/6 19:07:07", 9, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/11 23:14:08", 10, _sender)); // 115
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/11 23:13:46", 11, _sender)); // 115
 
 
             // rateDataCtrl.AddSymbol();

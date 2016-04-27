@@ -1154,6 +1154,66 @@ namespace MyProject01.Controller
             return senGroup;
         }
     }
+
+    [Serializable]
+    class SensorYieldRate : ISensor
+    {
+        private ISensor _sourceSen;
+
+        public SensorYieldRate(ISensor srcSensor)
+        {
+            _sourceSen = srcSensor;
+        }
+        public int SkipCount
+        {
+            get { return _sourceSen.SkipCount + 1; }
+        }
+
+        public int TotalLength
+        {
+            get { return _sourceSen.TotalLength; }
+        }
+
+        public int DataBlockLength
+        {
+            get { return _sourceSen.DataBlockLength - 1; }
+        }
+
+        public IDataSource DataSource
+        {
+            get { return _sourceSen.DataSource; }
+        }
+
+        public DataSourceCtrl DataSourceCtrl
+        {
+            set { _sourceSen.DataSourceCtrl = value; }
+        }
+
+        public int Copy(int index, DataBlock buffer, int offset)
+        {
+            DataBlock tmp = new DataBlock(_sourceSen.DataBlockLength);
+            _sourceSen.Copy(index, tmp, 0);
+
+            for(int i=0;i<tmp.Length-1;i++)
+            {
+                buffer[offset + i] = Math.Log(tmp[i + 1] / tmp[i]);
+            }
+
+            return tmp.Length - 1;
+        }
+
+        public void Init()
+        {
+            return;
+        }
+
+        public ISensor Clone()
+        {
+            return MemberwiseClone() as ISensor;
+        }
+    }
+
+
     class SensorUtility
     {
 

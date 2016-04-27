@@ -17,22 +17,25 @@ namespace MyProject01.Controller
 {
     class NewTestDataPacket
     {
-        static public BasicTestDataLoader GetOneWeek()
+        static public BasicTestDataLoader GetCurrentM1_1Month()
         {
-            DateTime StartDateTime = new DateTime(2013, 11, 1);
-            DateTime EndDateTime = new DateTime(2013, 11, 7);
+            DateTime EndDateTime = DateTime.Now;
+            DateTime StartDateTime = EndDateTime.AddMonths(-1);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY", DataTimeType.M30, StartDateTime, EndDateTime, 50000);
+                // new TestDataDateRangeLoader("USDJPY_30", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M1, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
             // loader.Load();
             return loader;
         }
+
         static public BasicTestDataLoader GetCurrentM30_1Month()
         {
             DateTime EndDateTime = DateTime.Now;
             DateTime StartDateTime = EndDateTime.AddMonths(-1);
             BasicTestDataLoader loader =
-                new TestDataDateRangeLoader("USDJPY_30", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
-            // loader.Load();
+                // new TestDataDateRangeLoader("USDJPY_30", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
+                new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = true };
+           // loader.Load();
             return loader;
         }
         static public BasicTestDataLoader GetCurrentM30_3Month()
@@ -41,6 +44,8 @@ namespace MyProject01.Controller
             DateTime StartDateTime = EndDateTime.AddMonths(-3);
             BasicTestDataLoader loader =
                 new TestDataDateRangeLoader("USDJPY_30", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
+                // new TestDataDateRangeLoader("USDJPY_1", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = true };
+
             // loader.Load();
             return loader;
         }
@@ -953,6 +958,19 @@ namespace MyProject01.Controller
                     Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_3Month() 
                 },
+                new NewTestContainer(){ Name="Legendre6-1024-4-Current_M1_1Month", 
+                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month() 
+                },
+
+                new NewTestContainer(){ Name="Legendre6-8192-4-Current_M1_1Month", 
+                    Sensor = new RateWaveletSensor(8192, new Legendre6Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month() 
+                },
+                new NewTestContainer(){ Name="Legendre6-32768-4-Current_M1_1Month", 
+                    Sensor = new RateWaveletSensor(32768, new Legendre6Wavelet(),4), 
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month() 
+                },
 
                 new NewTestContainer(){ Name="Legendre6-1024-16-Recent-M5-1Month", 
                     Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),16), 
@@ -1015,13 +1033,17 @@ namespace MyProject01.Controller
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_3Month()},
                    new NewTestContainer(){ Name="CrossTest5-4,2,9-Current_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_1Month()},
+                   new NewTestContainer(){ Name="CrossTest5-4,2,9-Current_M1_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month()},
 
                 new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Current_M30_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_3Month()},
 
                 new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Current_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_1Month()},
-                 
+                 new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Current_M1_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
+                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month()},
+                
 
 //--------------------------
 
