@@ -86,7 +86,7 @@ namespace MyProject01
             System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.Idle;
             this.Closing += TestCaseWindow_Closing;
             TestCaseList = new TestCaseGroup();
-            StartAllButton.Click += StartAllButton_Click;
+            // StartAllButton.Click += StartAllButton_Click;
             AddTestCase();
             int i = 0;
 
@@ -105,19 +105,77 @@ namespace MyProject01
                 testButton.Click += new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
                     {
                         MainWindow mainWin = new MainWindow(obj);
-                        mainWin.Title = displayName;
+                        mainWin.Title = DateTime.Now.ToString() + ": " + displayName;
                         mainWin.Show();
                     });
                 border.Child = testButton;
                 MainStackPanel.Children.Add(border);
             }
 
+            InitParamConfig();
 
         }
-
-        void StartAllButton_Click(object sender, RoutedEventArgs e)
+        private void InitParamConfig()
         {
+            //-------------------------------
+            AddParamConfigUI("ParameterConfigure:", null);
 
+
+            // ServerIP
+            //------------------------
+            TextBox ipTb = new TextBox();
+            ipTb.Text = CommonConfig.ServerIP;
+            ipTb.TextChanged += new TextChangedEventHandler(
+                    delegate(object sender, TextChangedEventArgs args)
+                    {
+                        CommonConfig.ServerIP = ipTb.Text;
+                    }
+                );
+            AddParamConfigUI("Server IP Address", ipTb);
+
+            // PopulationSize
+            //---------------------------
+            TextBox popSizeTb = new TextBox();
+            popSizeTb.Text = CommonConfig.PopulationSize.ToString();
+            popSizeTb.TextChanged += new TextChangedEventHandler(
+                    delegate(object sender, TextChangedEventArgs args)
+                    {
+                        int result;
+                        if (int.TryParse(popSizeTb.Text, out result) == false)
+                            return;
+                        CommonConfig.PopulationSize = result;
+                    }
+                );
+            AddParamConfigUI("Populaton Size", popSizeTb);
+
+            // LoaderParam
+            //------------------------
+            StackPanel loaderPanel = new StackPanel();
+            foreach(DataLoaderParam parm in DataLoaderParamList.GetParams())
+            {
+                RadioButton loaderParamRb = new RadioButton();
+                loaderParamRb.GroupName = "LoaderParam";
+                loaderParamRb.Content = parm.ToString();
+                loaderParamRb.Checked += new RoutedEventHandler(
+                        delegate(object sender, RoutedEventArgs args)
+                        {
+                            CommonConfig.LoaderParam = parm;
+                        }
+                    );
+                loaderPanel.Children.Add(loaderParamRb);
+                if (parm.IsDefault == true)
+                    loaderParamRb.IsChecked = true;
+            }
+            AddParamConfigUI("Rate Data Loader", loaderPanel);
+
+        }
+        private void AddParamConfigUI(string name, UIElement ui)
+        {
+            StackPanel panel = this.ParamConfigStackPanel;
+            panel.Children.Add(new Label() { Content = name });
+            if (ui != null)
+                panel.Children.Add(ui);
+            panel.Children.Add(new Rectangle() { Height = 2, HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, Fill = Brushes.Black });
         }
 
         void TestCaseWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

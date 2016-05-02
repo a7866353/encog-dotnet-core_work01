@@ -393,6 +393,9 @@ namespace MyProject01.Controller
         private int _testDataLength;
         public void Run()
         {
+            // Config Server IP
+            DataBaseAddress.SetIP(CommonConfig.ServerIP);
+
             _loader = GetDataLoader();
             _loader.Load();
 
@@ -420,7 +423,7 @@ namespace MyProject01.Controller
 
             trainer.CheckCtrl = CreateCheckCtrl();
             trainer.TestName = "";
-            trainer.PopulationFacotry = new NormalPopulationFactory();
+            trainer.PopulationFacotry = new NormalPopulationFactory() { PopulationNumber = CommonConfig.PopulationSize };
             trainer.ScoreCtrl = _score;
            
             trainer.RunTestCase();
@@ -438,8 +441,12 @@ namespace MyProject01.Controller
             testCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader);
             mainCheckCtrl.Add(new NewUpdateTestCaseJob()
             {
-                TestName = TestCaseName,
-                TestDescription = "",
+                TestName = TestCaseName + "_" + DateTime.Now.ToString(),
+
+                TestDescription = TestCaseName + "|" +
+                    CommonConfig.LoaderParam.ToString() + "|" +
+                    "P=" + CommonConfig.PopulationSize,
+
                 Controller = testCtrl,
                 TrainDataLength = _trainDataLength,
                 TestDataLength = _testDataLength,
@@ -817,7 +824,7 @@ namespace MyProject01.Controller
 
         public override string TestCaseName
         {
-            get { return "NewTestCase_All_1Day_Short" + DateTime.Now; }
+            get { return "NewTestCase_All_1Day_Short"; }
         }
     }
 
@@ -850,12 +857,15 @@ namespace MyProject01.Controller
 
         protected override BasicTestDataLoader GetDataLoader()
         {
-            return _loader;
+            return CommonConfig.LoaderParam.GetLoader();
         }
 
         public override string TestCaseName
         {
-            get { return _name + "\t" + DateTime.Now; }
+            get
+            {
+                return _name; 
+            }
         }
     }
 
@@ -877,12 +887,11 @@ namespace MyProject01.Controller
         {
             _testArr = new NewTestContainer[]
             {
+/*
                 new NewTestContainer(){ Name="FWT2-1024-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(1024){ DataCollectLength = 4}, 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-                new NewTestContainer(){ Name="FWT2-4096-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(4096){ DataCollectLength = 4}, 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                    Actor = new BasicActor()},
                 new NewTestContainer(){ Name="FWT2-16384-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(16384){ DataCollectLength = 4}, 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
+                    Actor = new BasicActor()},
                 new NewTestContainer(){ Name="FWT2-32768-4-Recent-M5-1Month", Sensor = new RateFWT2Sensor(32768){ DataCollectLength = 4}, 
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
 
@@ -891,195 +900,73 @@ namespace MyProject01.Controller
 
                 new NewTestContainer(){ Name="FWT2-1024-4-Recent-M30-1Month", Sensor = new RateFWT2Sensor(1024){ DataCollectLength = 4}, 
                     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
+*/
 
-
-                new NewTestContainer(){ Name="Haar-64-4-Recent-M30-1Month", 
+                // Haar
+                //------------------------
+                new NewTestContainer(){ Name="Haar-64-4", 
                     Sensor = new RateWaveletSensor(64, new HaarWavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
-                },
-                new NewTestContainer(){ Name="Daubechies8-64-4-Recent-M30-1Month", 
-                    Sensor = new RateWaveletSensor(64, new Daubechies8Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
-                },
-
-                new NewTestContainer(){ Name="Daubechies4-64-4-Recent-M30-1Month", 
-                    Sensor = new RateWaveletSensor(64, new Daubechies4Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
-                },
-
-                new NewTestContainer(){ Name="Legendre6-64-4-Recent-M30-1Month", 
-                    Sensor = new RateWaveletSensor(64, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
-                },
-
-                new NewTestContainer(){ Name="Daubechies4-1024-4-Recent-M30-1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Daubechies4Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
-                },
-
-                new NewTestContainer(){ Name="Legendre6-1024-4-Recent-M30-1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month() 
-                },
-                new NewTestContainer(){ Name="Legendre6-1024-4-Recent-M30-2Year", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year() 
+                    Actor = new BasicActor()
                 },
 
 
-                new NewTestContainer(){ Name="Haar-1024-4-Recent-M5-1Month", 
+                new NewTestContainer(){ Name="Haar-1024-4", 
                     Sensor = new RateWaveletSensor(1024, new HaarWavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
-                },
-                new NewTestContainer(){ Name="Daubechies8-1024-4-Recent-M5-1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Daubechies8Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                    Actor = new BasicActor()
                 },
 
-                new NewTestContainer(){ Name="Daubechies4-1024-4-Recent-M5-1Month", 
+                // Daubechies
+                //------------------------
+                new NewTestContainer(){ Name="Daubechies4-64-4", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies4Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies4-1024-4", 
                     Sensor = new RateWaveletSensor(1024, new Daubechies4Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies8-64-4", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies8Wavelet(),4), 
+                    Actor = new BasicActor()
                 },
 
-                new NewTestContainer(){ Name="Legendre6-1024-4-Recent-M5-1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+
+                // Legendre
+                //------------------------
+                new NewTestContainer(){ Name="Legendre6-64-4", 
+                    Sensor = new RateWaveletSensor(64, new Legendre6Wavelet(),4), 
+                    Actor = new BasicActor()
                 },
-                new NewTestContainer(){ Name="Legendre6-1024-4-Recent-M30-10Year", 
+                new NewTestContainer(){ Name="Legendre6-1024-4", 
                     Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_10Year() 
+                    Actor = new BasicActor()
                 },
 
-                new NewTestContainer(){ Name="Legendre6-1024-4-Current_M30_1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_1Month() 
-                },
-                new NewTestContainer(){ Name="Legendre6-1024-4-Current_M30_3Month", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_3Month() 
-                },
-                new NewTestContainer(){ Name="Legendre6-1024-4-Current_M1_1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month() 
-                },
-
-                new NewTestContainer(){ Name="Legendre6-8192-4-Current_M1_1Month", 
+                new NewTestContainer(){ Name="Legendre6-8192-4", 
                     Sensor = new RateWaveletSensor(8192, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month() 
+                    Actor = new BasicActor()
                 },
-                new NewTestContainer(){ Name="Legendre6-32768-4-Current_M1_1Month", 
+                new NewTestContainer(){ Name="Legendre6-32768-4", 
                     Sensor = new RateWaveletSensor(32768, new Legendre6Wavelet(),4), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month() 
-                },
-
-                new NewTestContainer(){ Name="Legendre6-1024-16-Recent-M5-1Month", 
-                    Sensor = new RateWaveletSensor(1024, new Legendre6Wavelet(),16), 
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month() 
+                    Actor = new BasicActor()
                 },
 
 
-
-                new NewTestContainer(){ Name="CrossTest2-16,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(16, new int[] {9}, new CrossPartten02()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-                new NewTestContainer(){ Name="CrossTest2-16,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(16, new int[] {9, 89}, new CrossPartten02()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
 //--------------------------
-// CrossTest3-4,2,9
+// CrossTest5
 //------------------------
-
-                new NewTestContainer(){ Name="CrossTest3-4,2,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2,9}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-                new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-                new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M30_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year()},
-                new NewTestContainer(){ Name="CrossTest3-4,2,9-Recent_M30_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2,9}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year()},
-
-               new NewTestContainer(){ Name="CrossTest3-4,2,9,31,95,287-Recent_M30_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year()},
-               new NewTestContainer(){ Name="CrossTest3-4,2,9,31,95,287-Recent_M5_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_2Year()},
-
-//--------------------------
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9-Recent_M30_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year()},
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287-Recent_M30_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_2Year()},
-               new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287-Recent_M5_2Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_2Year()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9-Recent_M30_10Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_10Year()},
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Recent_M30_10Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9, 31}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_10Year()},
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287-Recent_M30_10Year", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_10Year()},
-
-                   new NewTestContainer(){ Name="CrossTest5-4,2,9-Current_M30_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_3Month()},
-                   new NewTestContainer(){ Name="CrossTest5-4,2,9-Current_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_1Month()},
-                   new NewTestContainer(){ Name="CrossTest5-4,2,9-Current_M1_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Current_M30_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_3Month()},
-
-                new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Current_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM30_1Month()},
-                 new NewTestContainer(){ Name="CrossTest5-4,2,9,31-Current_M1_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetCurrentM1_1Month()},
-                
-
-//--------------------------
-
-                new NewTestContainer(){ Name="CrossTest3-4,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten03()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest3-4,9-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten03()),
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-                new NewTestContainer(){ Name="CrossTest3-4,9,89-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten03()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-//--------------------------
-
-
-
-//--------------------------
-
-                new NewTestContainer(){ Name="CrossTest-4,59-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {59}, new CrossPartten01()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest-4,9,89-Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten01()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-                new NewTestContainer(){ Name="CrossTest-4,9,89-Recent_M30_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 89}, new CrossPartten01()),     
-                    Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-
-                new NewTestContainer(){ Name="CrossTest5Line_Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 299}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-                new NewTestContainer(){ Name="CrossTest5Line_Recent_M5_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9, 299}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_3Month()},
-
-                new NewTestContainer(){ Name="CrossTest_Recent_M5_1Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecentM5_1Month()},
-                new NewTestContainer(){ Name="CrossTest_Recent_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_1Month()},
-                new NewTestContainer(){ Name="CrossTest_Recent_M30_3Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetRecnetM30_3Month()},
-
-                
-                new NewTestContainer(){ Name="CrossTest_M5_Year",   Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM5_1Year()},
-                new NewTestContainer(){ Name="CrossTest_M30_Month", Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneMonth()},
-                new NewTestContainer(){ Name="CrossTest_M30_Year",  Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.GetM30OneYear()},
-                new NewTestContainer(){ Name="CrossTest_D1_Year",   Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {9}, new CrossPartten01()),     Actor = new BasicActor(),   Loader=NewTestDataPacket.Get1DayOneYear()},
+                new NewTestContainer(){ Name="CrossTest5-4,2,9", 
+                    Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="CrossTest5-4,2,9,31", 
+                    Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287", 
+                    Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
+                    Actor = new BasicActor()
+                },
 
             };
         }
