@@ -9,9 +9,11 @@ namespace MyProject01.DAO
 {
     public class DataBaseAddress
     {
-        // static public string ConnectionString = @"mongodb://192.168.1.15";
+#if true
+        static public string ConnectionString = @"mongodb://192.168.1.15";
+#else
         static public string ConnectionString = @"mongodb://127.0.0.1";
-
+#endif
         static public void SetIP(string ip)
         {
             ConnectionString = @"mongodb://" + ip;
@@ -19,7 +21,8 @@ namespace MyProject01.DAO
     }
     class MarketRateDatabaseConnector
     {
-        public static string DatabaseName = "MarketRateDB_160310";
+        public static string DatabaseName = "MarketRateDB_160312";
+        // public static string DatabaseName = "MarketRateDB_160322";
         public static string ConnectionString = DataBaseAddress.ConnectionString;
         // public static string ConnectionString = @"mongodb://127.0.0.1";
 

@@ -106,6 +106,12 @@ namespace MyProject01
                     {
                         MainWindow mainWin = new MainWindow(obj);
                         mainWin.Title = DateTime.Now.ToString() + ": " + displayName;
+                        mainWin.Closed += new EventHandler(
+                                delegate(object sender2, EventArgs args)
+                                {
+                                    Application.Current.Shutdown();
+                                }
+                            );
                         mainWin.Show();
                     });
                 border.Child = testButton;
