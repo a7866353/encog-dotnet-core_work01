@@ -11,6 +11,11 @@ namespace MyProject01.DAO
     {
         // static public string ConnectionString = @"mongodb://192.168.1.15";
         static public string ConnectionString = @"mongodb://127.0.0.1";
+
+        static public void SetIP(string ip)
+        {
+            ConnectionString = @"mongodb://" + ip;
+        }
     }
     class MarketRateDatabaseConnector
     {

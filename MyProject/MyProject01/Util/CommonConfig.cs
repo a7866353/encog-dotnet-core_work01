@@ -460,6 +460,28 @@ namespace MyProject01.Util
         }
     }
 
+    class ServerIPParam
+    {
+        public string IP;
+        public bool IsDefault = false;
+    }
+    class ServerIPParamList
+    {
+        static public ServerIPParam[] IPs
+        {
+            get
+            {
+                return new ServerIPParam[]
+                {
+                    new ServerIPParam(){ IP = "127.0.0.1", IsDefault = true},
+                    new ServerIPParam(){ IP = "192.168.1.11", IsDefault = false},
+                    new ServerIPParam(){ IP = "192.168.1.15", IsDefault = false},
+
+                };
+            }
+        }
+    }
+
     class CommonConfig
     {
         // public static string ServerIP = "127.0.0.1";

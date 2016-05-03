@@ -123,6 +123,7 @@ namespace MyProject01
 
             // ServerIP
             //------------------------
+#if false
             TextBox ipTb = new TextBox();
             ipTb.Text = CommonConfig.ServerIP;
             ipTb.TextChanged += new TextChangedEventHandler(
@@ -132,6 +133,27 @@ namespace MyProject01
                     }
                 );
             AddParamConfigUI("Server IP Address", ipTb);
+#endif
+            StackPanel ipPanel = new StackPanel();
+            foreach(ServerIPParam param in ServerIPParamList.IPs)
+            {
+                RadioButton rb = new RadioButton();
+                rb.GroupName = "IPParam";
+                rb.Content = param.IP;
+                rb.Checked += new RoutedEventHandler(
+                        delegate(object sender, RoutedEventArgs args)
+                        {
+                            CommonConfig.ServerIP = param.IP;
+                            DataBaseAddress.SetIP(CommonConfig.ServerIP);
+                        }
+                    );
+                ipPanel.Children.Add(rb);
+                
+                if (param.IsDefault == true)
+                    rb.IsChecked = true;
+            }
+            AddParamConfigUI("Server IP Address", ipPanel);
+
 
             // PopulationSize
             //---------------------------
