@@ -218,6 +218,9 @@
     <Compile Include="TestCaseWindow.xaml.cs">
       <DependentUpon>TestCaseWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Win\ControllerCheckWin.xaml.cs">
+      <DependentUpon>ControllerCheckWin.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Win\DataBaseViewer.xaml.cs">
       <DependentUpon>DataBaseViewer.xaml</DependentUpon>
     </Compile>
@@ -238,6 +241,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TestCaseWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Win\ControllerCheckWin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
