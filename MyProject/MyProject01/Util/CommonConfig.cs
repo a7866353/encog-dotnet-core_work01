@@ -72,7 +72,7 @@ namespace MyProject01.Util
                 EndDate = endDate,
                 PreCount = 50000,
                 NeedTimeFrameConver = true,
-                IsDefault = true
+                IsDefault = false
             });
 
             endDate = DateTime.Now;
@@ -380,7 +380,7 @@ namespace MyProject01.Util
                 EndDate = endDate,
                 PreCount = 50000,
                 NeedTimeFrameConver = false,
-                IsDefault = false
+                IsDefault = true
             });
 
             startDate = endDate.AddYears(-2);
@@ -473,9 +473,9 @@ namespace MyProject01.Util
             {
                 return new ServerIPParam[]
                 {
-                    new ServerIPParam(){ IP = "127.0.0.1", IsDefault = true},
+                    new ServerIPParam(){ IP = "127.0.0.1", IsDefault = false},
                     new ServerIPParam(){ IP = "192.168.1.11", IsDefault = false},
-                    new ServerIPParam(){ IP = "192.168.1.15", IsDefault = false},
+                    new ServerIPParam(){ IP = "192.168.1.15", IsDefault = true},
 
                 };
             }
@@ -488,6 +488,8 @@ namespace MyProject01.Util
         public static string ServerIP = "192.168.1.15";
         public static int PopulationSize = 2048;
         public static DataLoaderParam LoaderParam = null;
+        public static double BuyOffset = 0.01;
+        public static double SellOffset = 0.01;
     }
 
 

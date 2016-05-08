@@ -117,6 +117,13 @@ namespace MyProject01.Util
                 Set(secData[i]);
             }
         }
+        public void Set(double[] dataArr)
+        {
+            for (int i = 0; i < dataArr.Length; i++)
+            {
+                Set(dataArr[i]);
+            }
+        }
 
         public void SetTarget(double middleValue, double margin, double limit)
         {

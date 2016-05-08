@@ -406,8 +406,8 @@ namespace MyProject01.Controller
             _trainDataLength = (int)(totalDataLength * _testRate);
             _testDataLength = totalDataLength - _trainDataLength;
 
-            _testCtrl.Normilize(0, 0.1);
-
+            // _testCtrl.Normilize(0, 0.1);
+            _testCtrl.Normilize2(0, 0.1);
 
             BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO
@@ -445,7 +445,8 @@ namespace MyProject01.Controller
 
                 TestDescription = TestCaseName + "|" +
                     CommonConfig.LoaderParam.ToString() + "|" +
-                    "P=" + CommonConfig.PopulationSize,
+                    "P=" + CommonConfig.PopulationSize + "|" +
+                    "Offset=" + CommonConfig.BuyOffset + "," + CommonConfig.SellOffset,
 
                 Controller = testCtrl,
                 TrainDataLength = _trainDataLength,
@@ -925,12 +926,32 @@ namespace MyProject01.Controller
                     Sensor = new RateWaveletSensor(1024, new Daubechies4Wavelet(),4), 
                     Actor = new BasicActor()
                 },
+
                 new NewTestContainer(){ Name="Daubechies8-64-4", 
                     Sensor = new RateWaveletSensor(64, new Daubechies8Wavelet(),4), 
                     Actor = new BasicActor()
                 },
+                new NewTestContainer(){ Name="Daubechies8-1024-4", 
+                    Sensor = new RateWaveletSensor(1024, new Daubechies8Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
 
-
+                new NewTestContainer(){ Name="Daubechies20-64-4", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies20Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies20-1024-4", 
+                    Sensor = new RateWaveletSensor(1024, new Daubechies20Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies20-8192-4", 
+                    Sensor = new RateWaveletSensor(8192, new Daubechies20Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies20-32768-4", 
+                    Sensor = new RateWaveletSensor(32768, new Daubechies20Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
                 // Legendre
                 //------------------------
                 new NewTestContainer(){ Name="Legendre6-64-4", 
@@ -965,6 +986,17 @@ namespace MyProject01.Controller
                 },
                 new NewTestContainer(){ Name="CrossTest5-4,2,9,31,95,287", 
                     Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
+                    Actor = new BasicActor()
+                },
+//--------------------------
+// CrossTest5
+//------------------------
+                new NewTestContainer(){ Name="Yield-Daubechies4-1024-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new RateSensor(1024+1)), new Daubechies4Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="AVE-Yield-Daubechies4-1024-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(1024+1+2), 3)), new Daubechies4Wavelet(),4), 
                     Actor = new BasicActor()
                 },
 

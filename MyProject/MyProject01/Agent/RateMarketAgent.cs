@@ -86,8 +86,8 @@ namespace MyProject01.Agent
         public double BuyOffset = 0.0;
         public double SellOffset = 0.0;
 #else
-        public double BuyOffset = 0.02;
-        public double SellOffset = 0.01;
+        public double BuyOffset = 0.025;
+        public double SellOffset = 0.025;
 
 #endif
         private double _money;
@@ -384,7 +384,7 @@ namespace MyProject01.Agent
         {
             _ctrl = ctrl;
             _stateData = new RateMarketAgentData();
-            _order = new Order(InitMoney);
+            _order = new Order(InitMoney) { BuyOffset = CommonConfig.BuyOffset, SellOffset = CommonConfig.SellOffset };
             _tradeLog = new TradeAnalzeLog();
             _endPosition = _ctrl.TotalLength;
 

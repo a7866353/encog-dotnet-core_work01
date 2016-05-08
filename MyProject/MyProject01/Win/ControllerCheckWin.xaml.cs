@@ -41,7 +41,7 @@ namespace MyProject01.Win
         private void Debug()
         {
             ControllerNameTextBox.Text = "Controller2016/5/7 13:19:59";
-            StartDateTextBox.Text = "2015/10/1";
+            StartDateTextBox.Text = "2016/1/1";
             EndDateTextBox.Text = "2016/4/1";
             TimeFrameTextBox.Text = "30";
         }

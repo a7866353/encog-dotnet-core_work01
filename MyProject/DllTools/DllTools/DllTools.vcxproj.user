@@ -16,7 +16,7 @@
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommand>$(SolutionDir)\MyProject\MyProject01\bin\x64\Debug\MyProject01.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(SolutionDir)\MyProject\MyProject01\bin\Release\MyProject01.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
   </PropertyGroup>

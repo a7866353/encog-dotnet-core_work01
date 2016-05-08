@@ -345,6 +345,43 @@ namespace MyProject01.Controller
             }
 
         }
+        public void Normilize2(double middleValue, double limit)
+        {
+            NormalizeAnalyzer norm = new NormalizeAnalyzer();
+            norm.SetTarget(middleValue, limit, limit*2);
+            DataBlock buffer = new DataBlock(NetworkInputVectorLength);
+
+            int startPos = Math.Max(_sensor.SkipCount, StartPosition);
+
+            _sensor.Copy(startPos, buffer, 0);
+            norm.Init(buffer[0]);
+
+            for (int i = startPos + 1; i < TotalLength; i++)
+            {
+                _sensor.Copy(i, buffer, 0);
+                norm.Set(buffer.Data);
+            }
+
+            _normalizerArray = new Normalizer[buffer.Length];
+            for (int i = 0; i < _normalizerArray.Length; i++)
+                _normalizerArray[i] = norm.Normalizer;
+
+
+            // Create cache data
+            _inDataCache = new DataBlock[TotalLength];
+            for (int i = startPos; i < TotalLength; i++)
+            {
+                buffer = new DataBlock(NetworkInputVectorLength);
+                _sensor.Copy(i, buffer, 0);
+                for (int j = 0; j < buffer.Length; j++)
+                {
+                    buffer[j] = _normalizerArray[j].Convert(buffer[j]);
+                }
+
+                _inDataCache[i] = buffer;
+            }
+
+        }
 
         public int GetIndexByTime(DateTime time)
         {

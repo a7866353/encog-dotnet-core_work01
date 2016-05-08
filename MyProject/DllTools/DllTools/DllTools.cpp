@@ -117,7 +117,7 @@ EXTERN_C
 		double *temp = (double *)malloc(param.inputLength*sizeof(double));
 		while (1)
 		{
-			if (level == 1)
+			if (level < param.filterLength)
 				break;
 			DWT1D(in, out, temp, param.h, param.g, level, param.filterLength);
 

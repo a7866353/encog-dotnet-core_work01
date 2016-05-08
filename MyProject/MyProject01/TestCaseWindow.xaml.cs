@@ -81,6 +81,12 @@ namespace MyProject01
         public TestCaseWindow()
         {
             InitializeComponent();
+            this.Loaded += TestCaseWindow_Loaded;
+
+        }
+
+        void TestCaseWindow_Loaded(object sender0, RoutedEventArgs e0)
+        {
 
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
             System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.Idle;
@@ -90,7 +96,7 @@ namespace MyProject01
             AddTestCase();
             int i = 0;
 
-            foreach( TestCaseObject obj in TestCaseList)
+            foreach (TestCaseObject obj in TestCaseList)
             {
                 string displayName = "[" + i.ToString("D2") + "]" + obj.Name + ": " + obj.Description;
                 i++;
@@ -103,23 +109,22 @@ namespace MyProject01
                 testButton.Content = displayName;
                 testButton.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
                 testButton.Click += new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
-                    {
-                        MainWindow mainWin = new MainWindow(obj);
-                        mainWin.Title = DateTime.Now.ToString() + ": " + displayName;
-                        mainWin.Closed += new EventHandler(
-                                delegate(object sender2, EventArgs args)
-                                {
-                                    Application.Current.Shutdown();
-                                }
-                            );
-                        mainWin.Show();
-                    });
+                {
+                    MainWindow mainWin = new MainWindow(obj);
+                    mainWin.Title = DateTime.Now.ToString() + ": " + displayName;
+                    mainWin.Closed += new EventHandler(
+                            delegate(object sender2, EventArgs args)
+                            {
+                                Application.Current.Shutdown();
+                            }
+                        );
+                    mainWin.Show();
+                });
                 border.Child = testButton;
                 MainStackPanel.Children.Add(border);
             }
 
             InitParamConfig();
-
         }
         private void InitParamConfig()
         {
@@ -195,6 +200,36 @@ namespace MyProject01
                     loaderParamRb.IsChecked = true;
             }
             AddParamConfigUI("Rate Data Loader", loaderPanel);
+
+            // BuyOffset
+            //---------------------------
+            TextBox buyOffsetTb = new TextBox();
+            buyOffsetTb.Text = CommonConfig.BuyOffset.ToString();
+            buyOffsetTb.TextChanged += new TextChangedEventHandler(
+                    delegate(object sender, TextChangedEventArgs args)
+                    {
+                        double result;
+                        if (double.TryParse(buyOffsetTb.Text, out result) == false)
+                            return;
+                        CommonConfig.BuyOffset = result;
+                    }
+                );
+            AddParamConfigUI("BuyOffset", buyOffsetTb);
+
+            // SellOffset
+            //---------------------------
+            TextBox sellOffsetTb = new TextBox();
+            sellOffsetTb.Text = CommonConfig.SellOffset.ToString();
+            sellOffsetTb.TextChanged += new TextChangedEventHandler(
+                    delegate(object sender, TextChangedEventArgs args)
+                    {
+                        double result;
+                        if (double.TryParse(sellOffsetTb.Text, out result) == false)
+                            return;
+                        CommonConfig.SellOffset = result;
+                    }
+                );
+            AddParamConfigUI("SellOffset", sellOffsetTb);
 
         }
         private void AddParamConfigUI(string name, UIElement ui)
@@ -743,6 +778,7 @@ namespace MyProject01
             // New test case
             AddNewTestCase(newTestList);
 
+            /*
             AddFwtNormM5RecentCrossTestCase(newTestList);
             AddKdjNormM5CrossTestCase(newTestList);
             AddKdjM5CrossTestCase(newTestList);
@@ -752,6 +788,7 @@ namespace MyProject01
             AddRecentM5StepCrossTestCase(newTestList);
             AddRecentM5CrossTestCase(newTestList);
             AddRecentCrossTestCase(newTestList);
+            */
             // AddCrossTestCase(newTestList);
             /*
             newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
@@ -768,6 +805,7 @@ namespace MyProject01
             newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 100 });
             newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 1000 });
             */
+
             TestCaseList.Add(newTestList);
 
             // TestCaseList.Add(oldTestList);
