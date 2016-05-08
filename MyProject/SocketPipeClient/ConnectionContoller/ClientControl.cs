@@ -43,6 +43,11 @@ namespace SocketTestClient.ConnectionContoller
             _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M5, "Controller2016/4/6 19:07:07", 9, _sender)); // 115
             _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/11 23:14:08", 10, _sender)); // 115
             _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/4/11 23:13:46", 11, _sender)); // 115
+            // CrossTest5-4,2,9_2016/5/2 23:26:37 129.413418773733  CrossTest5-4,2,9|USDJPY_1_M30_Len=3M_2016/2/2-2016/5/2_Cov=True|P=2048  
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_1", MyProject01.Util.DataTimeType.M30, "Controller2016/5/3 1:23:51", 12, _sender)); // 
+
+            // CrossTest5-4,2,9_2016/5/2 23:26:49 96.5798881926043 CrossTest5-4,2,9|USDJPY_30_M30_Len=3M_2016/2/2-2016/5/2_Cov=False|P=2048
+            _tradeOrderList.Add(new NewTradeOrder("USDJPY_30", MyProject01.Util.DataTimeType.M30, "Controller2016/5/3 1:57:45", 13, _sender, false)); // 
 
 
             // rateDataCtrl.AddSymbol();

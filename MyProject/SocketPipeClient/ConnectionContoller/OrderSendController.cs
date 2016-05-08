@@ -148,13 +148,15 @@ namespace SocketTestClient.ConnectionContoller
         private IController _ctrl;
         private DataTimeType _timeFrame;
         private DateTime _lastItemTime;
-        public NewTradeOrder(string rateDataControllerName, DataTimeType timeFrame, string networkControllerName, int magicNumber, ISender sender)
+        private bool _isTimeFrameConvert;
+        public NewTradeOrder(string rateDataControllerName, DataTimeType timeFrame, string networkControllerName, int magicNumber, ISender sender, bool IsCov = true)
             : base(rateDataControllerName, networkControllerName, magicNumber, sender)
         {
             ControllerDAOV2 dao = ControllerDAOV2.GetDAOByName(networkControllerName);
             _ctrl = dao.GetController();
             _timeFrame = timeFrame;
             _lastItemTime = DateTime.Now.AddMinutes(-2 * (int)_timeFrame);
+            _isTimeFrameConvert = IsCov;
         }
         protected override MarketActions GetNextCommand(RateDataControlDAO dataController, DateTime itemTime)
         {
@@ -162,7 +164,7 @@ namespace SocketTestClient.ConnectionContoller
             BasicTestDataLoader loader =
                 new TestDataDateRangeLoader(dataController.CollectiongName, _timeFrame, lastTradeTime.AddMinutes(-1 * dataController.TimeFrame * 1000), lastTradeTime, 2000)
                 {
-                    NeedTimeFrameConver = true,
+                    NeedTimeFrameConver = _isTimeFrameConvert,
                 };
             loader.Load();
 
