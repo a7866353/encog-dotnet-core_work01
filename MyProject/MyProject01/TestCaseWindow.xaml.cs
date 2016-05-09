@@ -32,6 +32,7 @@ using MyProject01.Util.DllTools;
 using MyProject01.Controller;
 using MyProject01.TestCases.RateMarketTestCases;
 using System.Threading;
+using MyProject01.DataSources;
 
 namespace MyProject01
 {
@@ -484,8 +485,44 @@ namespace MyProject01
                 win.Show();
             }));
         }
- 
 
+        private void TestDataAnalyzer()
+        {
+            this.Dispatcher.BeginInvoke(new Func(delegate()
+            {
+                BasicTestDataLoader _loader = NewTestDataPacket.GetRecnetM30_3Month();
+                _loader.Load();
+                DataSourceCtrl dsc = new DataSources.DataSourceCtrl(_loader);
+                ISensor Sensor = new RateWaveletSensor(64, new Daubechies20Wavelet(), 4);
+                Sensor.DataSourceCtrl = dsc;
+
+                DataAnalyzer[] anzArr = new DataAnalyzer[Sensor.DataBlockLength];
+                for (int i = 0; i < anzArr.Length;i++ )
+                {
+                    anzArr[i] = new DataAnalyzer();
+                    anzArr[i].Init(2048);
+                }
+                DataBlock db = new DataBlock(Sensor.DataBlockLength);
+                for(int i=50000;i<Sensor.TotalLength;i++)
+                {
+                    Sensor.Copy(i, db, 0);
+                    for (int j = 0; j < db.Length;j++ )
+                        anzArr[j].AddData(db.Data[j]);
+                }
+
+                foreach (DataAnalyzer anz in anzArr)
+                {
+                    DataAnalyzerDesc[] descArr = anz.GetResult();
+                    LogFile.WriteLine("DataAnalyzer[]");
+                    LogFile.WriteLine("========================");
+                    foreach (DataAnalyzerDesc desc in descArr)
+                    {
+                        LogFile.WriteLine(desc.ToString());
+                    }
+                }
+
+            }));
+        }
 
         private void AddNewTestCase(TestCaseGroup group)
         {
@@ -499,8 +536,8 @@ namespace MyProject01
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
             newTestList.Add(new TestCaseObject("ControllerViewer", "", new TestCaseObject.TestFucntion(ControllerViewer)));
+            newTestList.Add(new TestCaseObject("TestDataAnalyzer", "", new TestCaseObject.TestFucntion(TestDataAnalyzer)));
 
-            newTestList.Add(new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)));
             // New test case
             AddNewTestCase(newTestList);
             TestCaseList.Add(newTestList);
