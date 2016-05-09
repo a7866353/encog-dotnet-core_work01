@@ -365,111 +365,6 @@ namespace MyProject01
 
         }
 
-        private void TestBPTrain()
-        {
-            NetworkTestParameter parm = new NetworkTestParameter("QLearn", 0.5, 10, 10);
-            parm.InputSize = 30;
-            parm.OutputSize = 3;
-            FeedForwardNet net = new FeedForwardNet();
-            BasicNetwork network = net.GetNet(parm);
-            BackpropagationTraining method = new BackpropagationTraining();
-            method.ErrorChangeLimit = 0.0000001;
-            method.ErrorChangeTryMaxCount = 10;
-            IMLDataSet trainingSet = RandomTrainingFactory.Generate(1000, 1500,
-                                         parm.InputSize, parm.OutputSize, -1, 1);
-
-            LogFile.WriteLine(@"Beginning training...");
-            method.TrainNetwork(network, trainingSet);
-            LogFile.WriteLine(@"Neural Network Results:");
-
-        }
-        private void TestRateMarketNEAT()
-        {
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = GetTestName();
-            test.TestDataRate = 0.8;
-            test.PopulationNum = 1000;
-            test.DataBlockLength = 2880;
-            test.RunTest();
-        }
-
-        private void TestRateMarketNEAT_Short()
-        {
-            string prefix = "Short_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.5;
-            test.PopulationNum = 500;
-            test.DataBlockLength = 12*4;
-            test.DataSoreceType = 1;
-            test.RateDataControllerName = "test01";
-            test.RunTest();
-        }
-        private void TestRateMarketNEAT_Long()
-        {
-            string prefix = "Long_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.9;
-            test.PopulationNum = 500;
-            test.DataBlockLength = 300;
-            test.DataSoreceType = 1;
-            test.RunTest();
-        }
-        private void Test_1Min_Long()
-        {
-            string prefix = "1Min_Long_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.5;
-            test.PopulationNum = 1000;
-            test.DataBlockLength = 60 * 24;
-            test.RateDataControllerName = "test02";
-            test.DataSoreceType = 1;
-            test.RunTest();
-        }
-        private void Test_1Min_Short()
-        {
-            string prefix = "1Min_Short_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.5;
-            test.PopulationNum = 1000;
-            test.DataBlockLength = 60 * 3;
-            test.RateDataControllerName = "test02";
-            test.DataSoreceType = 1;
-            test.RunTest();
-        }
-        private void Test_5Min_Short()
-        {
-            string prefix = "5Min_Short_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.5;
-            test.PopulationNum = 1000;
-            test.DataBlockLength = 12 * 3;
-            test.RateDataControllerName = "test01";
-            test.DataSoreceType = 1;
-            test.RunTest();
-        }
-        private void Long5Min_Simple()
-        {
-            string prefix = "Long5Min_Simple_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.7;
-            test.PopulationNum = 500;
-            test.DataBlockLength = 12 * 2;
-            test.RateDataControllerName = "test01";
-            test.DataSoreceType = 0;
-            test.RunTest();
-        }
-        private void TestRateMarketNEATBatch()
-        {
-            RateMarketNEATBatchTest test = new RateMarketNEATBatchTest();
-            test.TestName = GetTestName();
-            test.RunTest();
-        }
 
         private void TestDAO()
         {
@@ -545,32 +440,7 @@ namespace MyProject01
 
 
         }
-        private void FWT_5min_Simple()
-        {
-            string prefix = "FWT_5min_Simple_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.4;
-            test.PopulationNum = 100;
-            test.DataBlockLength = 32;
-            test.RateDataControllerName = "test03";
-            test.DataSoreceType = 0;
-            test.IsFWT = true;
-            test.RunTest();
-        }
-        private void FWT_5min_Long()
-        {
-            string prefix = "FWT_5min_Long_";
-            RateMarketNEATTest test = new RateMarketNEATTest();
-            test.TestName = prefix + GetTestName();
-            test.TestDataRate = 0.4;
-            test.PopulationNum = 100;
-            test.DataBlockLength = 2048;
-            test.RateDataControllerName = "test01";
-            test.DataSoreceType = 0;
-            test.IsFWT = true;
-            test.RunTest();
-        }
+      
         private void FWT_Cuda_Test()
         {
             // double[] input = new double[] {9, 7, 3, 5};
@@ -614,161 +484,17 @@ namespace MyProject01
                 win.Show();
             }));
         }
-
-        private void AddCrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[]{16, 32, 64, 1024, 2048, 4096};
-            DataTimeType[] timeFrameArr = new DataTimeType[] { DataTimeType.M1, DataTimeType.M5, DataTimeType.M10, DataTimeType.M30, DataTimeType.H1, DataTimeType.H2,  DataTimeType.D1 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                foreach(DataTimeType timeFrame in timeFrameArr)
-                {
-                    RawRateTestCase rawCase = new RawRateTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength, TimeFrame = timeFrame,};
-                    FwtNormTestCase fwtCase = new FwtNormTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength, TimeFrame = timeFrame, };
-                    group.Add(rawCase);
-                    group.Add(fwtCase);
-                }
-            }
-        }
-        private void AddRecentCrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[]{16, 32, 64, 1024, 2048, 4096};
-            foreach (int blockLength in dataBlockLength)
-            {
-                FwtReduceLossRecentM5TestCase fwtCase = new FwtReduceLossRecentM5TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            } 
-            
-            foreach (int blockLength in dataBlockLength)
-            {
-                FwtNormRecentM30TestCase fwtCase = new FwtNormRecentM30TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
+ 
 
 
-        }
-
-        private void AddRecentM5CrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                BasicRateMarketTestCase fwtCase = new FwtNormRecentM5TestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }
-        private void AddRecentM5StepCrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                FwtReduceLossRecentM5StepTestCase fwtCase = new FwtReduceLossRecentM5StepTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }
-        private void AddKdjM5CrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                KDJTestCase fwtCase = new KDJTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }
-        private void AddKdjNormM5CrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 128, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                KDJNormTestCase fwtCase = new KDJNormTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }
-        private void AddRateNormM5CrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 128, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                RawRateM5ShortTestCase fwtCase = new RawRateM5ShortTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }
-        private void AddFwtNormM5CrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 128, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                FwtNormM5ShortTestCase fwtCase = new FwtNormM5ShortTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }   
-        private void AddFwtNormM5RecentCrossTestCase(TestCaseGroup group)
-        {
-            int populatim = 512;
-            int[] dataBlockLength = new int[] { 16, 32, 64, 128, 1024, 2048, 4096 };
-            foreach (int blockLength in dataBlockLength)
-            {
-                KDJNormRecentTestCase fwtCase = new KDJNormRecentTestCase() { PopulationNumber = populatim, DataBlockLength = blockLength };
-                group.Add(fwtCase);
-            }
-        }   
         private void AddNewTestCase(TestCaseGroup group)
         {
             BasicNewTestCase[] testCaseArr = NewTestCollecor.GetTest();
-            foreach( BasicNewTestCase ca in testCaseArr)
+            foreach (BasicNewTestCase ca in testCaseArr)
                 group.Add(ca);
-
-            TestCaseGroup g = new TestCaseGroup
-            {
-                //------------------------------------
-                new NewTestCase2Short(),
-                // new NewTestCase(),
-                new NewTestCase2(),
-                new NewTestCase_FWT(),
-                new NewTestCase_All(),
-                new NewTestCase_All_5Min_Short(),
-                new NewTestCase_All_Switch_5Min_Short(),
-                new NewTestCase_All_Switch_1Day_Short(),
-                new NewTestCase_All_SwitchClose_5Min_Short(),
-                new NewTestCase_All_1Day_Short(),
-                new NewTestCase_All_1Day_Long(),
-
-            };
-
-            group.Add(g);
         }
         private void AddTestCase()
         {
-            TestCaseGroup oldTestList = new TestCaseGroup()
-            {
-                new TestCaseObject("FWT_Cuda_Test", "", new TestCaseObject.TestFucntion(FWT_Cuda_Test)),
-                new TestCaseObject("FWT_5min_Long", "", new TestCaseObject.TestFucntion(FWT_5min_Long)),
-                new TestCaseObject("FWT_5min_Simple", "", new TestCaseObject.TestFucntion(FWT_5min_Simple)),
-                new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)),
-                new TestCaseObject("Long5Min_Simple", "", new TestCaseObject.TestFucntion(Long5Min_Simple)),
-                new TestCaseObject("Test_5Min_Short", "", new TestCaseObject.TestFucntion(Test_5Min_Short)),
-                new TestCaseObject("Test_1Min_Short", "", new TestCaseObject.TestFucntion(Test_1Min_Short)),
-                new TestCaseObject("Test_1Min_Long", "", new TestCaseObject.TestFucntion(Test_1Min_Long)),
-                new TestCaseObject("TestRateMarketNEAT_Long", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Long)),
-                new TestCaseObject("TestRateMarketNEAT_Short", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT_Short)),
-                new TestCaseObject("TestRateMarketNEAT", "", new TestCaseObject.TestFucntion(TestRateMarketNEAT)),
-                // new TestCaseObject("TestDAO", "", new TestCaseObject.TestFucntion(TestDAO)),
-                // new TestCaseObject("TestRateMarketNEATBatch", "", new TestCaseObject.TestFucntion(TestRateMarketNEATBatch)),
-                // new TestCaseObject("TestRateMarketAgent", "", new TestCaseObject.TestFucntion(TestRateMarketAgent)),
-                // new TestCaseObject("TestAnn", "", new TestCaseObject.TestFucntion(TestANN)),
-                // new TestCaseObject("TestMarketAnalyz", "", new TestCaseObject.TestFucntion(TestMarketAnalyz)),
-                // new TestCaseObject("RateAnalyzeTest", "", new TestCaseObject.TestFucntion(RateAnalyzeTest)),
-                // new TestCaseObject("TestNEATNet", "", new TestCaseObject.TestFucntion(TestNEATNet)),
-                // new TestCaseObject("TestBPTrain", "", new TestCaseObject.TestFucntion(TestBPTrain)),
-            };
 
             TestCaseGroup newTestList = new TestCaseGroup();
             newTestList.Add(new TestCaseObject("TestDataBaseViewer", "", new TestCaseObject.TestFucntion(TestDataBaseViewer)));
@@ -777,38 +503,7 @@ namespace MyProject01
             newTestList.Add(new TestCaseObject("TestFWT", "", new TestCaseObject.TestFucntion(TestFWT)));
             // New test case
             AddNewTestCase(newTestList);
-
-            /*
-            AddFwtNormM5RecentCrossTestCase(newTestList);
-            AddKdjNormM5CrossTestCase(newTestList);
-            AddKdjM5CrossTestCase(newTestList);
-            AddRateNormM5CrossTestCase(newTestList);
-            AddFwtNormM5CrossTestCase(newTestList);
-
-            AddRecentM5StepCrossTestCase(newTestList);
-            AddRecentM5CrossTestCase(newTestList);
-            AddRecentCrossTestCase(newTestList);
-            */
-            // AddCrossTestCase(newTestList);
-            /*
-            newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
-            newTestList.Add(new FwtNorm5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });
-            newTestList.Add(new FwtNorm1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
-            newTestList.Add(new FwtNorm1Day3StateTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
-            newTestList.Add(new FwtNorm1Day3StateTestCase() { PopulationNumber = 100, DataBlockLength = 64 });
-            newTestList.Add(new FwtNorm1Day3StateTestCase() { PopulationNumber = 100, DataBlockLength = 128 });
-            newTestList.Add(new RawRate1DayTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
-            newTestList.Add(new RawRate5MinTestCase() { PopulationNumber = 100, DataBlockLength = 32 });
-            newTestList.Add(new RawRate5MinTestCase() { PopulationNumber = 100, DataBlockLength = 1024 });
-            newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 100 });
-            newTestList.Add(new NormalRateMarketTestCase() { PopulationNumber = 1000 });
-            newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 100 });
-            newTestList.Add(new Normal5MinRateMarketTestCase() { PopulationNumber = 1000 });
-            */
-
             TestCaseList.Add(newTestList);
-
-            // TestCaseList.Add(oldTestList);
              
         }
     }
