@@ -86,6 +86,15 @@ namespace MyProject01.Controller
             // loader.Load();
             return loader;
         }
+        static public BasicTestDataLoader GetRecnetM30_1Month_NonCov()
+        {
+            DateTime StartDateTime = new DateTime(2016, 2, 13);
+            DateTime EndDateTime = new DateTime(2016, 3, 13);
+            BasicTestDataLoader loader =
+                new TestDataDateRangeLoader("USDJPY_30", DataTimeType.M30, StartDateTime, EndDateTime, 50000) { NeedTimeFrameConver = false };
+            // loader.Load();
+            return loader;
+        }
         static public BasicTestDataLoader GetRecnetM30_3Month()
         {
             DateTime StartDateTime = new DateTime(2015, 12, 13);
@@ -406,8 +415,8 @@ namespace MyProject01.Controller
             _trainDataLength = (int)(totalDataLength * _testRate);
             _testDataLength = totalDataLength - _trainDataLength;
 
-            // _testCtrl.Normilize(0, 0.1);
-            _testCtrl.Normilize2(0, 0.1);
+            _testCtrl.Normilize(0, 0.5);
+            // _testCtrl.Normilize2(0, 0.1);
 
             BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO
