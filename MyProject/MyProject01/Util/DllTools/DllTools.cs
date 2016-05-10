@@ -89,8 +89,8 @@ namespace MyProject01.Util.DllTools
                 {
                     return new double[] 
                     { 
-                        1, 
-                        1, 
+                        1.0/Math.Sqrt(2), 
+                        1.0/Math.Sqrt(2), 
                      };
                 }
             }
@@ -101,8 +101,8 @@ namespace MyProject01.Util.DllTools
                 {
                     return new double[] 
                     { 
-                        -1, 
-                        1, 
+                        -1.0/Math.Sqrt(2), 
+                        1.0/Math.Sqrt(2), 
                      };
                 }
             }

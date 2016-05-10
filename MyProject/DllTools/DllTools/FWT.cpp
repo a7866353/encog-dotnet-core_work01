@@ -18,6 +18,7 @@ EXTERN_C
 	*
 	*  2010-08-18
 	******************************************************************/
+#if 0
 	void Covlution(double data[], double core[], double cov[], int n, int m)
 	{
 		int i = 0;
@@ -25,7 +26,7 @@ EXTERN_C
 		int k = 0;
 
 		//将cov[]清零  
-		for (i = 0; i < n; i++)
+		for (i = 0; i < n + m - 1; i++)
 		{
 			cov[i] = 0;
 		}
@@ -38,7 +39,7 @@ EXTERN_C
 			{
 				cov[i] += data[k - (m / 2 - j)] * core[k];//k针对core[k]  
 			}
-#if 0
+#if 1
 			for (k = n - m / 2 + j; k < n; k++)
 			{
 				cov[i] += data[k] * core[k - (n - m / 2 + j)];//k针对data[k]  
@@ -63,7 +64,7 @@ EXTERN_C
 			{
 				cov[i] += data[k] * core[m - j - k];//k针对data[k]  
 			}
-#if 0
+#if 1
 			for (k = 0; k < m - j; k++)
 			{
 				cov[i] += core[k] * data[n - (m - j) + k];//k针对core[k]  
@@ -72,6 +73,37 @@ EXTERN_C
 		}
 
 	}
+#else
+	void Covlution(double data[], double core[], double cov[], int n, int m)
+	{
+		int i = 0;
+		int j = 0;
+		int k = 0;
+		double tmp;
+
+		int len = n + m - 1;
+		//将cov[]清零  
+		for (i = 0; i < len; i++)
+		{
+			cov[i] = 0;
+		}
+
+		for (i = 0; i < len; i++)
+		{
+			tmp = 0;
+			for (j = max(0, i + 1 - m); j <= min(i, n - 1); j++)
+			{
+				tmp += core[i-j] * data[j];
+			}
+
+			cov[i] = tmp;
+		}
+
+		
+	}
+
+#endif
+
 
 	/******************************************************************
 	*　一维小波变换函数

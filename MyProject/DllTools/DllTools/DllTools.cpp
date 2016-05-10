@@ -114,7 +114,8 @@ EXTERN_C
 		int level = param.inputLength;
 		double *in = param.input;
 		double *out = param.output;
-		double *temp = (double *)malloc(param.inputLength*sizeof(double));
+		// double *temp = (double *)malloc((param.inputLength)*sizeof(double));
+		double *temp = (double *)malloc((param.inputLength + param.filterLength - 1)*sizeof(double));
 		while (1)
 		{
 			if (level < param.filterLength)

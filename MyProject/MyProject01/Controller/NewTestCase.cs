@@ -961,6 +961,25 @@ namespace MyProject01.Controller
                     Sensor = new RateWaveletSensor(32768, new Daubechies20Wavelet(),4), 
                     Actor = new BasicActor()
                 },
+
+
+                new NewTestContainer(){ Name="Daubechies20-64-10", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies20Wavelet(),10), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies20-1024-10", 
+                    Sensor = new RateWaveletSensor(1024, new Daubechies20Wavelet(),10), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies20-8192-10", 
+                    Sensor = new RateWaveletSensor(8192, new Daubechies20Wavelet(),10), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="Daubechies20-32768-10", 
+                    Sensor = new RateWaveletSensor(32768, new Daubechies20Wavelet(),10), 
+                    Actor = new BasicActor()
+                },                
+                
                 // Legendre
                 //------------------------
                 new NewTestContainer(){ Name="Legendre6-64-4", 
