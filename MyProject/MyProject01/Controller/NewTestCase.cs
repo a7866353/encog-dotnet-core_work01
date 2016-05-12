@@ -415,8 +415,10 @@ namespace MyProject01.Controller
             _trainDataLength = (int)(totalDataLength * _testRate);
             _testDataLength = totalDataLength - _trainDataLength;
 
-            _testCtrl.Normilize(0, 0.5);
+            // _testCtrl.Normilize(0, 0.1);
+            // _testCtrl.Normilize(0, 0.1);
             // _testCtrl.Normilize2(0, 0.1);
+            _testCtrl.Normilize3();
 
             BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO

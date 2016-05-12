@@ -165,12 +165,12 @@ namespace MyProject01.Controller
 
         public void Normilize(double middleValue, double limit)
         {
-            FwtDataNormalizer norm = new FwtDataNormalizer();
+            ArrayDataNormalizeAnalyzer norm = new ArrayDataNormalizeAnalyzer(new NormalizeAnalyzer(middleValue, limit / 2, limit));
             DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
 
             _sensor.Copy(SkipCount, buffer, 0);
-            norm.Init(buffer.Data, middleValue, limit);
+            norm.Init(buffer.Data);
 
             for (int i = SkipCount+1; i < TotalLength;i++ )
             {
@@ -313,13 +313,13 @@ namespace MyProject01.Controller
 
         public void Normilize(double middleValue, double limit)
         {
-            FwtDataNormalizer norm = new FwtDataNormalizer();
+            ArrayDataNormalizeAnalyzer norm = new ArrayDataNormalizeAnalyzer(new NormalizeAnalyzer(middleValue, limit / 2, limit));
             DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
             int startPos = Math.Max(_sensor.SkipCount, StartPosition);
 
             _sensor.Copy(startPos, buffer, 0);
-            norm.Init(buffer.Data, middleValue, limit);
+            norm.Init(buffer.Data);
 
             for (int i = startPos + 1; i < TotalLength; i++)
             {
@@ -347,8 +347,7 @@ namespace MyProject01.Controller
         }
         public void Normilize2(double middleValue, double limit)
         {
-            NormalizeAnalyzer norm = new NormalizeAnalyzer();
-            norm.SetTarget(middleValue, limit, limit*2);
+            NormalizeAnalyzer norm = new NormalizeAnalyzer(middleValue, limit, limit * 2);
             DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
             int startPos = Math.Max(_sensor.SkipCount, StartPosition);
@@ -382,7 +381,40 @@ namespace MyProject01.Controller
             }
 
         }
+        public void Normilize3()
+        {
+            ArrayDataNormalizeAnalyzer norm = new ArrayDataNormalizeAnalyzer(new ZeroScoreNormalizeAnalyzer(0.01));
+            DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
+            int startPos = Math.Max(_sensor.SkipCount, StartPosition);
+
+            _sensor.Copy(startPos, buffer, 0);
+            norm.Init(buffer.Data);
+
+            for (int i = startPos + 1; i < TotalLength; i++)
+            {
+                _sensor.Copy(i, buffer, 0);
+                norm.Set(buffer.Data);
+            }
+
+            _normalizerArray = norm.NromalizerArray;
+
+
+            // Create cache data
+            _inDataCache = new DataBlock[TotalLength];
+            for (int i = startPos; i < TotalLength; i++)
+            {
+                buffer = new DataBlock(NetworkInputVectorLength);
+                _sensor.Copy(i, buffer, 0);
+                for (int j = 0; j < buffer.Length; j++)
+                {
+                    buffer[j] = _normalizerArray[j].Convert(buffer[j]);
+                }
+
+                _inDataCache[i] = buffer;
+            }
+
+        }
         public int GetIndexByTime(DateTime time)
         {
             return _dataSourceCtrl.GetIndexByTime(time);
