@@ -258,13 +258,19 @@ namespace MyProject01.Util
 
         virtual public double Convert(double value)
         {
-            return (value + Offset) * Scale;
+            double res = (value + Offset) * Scale;
+            if (double.IsNaN(res) == true)
+                return 0;
+            else
+                return res;
         }
 
         public void Convert(DataSection dataSec)
         {
             for (int i = 0; i < dataSec.Length; i++)
+            {
                 dataSec[i] = Convert(dataSec[i]);
+            }
         }
 
         public override string ToString()

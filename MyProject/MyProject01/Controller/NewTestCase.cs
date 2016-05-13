@@ -416,7 +416,6 @@ namespace MyProject01.Controller
             _testDataLength = totalDataLength - _trainDataLength;
 
             // _testCtrl.Normilize(0, 0.1);
-            // _testCtrl.Normilize(0, 0.1);
             // _testCtrl.Normilize2(0, 0.1);
             _testCtrl.Normilize3();
 
@@ -1027,6 +1026,10 @@ namespace MyProject01.Controller
                 },
                 new NewTestContainer(){ Name="AVE-Yield-Daubechies4-1024-4", 
                     Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(1024+1+2), 3)), new Daubechies4Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
+                new NewTestContainer(){ Name="AVE-Yield-Daubechies20-8192-10", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(8192+1+2), 3)), new Daubechies20Wavelet(),10), 
                     Actor = new BasicActor()
                 },
 

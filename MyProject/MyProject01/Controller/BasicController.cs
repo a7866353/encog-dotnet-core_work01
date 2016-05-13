@@ -383,7 +383,7 @@ namespace MyProject01.Controller
         }
         public void Normilize3()
         {
-            ArrayDataNormalizeAnalyzer norm = new ArrayDataNormalizeAnalyzer(new ZeroScoreNormalizeAnalyzer(0.01));
+            ArrayDataNormalizeAnalyzer norm = new ArrayDataNormalizeAnalyzer(new ZeroScoreNormalizeAnalyzer(1));
             DataBlock buffer = new DataBlock(NetworkInputVectorLength);
 
             int startPos = Math.Max(_sensor.SkipCount, StartPosition);
