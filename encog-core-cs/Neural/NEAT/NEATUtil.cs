@@ -133,7 +133,7 @@ namespace Encog.Neural.NEAT
             result.ChampMutation = weightMutation;
             result.AddOperation(0.5, new NEATCrossover());
             result.AddOperation(0.494, weightMutation);
-            result.AddOperation(0.005, new NEATMutateAddNode());
+            result.AddOperation(0.0005, new NEATMutateAddNode());
             result.AddOperation(0.005, new NEATMutateAddLink());
             result.AddOperation(0.0005, new NEATMutateRemoveLink());
             result.Operators.FinalizeStructure();

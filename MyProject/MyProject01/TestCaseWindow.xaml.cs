@@ -182,26 +182,6 @@ namespace MyProject01
                 );
             AddParamConfigUI("Populaton Size", popSizeTb);
 
-            // LoaderParam
-            //------------------------
-            StackPanel loaderPanel = new StackPanel();
-            foreach(DataLoaderParam parm in DataLoaderParamList.GetParams())
-            {
-                RadioButton loaderParamRb = new RadioButton();
-                loaderParamRb.GroupName = "LoaderParam";
-                loaderParamRb.Content = parm.ToString();
-                loaderParamRb.Checked += new RoutedEventHandler(
-                        delegate(object sender, RoutedEventArgs args)
-                        {
-                            CommonConfig.LoaderParam = parm;
-                        }
-                    );
-                loaderPanel.Children.Add(loaderParamRb);
-                if (parm.IsDefault == true)
-                    loaderParamRb.IsChecked = true;
-            }
-            AddParamConfigUI("Rate Data Loader", loaderPanel);
-
             // BuyOffset
             //---------------------------
             TextBox buyOffsetTb = new TextBox();
@@ -232,7 +212,31 @@ namespace MyProject01
                 );
             AddParamConfigUI("SellOffset", sellOffsetTb);
 
+            AddTrainingDataBlockLengthParam();
+            AddTrainingTryCountParam();
+
+            // LoaderParam
+            //------------------------
+            StackPanel loaderPanel = new StackPanel();
+            foreach (DataLoaderParam parm in DataLoaderParamList.GetParams())
+            {
+                RadioButton loaderParamRb = new RadioButton();
+                loaderParamRb.GroupName = "LoaderParam";
+                loaderParamRb.Content = parm.ToString();
+                loaderParamRb.Checked += new RoutedEventHandler(
+                        delegate(object sender, RoutedEventArgs args)
+                        {
+                            CommonConfig.LoaderParam = parm;
+                        }
+                    );
+                loaderPanel.Children.Add(loaderParamRb);
+                if (parm.IsDefault == true)
+                    loaderParamRb.IsChecked = true;
+            }
+            AddParamConfigUI("Rate Data Loader", loaderPanel);
+
         }
+
         private void AddParamConfigUI(string name, UIElement ui)
         {
             StackPanel panel = this.ParamConfigStackPanel;
@@ -240,6 +244,36 @@ namespace MyProject01
             if (ui != null)
                 panel.Children.Add(ui);
             panel.Children.Add(new Rectangle() { Height = 2, HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, Fill = Brushes.Black });
+        }
+        private void AddTrainingDataBlockLengthParam()
+        {
+            TextBox tb = new TextBox();
+            tb.Text = CommonConfig.TrainingDataBlockLength.ToString();
+            tb.TextChanged += new TextChangedEventHandler(
+                    delegate(object sender, TextChangedEventArgs args)
+                    {
+                        int result;
+                        if (int.TryParse(tb.Text, out result) == false)
+                            return;
+                        CommonConfig.TrainingDataBlockLength = result;
+                    }
+                );
+            AddParamConfigUI("TrainingDataBlockLength", tb);
+        }
+        private void AddTrainingTryCountParam()
+        {
+            TextBox tb = new TextBox();
+            tb.Text = CommonConfig.TrainingTryCount.ToString();
+            tb.TextChanged += new TextChangedEventHandler(
+                    delegate(object sender, TextChangedEventArgs args)
+                    {
+                        int result;
+                        if (int.TryParse(tb.Text, out result) == false)
+                            return;
+                        CommonConfig.TrainingTryCount = result;
+                    }
+                );
+            AddParamConfigUI("TrainingTryCount", tb);
         }
 
         void TestCaseWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -16,11 +16,12 @@ namespace MyProject01.Controller.Jobs
 
         private int _currentStartPos;
 
-        public TrainDataChangeJob(NewNormalScore score, int startPos, int len, int stepOffset)
+        public TrainDataChangeJob(NewNormalScore score, int startPos, int len, int stepOffset, int trainCount)
         {
             _score = score;
             _startPosition = startPos;
             _stepOffset = stepOffset;
+            _trainCount = trainCount;
 
             _currentStartPos = _startPosition;
             _maxPos = Math.Max(_startPosition + len - score.TrainDataLength, _startPosition);

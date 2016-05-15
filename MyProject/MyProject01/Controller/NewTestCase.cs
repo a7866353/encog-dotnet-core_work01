@@ -396,7 +396,8 @@ namespace MyProject01.Controller
 
         private double _testRate = 0.7;
         private int _startPosition = 50000;
-        private int _trainBlockLength = 4096;
+        private int _trainBlockLength = 32;
+        private int _trainTryCount = 2;
 
         private int _trainDataLength;
         private int _testDataLength;
@@ -404,6 +405,9 @@ namespace MyProject01.Controller
         {
             // Config Server IP
             DataBaseAddress.SetIP(CommonConfig.ServerIP);
+
+            _trainBlockLength = CommonConfig.TrainingDataBlockLength;
+            _trainTryCount = CommonConfig.TrainingTryCount;
 
             _loader = GetDataLoader();
             _loader.Load();
@@ -456,7 +460,9 @@ namespace MyProject01.Controller
                 TestDescription = TestCaseName + "|" +
                     CommonConfig.LoaderParam.ToString() + "|" +
                     "P=" + CommonConfig.PopulationSize + "|" +
-                    "Offset=" + CommonConfig.BuyOffset + "," + CommonConfig.SellOffset,
+                    "Offset=" + CommonConfig.BuyOffset + "," + CommonConfig.SellOffset + "|" +
+                    "TrnBlk=" + _trainBlockLength + "," + "TrnCnt=" + _trainTryCount
+                    ,
 
                 Controller = testCtrl,
                 TrainDataLength = _trainDataLength,
@@ -465,7 +471,7 @@ namespace MyProject01.Controller
             });
 
             // mainCheckCtrl.Add(subCheckCtrl);
-            mainCheckCtrl.Add(new TrainDataChangeJob(_score, _startPosition, _trainDataLength, _trainBlockLength / 4));
+            mainCheckCtrl.Add(new TrainDataChangeJob(_score, _startPosition, _trainDataLength, _trainBlockLength / 4, _trainTryCount));
             return mainCheckCtrl;
 
         }
@@ -1017,9 +1023,27 @@ namespace MyProject01.Controller
                     Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
                     Actor = new BasicActor()
                 },
+
+                new NewTestContainer(){ Name="CrossTest5-Switch-4,2,9", 
+                    Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9}, new CrossPartten05()),
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="CrossTest5-Switch-4,2,9,31", 
+                    Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 9 ,31}, new CrossPartten05()),
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="CrossTest5-Switch-4,2,9,31,95,287", 
+                    Sensor = SensorUtility.GetKDJCrossSensor(4, new int[] {2, 6, 9, 31, 95, 287}, new CrossPartten05()),
+                    Actor = new StateSwitchActor()
+                },
+
 //--------------------------
-// CrossTest5
+// Yield
 //------------------------
+                new NewTestContainer(){ Name="AVE-Yield-Daubechies4-64-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(64+1+2), 3)), new Daubechies4Wavelet(),4), 
+                    Actor = new BasicActor()
+                },
                 new NewTestContainer(){ Name="Yield-Daubechies4-1024-4", 
                     Sensor = new WaveletSensor(new SensorYieldRate(new RateSensor(1024+1)), new Daubechies4Wavelet(),4), 
                     Actor = new BasicActor()
@@ -1032,6 +1056,31 @@ namespace MyProject01.Controller
                     Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(8192+1+2), 3)), new Daubechies20Wavelet(),10), 
                     Actor = new BasicActor()
                 },
+//--------------------------
+// Switch
+//------------------------
+                new NewTestContainer(){ Name="Switch-Daubechies4-64-4", 
+                    Sensor = new RateWaveletSensor(64, new Daubechies4Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="Switch-Daubechies20-8192-4", 
+                    Sensor = new RateWaveletSensor(8192, new Daubechies20Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="Switch-Daubechies20-32768-10", 
+                    Sensor = new RateWaveletSensor(32768, new Daubechies20Wavelet(),10), 
+                    Actor = new StateSwitchActor()
+                }, 
+                new NewTestContainer(){ Name="Switch-Yield-Daubechies4-64-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new RateSensor(64+1)), new Daubechies4Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
+
+                new NewTestContainer(){ Name="Switch-AVE-Yield-Daubechies4-64-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(64+1+2), 3)), new Daubechies4Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
+
 
             };
         }
