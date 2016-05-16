@@ -1080,6 +1080,26 @@ namespace MyProject01.Controller
                     Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(64+1+2), 3)), new Daubechies4Wavelet(),4), 
                     Actor = new StateSwitchActor()
                 },
+                new NewTestContainer(){ Name="Switch-AVE-Yield-Daubechies20-32768-10", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(32768+1+2), 3)), new Daubechies20Wavelet(),10), 
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="Switch-AVE9-Yield-Daubechies20-32768-10", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(32768+1+8), 9)), new Daubechies20Wavelet(),10), 
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="Switch-AVE12-Yield-Daubechies20-32768-10", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(32768+1+11), 12)), new Daubechies20Wavelet(),10), 
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="Switch-AVE9-Yield-Daubechies4-64-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(64+1+8), 9)), new Daubechies4Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
+                new NewTestContainer(){ Name="Switch-AVE12-Yield-Daubechies4-64-4", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(64+1+11), 12)), new Daubechies4Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
 
 
             };
