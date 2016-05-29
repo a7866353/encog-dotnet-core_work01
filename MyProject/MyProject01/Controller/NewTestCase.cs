@@ -421,7 +421,8 @@ namespace MyProject01.Controller
 
             // _testCtrl.Normilize(0, 0.1);
             // _testCtrl.Normilize2(0, 0.1);
-            _testCtrl.Normilize3();
+            // _testCtrl.Normilize3();
+            _testCtrl.Normilize4();
 
             BasicControllerWithCache trainCtrl = (BasicControllerWithCache)_testCtrl.Clone();
             trainCtrl.DataSourceCtrl = new DataSources.DataSourceCtrl(_loader); // TODO
@@ -1084,6 +1085,10 @@ namespace MyProject01.Controller
                     Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(32768+1+2), 3)), new Daubechies20Wavelet(),10), 
                     Actor = new StateSwitchActor()
                 },
+                new NewTestContainer(){ Name="Switch-AVE6-Yield-Daubechies20-32768-10", 
+                    Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(32768+1+5), 6)), new Daubechies20Wavelet(),10), 
+                    Actor = new StateSwitchActor()
+                },
                 new NewTestContainer(){ Name="Switch-AVE9-Yield-Daubechies20-32768-10", 
                     Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(32768+1+8), 9)), new Daubechies20Wavelet(),10), 
                     Actor = new StateSwitchActor()
@@ -1098,6 +1103,14 @@ namespace MyProject01.Controller
                 },
                 new NewTestContainer(){ Name="Switch-AVE12-Yield-Daubechies4-64-4", 
                     Sensor = new WaveletSensor(new SensorYieldRate(new SensorAveFilter(new RateSensor(64+1+11), 12)), new Daubechies4Wavelet(),4), 
+                    Actor = new StateSwitchActor()
+                },
+//--------------------------
+// Switch
+//------------------------
+
+                new NewTestContainer(){ Name="Switch-AVE9-Daubechies4-64-4", 
+                    Sensor = new WaveletSensor(new SensorAveFilter(new RateSensor(64+8), 9), new Daubechies4Wavelet(),4), 
                     Actor = new StateSwitchActor()
                 },
 

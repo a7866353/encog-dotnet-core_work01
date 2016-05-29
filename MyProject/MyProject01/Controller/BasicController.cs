@@ -415,6 +415,21 @@ namespace MyProject01.Controller
             }
 
         }
+        public void Normilize4()
+        {
+            DataBlock buffer = new DataBlock(NetworkInputVectorLength);
+
+            int startPos = Math.Max(_sensor.SkipCount, StartPosition);
+            // Create cache data
+            _inDataCache = new DataBlock[TotalLength];
+            for (int i = startPos; i < TotalLength; i++)
+            {
+                buffer = new DataBlock(NetworkInputVectorLength);
+                _sensor.Copy(i, buffer, 0);
+                 _inDataCache[i] = buffer;
+            }
+
+        }
         public int GetIndexByTime(DateTime time)
         {
             return _dataSourceCtrl.GetIndexByTime(time);
